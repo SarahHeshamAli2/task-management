@@ -30,7 +30,8 @@
   --color-ocean: #e8edff;
 
   --color-secondary: #434654;
-
+  --color-input-error: #93000a;
+  --color-input-error-light: #ffdad6;
   /* Typography */
   --font-sans: var(--font-inter);
 }
