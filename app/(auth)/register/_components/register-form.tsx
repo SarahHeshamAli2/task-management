@@ -8,14 +8,32 @@ import FormFooter from "../../_components/form-footer";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { RegisterFormValues, registerSchema } from "@/lib/schemes/auth.schema";
 import { useForm, useWatch } from "react-hook-form";
+import { registerAction } from "@/lib/actions/auth.actions";
+import { useState } from "react";
+import SubmissionError from "@/shared/components/submission-error";
 
 export default function RegisterForm() {
   const { register, handleSubmit, formState, control } =
     useForm<RegisterFormValues>({
       resolver: zodResolver(registerSchema),
     });
-  const onSubmit = (data: RegisterFormValues) => {
-    console.log(data);
+
+  const [errorMsg, setErrorMsg] = useState<string>("");
+
+  const onSubmit = async (fields: RegisterFormValues) => {
+    const submittedData = {
+      password: fields.password,
+      email: fields.email,
+      data: { name: fields.name, job_title: fields.job_title },
+    };
+    const response = await registerAction(submittedData);
+
+    if ("error_code" in response) {
+      setErrorMsg(response.msg);
+      return;
+    }
+
+    console.log(response, "success");
   };
   const passwordValue = useWatch({
     control,
@@ -24,7 +42,7 @@ export default function RegisterForm() {
   });
 
   return (
-    <div className="max-w-xl mx-auto bg-white mt-12 px-12 mb-28">
+    <div className="max-w-xl mx-auto bg-white mt-12 px-12 mb-28 rounded-lg">
       <SharedTitle
         title="Create your workspace"
         subtitle="Join the editorial approach to task management."
@@ -49,8 +67,8 @@ export default function RegisterForm() {
           optional
           label="job title"
           placeholder="e.g. Project Manager"
-          error={formState.errors.jobTitle?.message}
-          {...register("jobTitle")}
+          error={formState.errors.job_title?.message}
+          {...register("job_title")}
         />
         <div className="grid grid-cols-2 gap-4">
           <Input
@@ -63,13 +81,16 @@ export default function RegisterForm() {
           <Input
             label="Confirm Password"
             placeholder="Minimum 8 characters"
-            type="Repeat your password"
+            type="password"
             error={formState.errors.confirmPassword?.message}
             {...register("confirmPassword")}
           />
         </div>
         <ValidationChecker password={passwordValue ?? ""} />
-        <Button className="w-full mt-6">Create Account</Button>
+        {errorMsg && <SubmissionError error={errorMsg} />}
+        <Button disabled={formState.isSubmitting} className="w-full mt-6">
+          Create Account
+        </Button>
         <FormFooter
           className="py-12"
           title="Already have an account?"

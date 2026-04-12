@@ -32,7 +32,7 @@ export const registerSchema = z
 
     confirmPassword: z.string().min(1, "Please confirm your password"),
 
-    jobTitle: z
+    job_title: z
       .string()
       .max(100, "Job title must be at most 100 characters")
       .optional(),
@@ -43,3 +43,11 @@ export const registerSchema = z
   });
 
 export type RegisterFormValues = z.infer<typeof registerSchema>;
+export type SubmittedRegisterValues = {
+  password: string;
+  email: string;
+  data: {
+    job_title: string | undefined;
+    name: string;
+  };
+};
