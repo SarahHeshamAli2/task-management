@@ -32,8 +32,7 @@ export default function RegisterForm() {
       setErrorMsg(response.msg);
       return;
     }
-
-    console.log(response, "success");
+    setErrorMsg("");
   };
   const passwordValue = useWatch({
     control,

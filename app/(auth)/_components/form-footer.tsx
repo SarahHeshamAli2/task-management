@@ -12,7 +12,7 @@ export default function FormFooter({
   className?: string;
 }) {
   return (
-    <div className={`flex gap-1 items-center ${className}`}>
+    <div className={`flex gap-1 items-center justify-center ${className}`}>
       <p className="text-slate-container text-sm">{title}</p>
       <Link className="text-primary text-sm font-semibold" href={href}>
         {link}

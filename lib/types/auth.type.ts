@@ -41,3 +41,14 @@ export type RegisterResponse = {
   updated_at: string;
   is_anonymous: false;
 };
+
+export type LoginResponse = {
+  accessToken: string;
+  refresh_token: string;
+  user: {
+    email: string;
+    id: string;
+    role: string;
+    user_metadata: { department: string; name: string };
+  };
+};
