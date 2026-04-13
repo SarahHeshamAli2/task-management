@@ -33,7 +33,9 @@ export default function Input({
           >
             {label}
             {optional && (
-              <span className="text-placeholder ms-0.5">(Optional)</span>
+              <span className="text-placeholder ms-0.5 hidden md:block">
+                (Optional)
+              </span>
             )}
           </label>
 
@@ -70,7 +72,7 @@ export default function Input({
         )}
       </div>
       {hint && (
-        <span className="text-xs font-normal mt-1.5 text-slate-light">
+        <span className="text-xs font-normal mt-1.5 text-slate-light hidden md:block">
           {hint}
         </span>
       )}

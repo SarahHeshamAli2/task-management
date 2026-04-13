@@ -41,11 +41,22 @@ export default function RegisterForm() {
   });
 
   return (
-    <div className="max-w-xl mx-auto bg-white mt-12 px-12 mb-28 rounded-lg">
+    <div className="max-w-xl mx-auto bg-white mt-12 md:px-12 px-6 mb-28 rounded-lg">
       <SharedTitle
         title="Create your workspace"
-        subtitle="Join the editorial approach to task management."
-        className="text-center pt-12 pb-4"
+        subtitle={
+          <>
+            <span className="md:hidden">
+              Join the curated environment for institutional trust and task
+              precision.
+            </span>
+            <span className="hidden md:inline">
+              Join the editorial approach to task management.
+            </span>
+          </>
+        }
+        className="md:text-center pt-12 pb-4"
+        titleClassName="text-[1.75rem] md:text-3xl"
       />
       <form onSubmit={handleSubmit(onSubmit)}>
         <Input
@@ -69,7 +80,7 @@ export default function RegisterForm() {
           error={formState.errors.job_title?.message}
           {...register("job_title")}
         />
-        <div className="grid grid-cols-2 gap-4">
+        <div className="md:grid md:grid-cols-2 gap-4">
           <Input
             label="password"
             placeholder="Minimum 8 characters"
@@ -85,7 +96,10 @@ export default function RegisterForm() {
             {...register("confirmPassword")}
           />
         </div>
-        <ValidationChecker password={passwordValue ?? ""} />
+        <ValidationChecker
+          className="hidden md:block"
+          password={passwordValue ?? ""}
+        />
         {errorMsg && <SubmissionError error={errorMsg} />}
         <Button disabled={formState.isSubmitting} className="w-full mt-6">
           Create Account

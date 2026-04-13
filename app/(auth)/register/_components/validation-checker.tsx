@@ -27,9 +27,15 @@ const CheckIcon = () => (
     />
   </svg>
 );
-export function ValidationChecker({ password }: { password: string }) {
+export function ValidationChecker({
+  password,
+  className,
+}: {
+  password: string;
+  className?: string;
+}) {
   return (
-    <div className="rounded-lg bg-ocean mt-6 p-4">
+    <div className={`rounded-lg bg-ocean mt-6 p-4 ${className}`}>
       {rules.map(({ id, label, test }) => {
         const met = test(password);
         return (
