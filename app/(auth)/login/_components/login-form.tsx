@@ -12,6 +12,8 @@ import { useState } from "react";
 import SubmissionError from "@/shared/components/submission-error";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import MailIcon from "@/shared/icons/mail-icon";
+import LockIcon from "@/shared/icons/lock-icon";
 
 export default function LoginForm() {
   const { register, handleSubmit, formState } = useForm<LoginFormValues>({
@@ -45,6 +47,8 @@ export default function LoginForm() {
           label="email"
           placeholder="yourname@company.com"
           error={formState.errors.email?.message}
+          rightIcon={<MailIcon />}
+          iconClassName="lg:hidden"
           {...register("email")}
         />
 
@@ -52,6 +56,10 @@ export default function LoginForm() {
           label="password"
           placeholder="Enter your password"
           type="password"
+          link="forgot?"
+          href="/forgot-password"
+          rightIcon={<LockIcon />}
+          iconClassName="lg:hidden"
           error={formState.errors.password?.message}
           {...register("password")}
         />
@@ -75,7 +83,7 @@ export default function LoginForm() {
           </div>
 
           <Link
-            className="text-primary font-medium text-sm"
+            className="text-primary font-medium text-sm hidden md:block"
             href={"/forgot-password"}
           >
             Forgot Password?
@@ -84,7 +92,8 @@ export default function LoginForm() {
 
         {errorMsg && <SubmissionError error={errorMsg} />}
         <Button disabled={formState.isSubmitting} className="w-full">
-          Log in{" "}
+          <span className="sm:hidden">Sign in</span>{" "}
+          <span className="hidden sm:inline">Log in</span>
         </Button>
         <FormFooter
           className="py-12"
