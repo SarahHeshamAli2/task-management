@@ -5,22 +5,19 @@ import SharedTitle from "@/shared/components/shared-title";
 import Button from "@/shared/components/button";
 import FormFooter from "../../_components/form-footer";
 import { zodResolver } from "@hookform/resolvers/zod";
-import {
-  LoginFormValues,
-  loginSchema,
-  RegisterFormValues,
-  registerSchema,
-} from "@/lib/schemes/auth.schema";
+import { LoginFormValues, loginSchema } from "@/lib/schemes/auth.schema";
 import { useForm } from "react-hook-form";
-import { LoginAction, registerAction } from "@/lib/actions/auth.actions";
+import { LoginAction } from "@/lib/actions/auth.actions";
 import { useState } from "react";
 import SubmissionError from "@/shared/components/submission-error";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 
 export default function LoginForm() {
   const { register, handleSubmit, formState } = useForm<LoginFormValues>({
     resolver: zodResolver(loginSchema),
   });
+  const router = useRouter();
 
   const [errorMsg, setErrorMsg] = useState<string>("");
 
@@ -32,7 +29,7 @@ export default function LoginForm() {
       return;
     }
     setErrorMsg("");
-    console.log(response);
+    router.push("/dashboard");
   };
 
   return (
