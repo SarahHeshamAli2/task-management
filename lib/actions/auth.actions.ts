@@ -5,6 +5,7 @@ import {
   LoginFormValues,
   SubmittedRegisterValues,
 } from "../schemes/auth.schema";
+import { cookies } from "next/headers";
 
 export async function registerAction(
   data: SubmittedRegisterValues
@@ -34,6 +35,44 @@ export async function LoginAction(
       body: JSON.stringify(data),
     }
   );
+  const json = await response.json();
+  const cookieStore = await cookies();
 
-  return response.json();
+  //setting access token in httpOnly cookie
+  cookieStore.set("access_token", json.access_token, {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === "production",
+    sameSite: "lax",
+    path: "/",
+    maxAge: json.expires_in,
+  });
+
+  //setting refresh token in httpOnly cookie
+  cookieStore.set("refresh_token", json.refresh_token, {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === "production",
+    sameSite: "lax",
+    path: "/",
+    maxAge: 60 * 60 * 24 * 30,
+  });
+
+  //setting some user propreties in normal cookie
+
+  cookieStore.set(
+    "user",
+    JSON.stringify({
+      id: json.user.id,
+      name: json.user.user_metadata.name,
+      email: json.user.email,
+      department: json.user.user_metadata.department,
+      role: json.user.role,
+    }),
+    {
+      secure: process.env.NODE_ENV === "production",
+      sameSite: "lax",
+      path: "/",
+      maxAge: json.expires_in,
+    }
+  );
+  return json;
 }
