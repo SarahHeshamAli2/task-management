@@ -4,6 +4,7 @@ import { LoginResponse, RegisterResponse } from "@/lib/types/auth.type";
 import {
   ForgotPasswordFormValues,
   LoginFormValues,
+  ResetPasswordFormValues,
   SubmittedRegisterValues,
 } from "../schemes/auth.schema";
 import { cookies } from "next/headers";
@@ -22,7 +23,7 @@ export async function registerAction(
 
   return response.json();
 }
-export async function LoginAction(
+export async function loginAction(
   data: LoginFormValues
 ): Promise<ApiResponse<LoginResponse>> {
   const response = await fetch(
@@ -78,7 +79,7 @@ export async function LoginAction(
   return json;
 }
 
-export async function ForgotPasswordAction(
+export async function forgotPasswordAction(
   data: ForgotPasswordFormValues
 ): Promise<ApiResponse<RegisterResponse>> {
   const response = await fetch(`${process.env.API_URL}/auth/v1/recover`, {
@@ -86,6 +87,24 @@ export async function ForgotPasswordAction(
     headers: {
       "Content-Type": "application/json",
       apiKey: `${process.env.API_KEY}`,
+    },
+    body: JSON.stringify(data),
+  });
+
+  return response.json();
+}
+
+export async function resetPasswordAction(
+  data: ResetPasswordFormValues,
+  token: string | null
+): Promise<ApiResponse<RegisterResponse>> {
+  const response = await fetch(`${process.env.API_URL}/auth/v1/user`, {
+    method: "PUT",
+
+    headers: {
+      "Content-Type": "application/json",
+      apiKey: `${process.env.API_KEY}`,
+      Authorization: `Bearer ${token}`,
     },
     body: JSON.stringify(data),
   });

@@ -2,7 +2,7 @@
 
 import Input from "@/shared/components/shared-input";
 import SharedTitle from "@/shared/components/shared-title";
-import { ValidationChecker } from "./validation-checker";
+import { ValidationChecker } from "../../_components/validation-checker";
 import Button from "@/shared/components/button";
 import FormFooter from "../../_components/form-footer";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -11,6 +11,7 @@ import { useForm, useWatch } from "react-hook-form";
 import { registerAction } from "@/lib/actions/auth.actions";
 import { useState } from "react";
 import SubmissionError from "@/shared/components/submission-error";
+import { registerRules } from "@/lib/constants/auth.constants";
 
 export default function RegisterForm() {
   const { register, handleSubmit, formState, control } =
@@ -97,6 +98,7 @@ export default function RegisterForm() {
           />
         </div>
         <ValidationChecker
+          rules={registerRules}
           className="hidden md:block"
           password={passwordValue ?? ""}
         />

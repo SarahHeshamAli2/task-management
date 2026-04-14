@@ -9,7 +9,7 @@ import {
   forgotPasswordSchema,
 } from "@/lib/schemes/auth.schema";
 import { useForm } from "react-hook-form";
-import { ForgotPasswordAction } from "@/lib/actions/auth.actions";
+import { forgotPasswordAction } from "@/lib/actions/auth.actions";
 import { useState } from "react";
 import SubmissionError from "@/shared/components/submission-error";
 import Link from "next/link";
@@ -35,7 +35,7 @@ export default function ForgotPasswordForm() {
   const onSubmit = async (fields: ForgotPasswordFormValues) => {
     if (trialsExhausted) return;
 
-    const response = await ForgotPasswordAction(fields);
+    const response = await forgotPasswordAction(fields);
 
     if ("error_code" in response) {
       setErrorMsg(response.msg);
@@ -45,7 +45,6 @@ export default function ForgotPasswordForm() {
     sessionStorage.setItem("reset-link-sent", "true");
     setErrorMsg("");
     startTimer();
-    console.log(response);
   };
 
   return (

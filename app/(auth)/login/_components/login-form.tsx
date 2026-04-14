@@ -7,7 +7,7 @@ import FormFooter from "../../_components/form-footer";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { LoginFormValues, loginSchema } from "@/lib/schemes/auth.schema";
 import { useForm } from "react-hook-form";
-import { LoginAction } from "@/lib/actions/auth.actions";
+import { loginAction } from "@/lib/actions/auth.actions";
 import { useState } from "react";
 import SubmissionError from "@/shared/components/submission-error";
 import Link from "next/link";
@@ -24,7 +24,7 @@ export default function LoginForm() {
   const [errorMsg, setErrorMsg] = useState<string>("");
 
   const onSubmit = async (fields: LoginFormValues) => {
-    const response = await LoginAction(fields);
+    const response = await loginAction(fields);
 
     if ("error_code" in response) {
       setErrorMsg(response.msg);
