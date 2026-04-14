@@ -29,7 +29,7 @@ export default function Input({
       {label && (
         <div className="flex items-center justify-between mb-1.5">
           <label
-            className={`text-xs uppercase font-bold ${error ? "text-error" : "text-slate-container"}`}
+            className={`text-xs uppercase font-bold flex ${error ? "text-error" : "text-slate-container"}`}
           >
             {label}
             {optional && (

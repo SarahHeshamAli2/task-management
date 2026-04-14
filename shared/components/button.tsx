@@ -1,3 +1,6 @@
+import { clsx } from "clsx";
+import { twMerge } from "tailwind-merge";
+
 const variants = {
   primary: "text-white bg-[linear-gradient(135deg,#003D9B,#0052CC)]",
   secondary: "text-primary",
@@ -5,7 +8,7 @@ const variants = {
 };
 
 const sizes = {
-  sm: "h-8 px-3 text-sm",
+  sm: "h-8 px-3 text-xs",
   md: "h-12 px-4 text-sm",
   lg: "h-14 px-6 text-base",
 };
@@ -21,12 +24,12 @@ const base =
 export default function Button({
   variant = "primary",
   size = "md",
-  className = "",
+  className,
   ...props
 }: ButtonProps) {
   return (
     <button
-      className={`${base} ${variants[variant]} ${sizes[size]} ${className}`}
+      className={twMerge(clsx(base, variants[variant], sizes[size], className))}
       {...props}
     />
   );
