@@ -93,14 +93,30 @@ export default function ForgotPasswordForm() {
                   <p className="font-bold text-xs uppercase text-[#00523599]">
                     Didn&apos;t receive email?
                   </p>
-                  <Button
-                    variant="secondary"
-                    size="sm"
-                    className="uppercase text-primary text-xs flex items-center tracking-wider gap-1"
-                    disabled={!canResend || formState.isSubmitting}
-                  >
-                    Resend in <span>{formattedTime}</span>
-                  </Button>
+                  {trialsExhausted ? (
+                    <p className="text-center text-xs w-1/2 text-red-500 mt-3">
+                      Maximum attempts reached. Please try again later.
+                    </p>
+                  ) : canResend ? (
+                    <Button
+                      variant="secondary"
+                      size="sm"
+                      className="uppercase text-primary text-xs flex items-center tracking-wider gap-1"
+                      disabled={formState.isSubmitting}
+                      onClick={handleSubmit(onSubmit)}
+                    >
+                      Resend
+                    </Button>
+                  ) : (
+                    <Button
+                      variant="secondary"
+                      size="sm"
+                      className="uppercase text-primary text-xs flex items-center tracking-wider gap-1"
+                      disabled
+                    >
+                      Resend in {formattedTime}
+                    </Button>
+                  )}
                 </div>
               }
               title="If an account exists with this email, we’ve
