@@ -27,7 +27,7 @@ export default function Input({
   return (
     <div className="flex flex-col gap-1 mt-6">
       {label && (
-        <div className="flex items-center justify-between">
+        <div className="flex items-center justify-between mb-1.5">
           <label
             className={`text-xs uppercase font-bold ${error ? "text-error" : "text-slate-container"}`}
           >

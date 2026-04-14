@@ -2,6 +2,7 @@
 
 import { LoginResponse, RegisterResponse } from "@/lib/types/auth.type";
 import {
+  ForgotPasswordFormValues,
   LoginFormValues,
   SubmittedRegisterValues,
 } from "../schemes/auth.schema";
@@ -75,4 +76,19 @@ export async function LoginAction(
     }
   );
   return json;
+}
+
+export async function ForgotPasswordAction(
+  data: ForgotPasswordFormValues
+): Promise<ApiResponse<RegisterResponse>> {
+  const response = await fetch(`${process.env.API_URL}/auth/v1/recover`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      apiKey: `${process.env.API_KEY}`,
+    },
+    body: JSON.stringify(data),
+  });
+
+  return response.json();
 }

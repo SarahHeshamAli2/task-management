@@ -48,8 +48,13 @@ export const loginSchema = z.object({
     .string("please enter a valid password")
     .min(8, "please enter a valid password"),
 });
+
+export const forgotPasswordSchema = z.object({
+  email: z.email("please enter a valid email"),
+});
 export type RegisterFormValues = z.infer<typeof registerSchema>;
 export type LoginFormValues = z.infer<typeof loginSchema>;
+export type ForgotPasswordFormValues = z.infer<typeof forgotPasswordSchema>;
 export type SubmittedRegisterValues = {
   password: string;
   email: string;

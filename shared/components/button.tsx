@@ -1,11 +1,9 @@
 const variants = {
-  primary: "text-white",
-  secondary: " text-primary",
+  primary: "text-white bg-[linear-gradient(135deg,#003D9B,#0052CC)]",
+  secondary: "text-primary",
   ghost: "text-slate-container",
 };
-const gradients: Partial<Record<keyof typeof variants, React.CSSProperties>> = {
-  primary: { background: "linear-gradient(135deg, #003D9B, #0052CC)" },
-};
+
 const sizes = {
   sm: "h-8 px-3 text-sm",
   md: "h-12 px-4 text-sm",
@@ -29,7 +27,6 @@ export default function Button({
   return (
     <button
       className={`${base} ${variants[variant]} ${sizes[size]} ${className}`}
-      style={gradients[variant]}
       {...props}
     />
   );
