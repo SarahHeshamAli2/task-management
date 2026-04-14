@@ -42,7 +42,7 @@ export default function RegisterForm() {
   });
 
   return (
-    <div className="max-w-xl mx-auto bg-white mt-12 md:px-12 px-6 mb-28 rounded-lg">
+    <div className="max-w-xl mx-auto md:bg-white mt-12 md:px-12 px-6 mb-28 rounded-lg">
       <SharedTitle
         title="Create your workspace"
         subtitle={
@@ -61,6 +61,7 @@ export default function RegisterForm() {
       />
       <form onSubmit={handleSubmit(onSubmit)}>
         <Input
+          mobileLabel="full name"
           label="name"
           placeholder="Enter your full name"
           hint="3-50 characters, letters only."

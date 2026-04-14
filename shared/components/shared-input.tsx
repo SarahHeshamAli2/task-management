@@ -2,6 +2,7 @@ import Link from "next/link";
 
 type SharedInputProps = {
   label?: string;
+  mobileLabel?: string;
   error?: string;
   className?: string;
   hint?: string;
@@ -14,6 +15,7 @@ type SharedInputProps = {
 
 export default function Input({
   label,
+  mobileLabel,
   error,
   className = "",
   hint,
@@ -31,7 +33,10 @@ export default function Input({
           <label
             className={`text-xs uppercase font-bold flex ${error ? "text-error" : "text-slate-container"}`}
           >
-            {label}
+            {mobileLabel && <span className="md:hidden">{mobileLabel}</span>}
+            <span className={mobileLabel ? "hidden md:inline" : ""}>
+              {label}
+            </span>{" "}
             {optional && (
               <span className="text-placeholder ms-0.5 hidden md:block">
                 (Optional)
