@@ -36,10 +36,8 @@ export default function ResetPassowrdForm() {
   const [errorMsg, setErrorMsg] = useState<string>("");
   const [successMsg, setSuccessMsg] = useState<boolean>(false);
 
-  console.log(accessToken);
   const onSubmit = async (fields: ResetPasswordFormValues) => {
     const response = await resetPasswordAction(fields, accessToken);
-    console.log(response);
 
     if ("error_code" in response) {
       setErrorMsg(response.msg);

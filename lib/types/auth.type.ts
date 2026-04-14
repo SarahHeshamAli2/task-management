@@ -52,3 +52,5 @@ export type LoginResponse = {
     user_metadata: { department: string; name: string };
   };
 };
+
+export type ForgotPasswordResponse = Record<string, never>;

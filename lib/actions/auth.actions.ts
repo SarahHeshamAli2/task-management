@@ -1,6 +1,10 @@
 "use server";
 
-import { LoginResponse, RegisterResponse } from "@/lib/types/auth.type";
+import {
+  ForgotPasswordResponse,
+  LoginResponse,
+  RegisterResponse,
+} from "@/lib/types/auth.type";
 import {
   ForgotPasswordFormValues,
   LoginFormValues,
@@ -81,7 +85,7 @@ export async function loginAction(
 
 export async function forgotPasswordAction(
   data: ForgotPasswordFormValues
-): Promise<ApiResponse<RegisterResponse>> {
+): Promise<ApiResponse<ForgotPasswordResponse>> {
   const response = await fetch(`${process.env.API_URL}/auth/v1/recover`, {
     method: "POST",
     headers: {
