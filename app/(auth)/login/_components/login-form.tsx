@@ -14,6 +14,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import MailIcon from "@/shared/icons/mail-icon";
 import LockIcon from "@/shared/icons/lock-icon";
+import RightArrow from "@/shared/icons/right-arrow";
 
 export default function LoginForm() {
   const { register, handleSubmit, formState } = useForm<LoginFormValues>({
@@ -35,7 +36,7 @@ export default function LoginForm() {
   };
 
   return (
-    <div className="max-w-120 mx-auto bg-white mt-12 px-12 mb-28 rounded-lg">
+    <div className="max-w-120 mx-auto md:bg-white mt-12 px-12 mb-28 rounded-lg">
       <SharedTitle
         title="Welcome Back"
         subtitle="Please enter your details to access your workspace"
@@ -44,6 +45,7 @@ export default function LoginForm() {
       <form onSubmit={handleSubmit(onSubmit)}>
         <Input
           type="email"
+          mobileLabel="email address"
           label="email"
           placeholder="yourname@company.com"
           error={formState.errors.email?.message}
@@ -91,7 +93,12 @@ export default function LoginForm() {
         </div>
 
         {errorMsg && <SubmissionError error={errorMsg} />}
-        <Button disabled={formState.isSubmitting} className="w-full">
+        <Button
+          rightIcon={<RightArrow />}
+          iconClassName="sm:hidden"
+          disabled={formState.isSubmitting}
+          className="w-full gap-2"
+        >
           <span className="sm:hidden">Sign in</span>{" "}
           <span className="hidden sm:inline">Log in</span>
         </Button>

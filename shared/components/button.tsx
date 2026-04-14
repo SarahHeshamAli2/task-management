@@ -1,3 +1,4 @@
+import { cn } from "@/lib/utils/tailwind-merge";
 import { clsx } from "clsx";
 import { twMerge } from "tailwind-merge";
 
@@ -16,6 +17,8 @@ const sizes = {
 type ButtonProps = React.ButtonHTMLAttributes<HTMLButtonElement> & {
   variant?: keyof typeof variants;
   size?: keyof typeof sizes;
+  rightIcon?: React.ReactNode;
+  iconClassName?: string;
 };
 
 const base =
@@ -25,12 +28,20 @@ export default function Button({
   variant = "primary",
   size = "md",
   className,
+  rightIcon,
+  children,
+  iconClassName,
   ...props
 }: ButtonProps) {
   return (
     <button
       className={twMerge(clsx(base, variants[variant], sizes[size], className))}
       {...props}
-    />
+    >
+      {children}
+      {rightIcon && (
+        <span className={cn("shrink-0", iconClassName)}>{rightIcon}</span>
+      )}
+    </button>
   );
 }
