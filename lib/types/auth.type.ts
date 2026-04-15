@@ -16,6 +16,7 @@ export type RegisterResponse = {
     name: string;
     phone_verified: boolean;
     sub: string;
+    department: string;
   };
   identities: [
     {

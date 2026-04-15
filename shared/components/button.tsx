@@ -19,6 +19,7 @@ type ButtonProps = React.ButtonHTMLAttributes<HTMLButtonElement> & {
   size?: keyof typeof sizes;
   rightIcon?: React.ReactNode;
   iconClassName?: string;
+  leftIcon?: React.ReactNode;
 };
 
 const base =
@@ -31,6 +32,7 @@ export default function Button({
   rightIcon,
   children,
   iconClassName,
+  leftIcon,
   ...props
 }: ButtonProps) {
   return (
@@ -38,6 +40,9 @@ export default function Button({
       className={twMerge(clsx(base, variants[variant], sizes[size], className))}
       {...props}
     >
+      {leftIcon && (
+        <span className={cn("shrink-0", iconClassName)}>{leftIcon}</span>
+      )}
       {children}
       {rightIcon && (
         <span className={cn("shrink-0", iconClassName)}>{rightIcon}</span>
