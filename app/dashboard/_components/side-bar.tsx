@@ -13,7 +13,8 @@ import RightChevron from "@/shared/icons/right-chevron";
 import Logo from "@/shared/ui/logo";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useState } from "react";
+import { useEffect, useState } from "react";
+const STORAGE_KEY = "sidebar-collapsed";
 const sidebarList = [
   {
     icon: <ProjectIcon />,
@@ -46,9 +47,17 @@ const sidebarList = [
     id: 5,
   },
 ];
+
 export default function SideBar() {
-  const [isCollapsed, setIsCollapsed] = useState(false);
+  const [isCollapsed, setIsCollapsed] = useState<boolean>(() => {
+    if (typeof window === "undefined") return false;
+    return localStorage.getItem(STORAGE_KEY) === "true";
+  });
   const pathname = usePathname();
+
+  useEffect(() => {
+    localStorage.setItem(STORAGE_KEY, String(isCollapsed));
+  }, [isCollapsed]);
   return (
     <aside
       className={cn(
