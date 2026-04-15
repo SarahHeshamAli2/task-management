@@ -115,3 +115,28 @@ export async function resetPasswordAction(
 
   return response.json();
 }
+
+export async function refreshAccessToken(refreshToken: string) {
+  const res = await fetch(
+    `${process.env.API_URL}/auth/v1/token?grant_type=refresh_token`,
+    {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        apiKey: `${process.env.API_KEY}`,
+      },
+      body: JSON.stringify({ refresh_token: refreshToken }),
+    }
+  );
+  if (!res.ok) return null;
+  return res.json();
+}
+export async function verifyToken(token: string) {
+  const res = await fetch(`${process.env.API_URL}/auth/v1/user`, {
+    headers: {
+      Authorization: `Bearer ${token}`,
+      apiKey: `${process.env.API_KEY}`,
+    },
+  });
+  return res.ok;
+}
