@@ -4,7 +4,6 @@ import { projectsList } from "@/lib/types/projects.type";
 
 export default async function ProjectsList() {
   const projects: projectsList = await getAllProjectsService();
-  console.log(projects, "[[");
 
   return (
     <>
