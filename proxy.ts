@@ -8,7 +8,13 @@ export default async function proxy(request: NextRequest) {
   const loginUrl = new URL("/login", request.url);
   const dashboardUrl = new URL("/dashboard", request.url);
 
-  const authPages = ["/login", "/register", "/forgot-password"];
+  const authPages = [
+    "/",
+    "/login",
+    "/register",
+    "/forgot-password",
+    "/reset-password",
+  ];
   const isAuthPage = authPages.includes(request.nextUrl.pathname);
 
   // validate access token

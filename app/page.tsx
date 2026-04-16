@@ -37,5 +37,5 @@ export default function HomePage() {
     }
   }, [router]);
 
-  return <div></div>;
+  return null;
 }
