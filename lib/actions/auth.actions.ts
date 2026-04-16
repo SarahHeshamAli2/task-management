@@ -42,6 +42,11 @@ export async function loginAction(
     }
   );
   const json = await response.json();
+  if (!response.ok) {
+    console.log(json, "jj");
+
+    return json;
+  }
   const cookieStore = await cookies();
 
   //setting access token in httpOnly cookie
@@ -150,4 +155,10 @@ export async function getUserData(
     },
   });
   return res.json();
+}
+export async function logoutAction() {
+  const cookieStore = await cookies();
+  cookieStore.delete("access_token");
+  cookieStore.delete("refresh_token");
+  cookieStore.delete("user");
 }
