@@ -43,8 +43,6 @@ export async function loginAction(
   );
   const json = await response.json();
   if (!response.ok) {
-    console.log(json, "jj");
-
     return json;
   }
   const cookieStore = await cookies();

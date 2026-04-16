@@ -12,7 +12,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
         <Navbar />
 
         {/* Page Content */}
-        <main className="flex-1 p-6 bg-gray-100 overflow-y-auto">
+        <main className="flex-1 p-6 bg-background overflow-y-auto">
           {children}
         </main>
       </div>

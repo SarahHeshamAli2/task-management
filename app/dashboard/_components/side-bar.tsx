@@ -21,7 +21,7 @@ const sidebarList = [
   {
     icon: <ProjectIcon />,
     title: "Projects",
-    href: "/dashboard/projects",
+    href: "/dashboard/project",
     id: 1,
   },
   {
