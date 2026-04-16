@@ -1,16 +1,16 @@
 "use client";
 
-import Input from "@/shared/components/shared-input";
-import SharedTitle from "@/shared/components/shared-title";
+import Input from "@/components/ui/shared-input";
+import SharedTitle from "@/components/shared/shared-title";
 import { ValidationChecker } from "../../_components/validation-checker";
-import Button from "@/shared/components/button";
+import Button from "@/components/ui/button";
 import FormFooter from "../../_components/form-footer";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { RegisterFormValues, registerSchema } from "@/lib/schemes/auth.schema";
 import { useForm, useWatch } from "react-hook-form";
 import { registerAction } from "@/lib/actions/auth.actions";
 import { useState } from "react";
-import SubmissionError from "@/shared/components/submission-error";
+import SubmissionError from "@/components/shared/submission-error";
 import { registerRules } from "@/lib/constants/auth.constants";
 
 export default function RegisterForm() {

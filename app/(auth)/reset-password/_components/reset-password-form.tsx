@@ -5,10 +5,10 @@ import {
   ResetPasswordFormValues,
   resetPasswordSchema,
 } from "@/lib/schemes/auth.schema";
-import Button from "@/shared/components/button";
-import Input from "@/shared/components/shared-input";
-import SharedTitle from "@/shared/components/shared-title";
-import SubmissionError from "@/shared/components/submission-error";
+import Button from "@/components/ui/button";
+import Input from "@/components/ui/shared-input";
+import SharedTitle from "@/components/shared/shared-title";
+import SubmissionError from "@/components/shared/submission-error";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useState } from "react";
@@ -16,7 +16,7 @@ import { useForm, useWatch } from "react-hook-form";
 import { ValidationChecker } from "../../_components/validation-checker";
 import Link from "next/link";
 import { resetPasswordRules } from "@/lib/constants/auth.constants";
-import SucessToast from "@/shared/components/success-toast";
+import SucessToast from "@/components/shared/success-toast";
 
 export default function ResetPassowrdForm() {
   const { register, handleSubmit, formState, control } =

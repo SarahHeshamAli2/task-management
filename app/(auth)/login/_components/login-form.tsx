@@ -1,20 +1,20 @@
 "use client";
 
-import Input from "@/shared/components/shared-input";
-import SharedTitle from "@/shared/components/shared-title";
-import Button from "@/shared/components/button";
+import Input from "@/components/ui/shared-input";
+import SharedTitle from "@/components/shared/shared-title";
+import Button from "@/components/ui/button";
 import FormFooter from "../../_components/form-footer";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { LoginFormValues, loginSchema } from "@/lib/schemes/auth.schema";
 import { useForm } from "react-hook-form";
 import { loginAction } from "@/lib/actions/auth.actions";
 import { useState } from "react";
-import SubmissionError from "@/shared/components/submission-error";
+import SubmissionError from "@/components/shared/submission-error";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import MailIcon from "@/shared/icons/mail-icon";
-import LockIcon from "@/shared/icons/lock-icon";
-import RightArrow from "@/shared/icons/right-arrow";
+import MailIcon from "@/components/icons/mail-icon";
+import LockIcon from "@/components/icons/lock-icon";
+import RightArrow from "@/components/icons/right-arrow";
 
 export default function LoginForm() {
   const { register, handleSubmit, formState } = useForm<LoginFormValues>({

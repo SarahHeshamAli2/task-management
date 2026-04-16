@@ -1,16 +1,16 @@
 "use client";
 
 import { cn } from "@/lib/utils/tailwind-merge";
-import Button from "@/shared/components/button";
-import LeftChevron from "@/shared/icons/left-chevron";
-import LogOutIcon from "@/shared/icons/logout-icon";
-import ProjectDetailsIcon from "@/shared/icons/project-details-icon";
-import ProjectEpicIcon from "@/shared/icons/project-epic-icon";
-import ProjectMemeberIcon from "@/shared/icons/project-member-icon";
-import ProjectTaskIcon from "@/shared/icons/project-task-icon";
-import ProjectIcon from "@/shared/icons/projects-icon";
-import RightChevron from "@/shared/icons/right-chevron";
-import Logo from "@/shared/ui/logo";
+import Button from "@/components/ui/button";
+import LeftChevron from "@/components/icons/left-chevron";
+import LogOutIcon from "@/components/icons/logout-icon";
+import ProjectDetailsIcon from "@/components/icons/project-details-icon";
+import ProjectEpicIcon from "@/components/icons/project-epic-icon";
+import ProjectMemeberIcon from "@/components/icons/project-member-icon";
+import ProjectTaskIcon from "@/components/icons/project-task-icon";
+import ProjectIcon from "@/components/icons/projects-icon";
+import RightChevron from "@/components/icons/right-chevron";
+import Logo from "@/components/ui/logo";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
