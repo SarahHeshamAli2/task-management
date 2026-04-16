@@ -15,12 +15,15 @@ import { useRouter } from "next/navigation";
 import MailIcon from "@/components/icons/mail-icon";
 import LockIcon from "@/components/icons/lock-icon";
 import RightArrow from "@/components/icons/right-arrow";
+import { useAppDispatch } from "@/lib/store/hooks";
+import { setUser } from "@/lib/store/slices/user-slice";
 
 export default function LoginForm() {
   const { register, handleSubmit, formState } = useForm<LoginFormValues>({
     resolver: zodResolver(loginSchema),
   });
   const router = useRouter();
+  const dispatch = useAppDispatch();
 
   const [errorMsg, setErrorMsg] = useState<string>("");
 
@@ -32,7 +35,19 @@ export default function LoginForm() {
       return;
     }
     setErrorMsg("");
-    router.push("/dashboard");
+
+    if (response.user) {
+      dispatch(
+        setUser({
+          id: response.user.id,
+          name: response.user.user_metadata.name,
+          email: response.user.email,
+          department: response.user.user_metadata.department,
+          role: response.user.role,
+        })
+      );
+      router.push("/dashboard");
+    }
   };
 
   return (

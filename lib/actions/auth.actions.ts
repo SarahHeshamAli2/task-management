@@ -141,7 +141,7 @@ export async function verifyToken(token: string) {
   return res.ok;
 }
 export async function getUserData(
-  token: string | null
+  token: string | null | undefined
 ): Promise<RegisterResponse> {
   const res = await fetch(`${process.env.API_URL}/auth/v1/user`, {
     headers: {

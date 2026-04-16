@@ -14,6 +14,8 @@ import Logo from "@/components/ui/logo";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
+import { useAppDispatch, useAppSelector } from "@/lib/store/hooks";
+import { updateUser } from "@/lib/store/slices/user-slice";
 const STORAGE_KEY = "sidebar-collapsed";
 const sidebarList = [
   {
@@ -49,6 +51,10 @@ const sidebarList = [
 ];
 
 export default function SideBar() {
+  const user = useAppSelector((state) => state.user.data);
+  const dispatch = useAppDispatch();
+  console.log(user, "uuu");
+
   const [isCollapsed, setIsCollapsed] = useState<boolean>(() => {
     if (typeof window === "undefined") return false;
     return localStorage.getItem(STORAGE_KEY) === "true";
@@ -67,6 +73,9 @@ export default function SideBar() {
     >
       <div>
         {!isCollapsed && <Logo className="mt-4 mb-8" />}
+        <button onClick={() => dispatch(updateUser({ name: "soso" }))}>
+          test{" "}
+        </button>
         <ul>
           {sidebarList.map((li) => {
             const isActive = pathname === li.href;
