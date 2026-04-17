@@ -80,7 +80,7 @@ export async function loginAction(
       secure: process.env.NODE_ENV === "production",
       sameSite: "lax",
       path: "/",
-      maxAge: json.expires_in,
+      maxAge: 60 * 60 * 24 * 30,
     }
   );
   return json;

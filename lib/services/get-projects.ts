@@ -15,5 +15,5 @@ export async function getAllProjectsService() {
   if (response.ok) {
     return response.json();
   }
-  throw new Error("something went wrong");
+  throw new Error("Network error");
 }

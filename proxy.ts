@@ -51,6 +51,14 @@ export default async function proxy(request: NextRequest) {
         path: "/",
         maxAge: 60 * 60 * 24 * 7,
       });
+      const existingUser = request.cookies.get("user")?.value;
+      if (existingUser) {
+        response.cookies.set("user", existingUser, {
+          sameSite: "lax",
+          path: "/",
+          maxAge: 60 * 60 * 24 * 30,
+        });
+      }
 
       return response;
     }
