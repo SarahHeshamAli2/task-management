@@ -15,5 +15,9 @@ export async function getAllProjectsService() {
   if (response.ok) {
     return response.json();
   }
-  throw new Error("Network error");
+  if (response.status === 401) {
+    throw new Error("UNAUTHORIZED");
+  }
+
+  throw new Error("NETWORK_ERROR");
 }

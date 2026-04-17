@@ -2,10 +2,17 @@ import { getAllProjectsService } from "@/lib/services/get-projects";
 import ProjectCard from "./project-card";
 import { projectsList } from "@/lib/types/projects.type";
 import EmptyState from "./empty-state";
+import ErrorState from "./error-state";
 
 export default async function ProjectsList() {
-  const projects: projectsList = await getAllProjectsService();
-
+  let projects: projectsList;
+  try {
+    projects = await getAllProjectsService();
+  } catch (err) {
+    const message = err instanceof Error ? err.message : "";
+    if (message === "UNAUTHORIZED") throw err;
+    return <ErrorState />;
+  }
   if (projects.length == 0) {
     return <EmptyState />;
   }

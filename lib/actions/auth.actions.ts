@@ -134,6 +134,7 @@ export async function refreshAccessToken(refreshToken: string) {
   if (!res.ok) return null;
   return res.json();
 }
+
 export async function verifyToken(token: string) {
   const res = await fetch(`${process.env.API_URL}/auth/v1/user`, {
     headers: {

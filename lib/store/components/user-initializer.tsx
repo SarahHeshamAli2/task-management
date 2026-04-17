@@ -12,7 +12,7 @@ export default function UserInitializer({ user }: { user: User | null }) {
       dispatch(setUser(user));
       initialized.current = true;
     }
-  }, []);
+  }, [user, dispatch]);
 
   return null;
 }
