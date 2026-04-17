@@ -11,18 +11,17 @@ export async function addProjectAction(data: ProjectFormValues) {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
+      authorization: `Bearer ${token}`,
 
-      Authorization: `Bearer ${token}`,
       apiKey: `${process.env.API_KEY}`,
     },
     body: JSON.stringify(data),
   });
   if (!response.ok) {
-    const errorText = await response.text();
-    console.error("API error:", response.status, errorText);
+    const errorMsg = await response.json();
     return {
       success: false,
-      error: `Server error ${response.status}: ${errorText || "No details"}`,
+      error: `${response.status}: ${errorMsg.message || "No details"}`,
     };
   }
 

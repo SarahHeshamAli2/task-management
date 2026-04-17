@@ -1,7 +1,6 @@
 "use client";
 
 import AddMemberIcon from "@/components/icons/add-member-icon";
-import Header from "../../_components/header";
 import Input from "@/components/ui/shared-input";
 import Button from "@/components/ui/button";
 import TextArea from "@/components/ui/shared-textarea";
@@ -18,6 +17,7 @@ import SuccessToast from "@/components/shared/success-toast";
 import SubmissionError from "@/components/shared/submission-error";
 import FormHeader from "./form-header";
 import FormFooter from "./form-footer";
+import Header from "../../../_components/header";
 
 export default function AddProjectForm() {
   const { register, handleSubmit, formState } = useForm<ProjectFormValues>({
@@ -29,6 +29,8 @@ export default function AddProjectForm() {
   const onSubmit = async (data: ProjectFormValues) => {
     const response = await addProjectAction(data);
     if (!response.success) {
+      console.log(response.error, "ee");
+
       setError(response.error);
       return;
     }

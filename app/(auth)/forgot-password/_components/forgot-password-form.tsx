@@ -14,10 +14,10 @@ import { useState } from "react";
 import SubmissionError from "@/components/shared/submission-error";
 import Link from "next/link";
 import LeftArrow from "@/components/icons/left-arrow";
-import SucessToast from "@/components/shared/success-toast";
 import { useResendTimer } from "../_hooks/use-resend-otp";
 import TimerIcon from "@/components/icons/timer-icon";
 import ResetPassIcon from "@/components/icons/reset-pass-icon";
+import SuccessToast from "@/components/shared/success-toast";
 
 export default function ForgotPasswordForm() {
   const { register, handleSubmit, formState } =
@@ -87,7 +87,7 @@ export default function ForgotPasswordForm() {
 
         {sucessMsg && (
           <>
-            <SucessToast
+            <SuccessToast
               footer={
                 <div className="flex items-center justify-between pt-3 border-t border-[#0052351A] md:hidden">
                   <p className="font-bold text-xs uppercase text-[#00523599]">

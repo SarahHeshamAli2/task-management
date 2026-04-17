@@ -46,7 +46,7 @@ export default function LoginForm() {
           role: response.user.role,
         })
       );
-      router.push("/dashboard");
+      router.push("/project");
     }
   };
 

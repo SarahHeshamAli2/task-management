@@ -12,6 +12,7 @@ import { registerAction } from "@/lib/actions/auth.actions";
 import { useState } from "react";
 import SubmissionError from "@/components/shared/submission-error";
 import { registerRules } from "@/lib/constants/auth.constants";
+import { useRouter } from "next/navigation";
 
 export default function RegisterForm() {
   const { register, handleSubmit, formState, control } =
@@ -20,6 +21,7 @@ export default function RegisterForm() {
     });
 
   const [errorMsg, setErrorMsg] = useState<string>("");
+  const router = useRouter();
 
   const onSubmit = async (fields: RegisterFormValues) => {
     const submittedData = {
@@ -34,6 +36,7 @@ export default function RegisterForm() {
       return;
     }
     setErrorMsg("");
+    router.push("/login");
   };
   const passwordValue = useWatch({
     control,

@@ -34,7 +34,7 @@ export default function EmptyState() {
         architectural workspace to begin tracking tasks and epics.
       </p>
       <Button className="px-8" iconClassName="me-3" leftIcon={<PlusIcon />}>
-        <Link href={"/add-project"}>Create New Project</Link>
+        <Link href={"/project/add"}>Create New Project</Link>
       </Button>
     </div>
   );
