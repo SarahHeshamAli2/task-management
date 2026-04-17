@@ -5,7 +5,6 @@ import { getInitials } from "@/lib/utils/get-name-initials";
 
 export default function UserInfo() {
   const user = useAppSelector((store) => store.user.data);
-  console.log(user, "uu");
 
   return (
     <div className="flex items-center gap-4 me-6">
