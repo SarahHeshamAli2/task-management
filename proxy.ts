@@ -2,6 +2,8 @@ import { NextRequest, NextResponse } from "next/server";
 import { refreshAccessToken, verifyToken } from "./lib/actions/auth.actions";
 
 export default async function proxy(request: NextRequest) {
+  const { pathname } = request.nextUrl;
+
   const accessToken = request.cookies.get("access_token")?.value;
   const refreshToken = request.cookies.get("refresh_token")?.value;
 
@@ -9,14 +11,16 @@ export default async function proxy(request: NextRequest) {
   const dashboardUrl = new URL("/project", request.url);
 
   const authPages = [
-    "/",
     "/login",
     "/register",
     "/forgot-password",
     "/reset-password",
   ];
   const isAuthPage = authPages.includes(request.nextUrl.pathname);
-
+  const isHome = pathname === "/";
+  if (isHome) {
+    return NextResponse.next();
+  }
   // validate access token
   if (accessToken) {
     const valid = await verifyToken(accessToken);

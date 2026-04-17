@@ -7,11 +7,16 @@ export default function HomePage() {
 
   useEffect(() => {
     const hash = window.location.hash;
-    if (!hash) return;
+
+    // No hash = normal visit, redirect based on auth
+    if (!hash) {
+      const accessToken = document.cookie.includes("access_token");
+      router.replace(accessToken ? "/project" : "/login");
+      return;
+    }
 
     const params = new URLSearchParams(hash.replace("#", ""));
 
-    // Handle error case (e.g., expired OTP link)
     const error = params.get("error");
     const errorCode = params.get("error_code");
     const errorDescription = params.get("error_description");
@@ -24,7 +29,6 @@ export default function HomePage() {
       return;
     }
 
-    // Handle successful recovery case
     if (params.get("type") === "recovery") {
       const accessToken = params.get("access_token");
       if (accessToken) {
@@ -34,6 +38,8 @@ export default function HomePage() {
           `/reset-password?error=${encodeURIComponent("Invalid or expired reset link.")}`
         );
       }
+    } else {
+      router.replace("/login");
     }
   }, [router]);
 
