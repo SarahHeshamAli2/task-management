@@ -1,4 +1,5 @@
 import Button from "@/components/ui/button";
+import { cn } from "@/lib/utils/tailwind-merge";
 import Link from "next/link";
 
 type HeaderProps = {
@@ -7,6 +8,7 @@ type HeaderProps = {
   buttonText?: string;
   linkHref?: string;
   leftIcon?: string | React.ReactElement;
+  className?: string;
 };
 
 export default function Header({
@@ -15,9 +17,10 @@ export default function Header({
   buttonText,
   linkHref,
   leftIcon,
+  className,
 }: HeaderProps) {
   return (
-    <div className="flex items-center justify-between mb-10">
+    <div className={cn("flex items-center justify-between mb-10", className)}>
       <div>
         <h3 className="font-semibold text-3xl">{title}</h3>
         <p className="text-secondary mt-1">{subtitle}</p>

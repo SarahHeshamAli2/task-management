@@ -37,15 +37,16 @@ export default function AddProjectForm() {
   return (
     <div>
       <Header
+        className="md:flex hidden"
         title="Add New Project"
         buttonText="Invite Member"
         leftIcon={<AddMemberIcon />}
       />
-      <div className="bg-white max-w-2xl mx-auto ">
+      <div className="md:bg-white max-w-2xl mx-auto ">
         <form onSubmit={handleSubmit(onSubmit)}>
           <FormHeader />
 
-          <div className="p-8">
+          <div className="md:p-8 p-6">
             <Input
               label="Project TITLE"
               placeholder="project title"
@@ -61,12 +62,16 @@ export default function AddProjectForm() {
 key milestones..."
               {...register("description")}
               error={formState.errors.description?.message}
+              maxLength={500}
             />
             {error && <SubmissionError error={error} />}
             {success && <SuccessToast title="Project created successfully" />}
-            <div className="flex justify-between items-center mt-14">
+            <div className="flex justify-between items-center mt-14 flex-col-reverse md:flex-row">
               <Button variant="ghost">Cancel</Button>
-              <Button className="px-8" disabled={formState.isSubmitting}>
+              <Button
+                className="px-8 w-full md:w-fit"
+                disabled={formState.isSubmitting}
+              >
                 Create Project
               </Button>
             </div>

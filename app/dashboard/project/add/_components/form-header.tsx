@@ -1,7 +1,7 @@
 export default function FormHeader() {
   return (
-    <div className="border-b border-surface-low pb-10 flex items-center gap-4 p-8">
-      <div className="bg-primary-container/10 w-11.5 h-11 flex justify-center items-center rounded-sm">
+    <div className="border-b border-surface-low md:pb-10 flex items-center gap-4 md:p-8 px-6">
+      <div className="bg-primary-container/10 w-11.5 h-11 md:flex justify-center items-center rounded-sm hidden">
         <svg
           width="22"
           height="20"

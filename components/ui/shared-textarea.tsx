@@ -1,3 +1,7 @@
+"use client";
+
+import { useState } from "react";
+
 type SharedTextAreaProps = {
   label?: string;
   error?: string;
@@ -5,6 +9,7 @@ type SharedTextAreaProps = {
   hint?: string;
   optional?: boolean;
   errorIcon?: string | React.ReactElement;
+  maxLength?: number;
 } & React.InputHTMLAttributes<HTMLTextAreaElement>;
 
 export default function TextArea({
@@ -13,8 +18,15 @@ export default function TextArea({
   className = "",
   optional,
   errorIcon,
+  maxLength,
+  onChange,
   ...props
 }: SharedTextAreaProps) {
+  const [charCount, setCharCount] = useState(0);
+  const handleChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+    setCharCount(e.target.value.length);
+    onChange?.(e);
+  };
   return (
     <div className="flex flex-col gap-1 mt-6">
       {label && (
@@ -42,6 +54,8 @@ export default function TextArea({
           }
           ${className}`}
           {...props}
+          maxLength={maxLength}
+          onChange={handleChange}
         ></textarea>
       </div>
       {error && (
@@ -49,7 +63,12 @@ export default function TextArea({
           <span className="me-1.5"> {errorIcon && errorIcon}</span>
           {error}
         </p>
-      )}{" "}
+      )}
+      {maxLength !== undefined && (
+        <span className="text-xs text-placeholder text-end">
+          {charCount}/{maxLength}
+        </span>
+      )}
     </div>
   );
 }
