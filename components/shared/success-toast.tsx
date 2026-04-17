@@ -1,7 +1,7 @@
 import { cn } from "@/lib/utils/tailwind-merge";
 import CheckIcon from "../icons/check-icon";
 
-export default function SucessToast({
+export default function SuccessToast({
   title,
   className,
   footer,

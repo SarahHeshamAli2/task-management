@@ -14,7 +14,7 @@ complex in the downtown district`,
   createdAt = "12 Oct 2025",
 }: ProjectCardProps) {
   return (
-    <div className="bg-white max-w-76 p-6 rounded-lg min-h-55 flex flex-col justify-between">
+    <div className="bg-white  p-6 rounded-lg min-h-55 flex flex-col justify-between">
       <div>
         <h1 className="text-slate-dark font-medium text-lg">{title}</h1>
         <p className="mt-3.5 text-secondary text-sm leading-6">{desc}</p>

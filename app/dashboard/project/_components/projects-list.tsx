@@ -2,7 +2,8 @@ import { getAllProjectsService } from "@/lib/services/get-projects";
 import ProjectCard from "./project-card";
 import { projectsList } from "@/lib/types/projects.type";
 import EmptyState from "./empty-state";
-import ErrorState from "./error-state";
+import ErrorState from "../../../../components/shared/error-state";
+import Header from "./header";
 
 export default async function ProjectsList() {
   let projects: projectsList;
@@ -19,15 +20,23 @@ export default async function ProjectsList() {
 
   return (
     <>
-      {projects.map((project) => (
-        <div key={project.id} className="grid grid-cols-3">
+      <Header
+        title="Projects"
+        subtitle="Manage and curate your projects"
+        buttonText="Create new project"
+        linkHref="/dashboard/project/add"
+        leftIcon="+"
+      />{" "}
+      <div className="grid grid-cols-3 gap-6">
+        {projects.map((project) => (
           <ProjectCard
+            key={project.id}
             title={project.name}
             createdAt={project.created_at}
             desc={project.description}
           />
-        </div>
-      ))}
+        ))}
+      </div>
     </>
   );
 }

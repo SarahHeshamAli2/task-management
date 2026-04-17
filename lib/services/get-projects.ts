@@ -1,8 +1,7 @@
-import { cookies } from "next/headers";
+import { getToken } from "../utils/manage-token";
 
 export async function getAllProjectsService() {
-  const cookieStore = await cookies();
-  const token = cookieStore.get("access_token")?.value;
+  const token = await getToken();
   const response = await fetch(
     `${process.env.API_URL}/rest/v1/rpc/get_projects`,
     {

@@ -11,6 +11,7 @@ type SharedInputProps = {
   iconClassName?: string;
   link?: string;
   href?: string;
+  errorIcon?: string | React.ReactElement;
 } & React.InputHTMLAttributes<HTMLInputElement>;
 
 export default function Input({
@@ -24,6 +25,7 @@ export default function Input({
   iconClassName,
   link,
   href,
+  errorIcon,
   ...props
 }: SharedInputProps) {
   return (
@@ -81,7 +83,12 @@ export default function Input({
           {hint}
         </span>
       )}
-      {error && <p className="text-xs text-red-500">{error}</p>}
+      {error && (
+        <p className="text-xs text-error font-medium flex">
+          <span className="me-1.5"> {errorIcon && errorIcon}</span>
+          {error}
+        </p>
+      )}
     </div>
   );
 }
