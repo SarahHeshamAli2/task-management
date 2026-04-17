@@ -13,10 +13,9 @@ import RightChevron from "@/components/icons/right-chevron";
 import Logo from "@/components/ui/logo";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useEffect, useState } from "react";
 import { useLogout } from "@/lib/hooks/use-logout";
+import { useSidebarCollapsed } from "../context/sidebar-context";
 
-const STORAGE_KEY = "sidebar-collapsed";
 const sidebarList = [
   {
     icon: <ProjectIcon />,
@@ -51,15 +50,9 @@ const sidebarList = [
 ];
 
 export default function SideBar() {
-  const [isCollapsed, setIsCollapsed] = useState<boolean>(() => {
-    if (typeof window === "undefined") return false;
-    return localStorage.getItem(STORAGE_KEY) === "true";
-  });
-  const pathname = usePathname();
+  const { isCollapsed, toggle } = useSidebarCollapsed();
 
-  useEffect(() => {
-    localStorage.setItem(STORAGE_KEY, String(isCollapsed));
-  }, [isCollapsed]);
+  const pathname = usePathname();
 
   const { handleLogout } = useLogout();
   return (
@@ -84,13 +77,15 @@ export default function SideBar() {
                     "flex gap-3 my-1 font-medium min-w-10 min-h-10  items-center px-2 rounded-sm transition-colors",
                     isActive
                       ? "bg-white text-primary shadow-sm"
-                      : "text-slate-dark hover:bg-slate-100"
+                      : "text-slate-dark hover:bg-slate-100",
+                    isCollapsed && !isActive && "text-[#041B3C99]",
+                    isCollapsed && "mt-6"
                   )}
                 >
                   <span
                     className={cn(
                       isCollapsed &&
-                        "h-12 w-12 flex  items-center justify-center"
+                        "h-12 w-12 flex  items-center justify-center  "
                     )}
                   >
                     {li.icon}
@@ -106,7 +101,7 @@ export default function SideBar() {
 
       <div className="flex flex-col border-t border-slate-light/20 pt-6 pb-4">
         <Button
-          onClick={() => setIsCollapsed((prev) => !prev)}
+          onClick={toggle}
           iconClassName="me-3"
           leftIcon={!isCollapsed && <LeftChevron />}
           variant="ghost"
