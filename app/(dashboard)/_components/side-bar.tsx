@@ -21,31 +21,31 @@ const sidebarList = [
   {
     icon: <ProjectIcon />,
     title: "Projects",
-    href: "/dashboard/project",
+    href: "/project",
     id: 1,
   },
   {
     icon: <ProjectEpicIcon />,
     title: "Project Epics",
-    href: "/dashboard/projects-epic",
+    href: "/projects-epic",
     id: 2,
   },
   {
     icon: <ProjectTaskIcon />,
     title: "Project Tasks",
-    href: "/dashboard/projects-tasks",
+    href: "/projects-tasks",
     id: 3,
   },
   {
     icon: <ProjectMemeberIcon />,
     title: "Project Members",
-    href: "/dashboard/projects-member",
+    href: "/projects-member",
     id: 4,
   },
   {
     icon: <ProjectDetailsIcon />,
     title: "Project Details",
-    href: "/dashboard/projects-details",
+    href: "/projects-details",
     id: 5,
   },
 ];

@@ -24,7 +24,7 @@ export default async function ProjectsList() {
         title="Projects"
         subtitle="Manage and curate your projects"
         buttonText="Create new project"
-        linkHref="/dashboard/project/add"
+        linkHref="/project/add"
         leftIcon="+"
       />{" "}
       <div className="grid grid-cols-3 gap-6">

@@ -6,7 +6,7 @@ export default async function proxy(request: NextRequest) {
   const refreshToken = request.cookies.get("refresh_token")?.value;
 
   const loginUrl = new URL("/login", request.url);
-  const dashboardUrl = new URL("/dashboard", request.url);
+  const dashboardUrl = new URL("/project", request.url);
 
   const authPages = [
     "/",
