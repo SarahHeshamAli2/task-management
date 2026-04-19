@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { refreshAccessToken, verifyToken } from "./lib/actions/auth.actions";
+import { setAuthCookies } from "./lib/utils/proxy-utils";
 
 export default async function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl;
@@ -16,11 +17,8 @@ export default async function proxy(request: NextRequest) {
     "/forgot-password",
     "/reset-password",
   ];
-  const isAuthPage = authPages.includes(request.nextUrl.pathname);
-  const isHome = pathname === "/";
-  if (isHome) {
-    return NextResponse.next();
-  }
+  const isAuthPage = authPages.includes(pathname);
+
   // validate access token
   if (accessToken) {
     const valid = await verifyToken(accessToken);
@@ -47,25 +45,9 @@ export default async function proxy(request: NextRequest) {
       const sessionType = request.cookies.get("session_type")?.value;
       const isPersistent = sessionType === "persistent";
 
-      response.cookies.set("access_token", newTokens.access_token, {
-        httpOnly: true,
-        path: "/",
-        maxAge: 3600,
-      });
-
-      response.cookies.set("refresh_token", newTokens.refresh_token, {
-        httpOnly: true,
-        path: "/",
-        maxAge: isPersistent ? 60 * 60 * 24 * 30 : 60 * 3,
-      });
       const existingUser = request.cookies.get("user")?.value;
-      if (existingUser) {
-        response.cookies.set("user", existingUser, {
-          sameSite: "lax",
-          path: "/",
-          maxAge: isPersistent ? 60 * 60 * 24 * 30 : 60 * 3,
-        });
-      }
+
+      setAuthCookies(response, newTokens, isPersistent, existingUser);
 
       return response;
     }
