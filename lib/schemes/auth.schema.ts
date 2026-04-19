@@ -47,6 +47,7 @@ export const loginSchema = z.object({
   password: z
     .string("please enter a valid password")
     .min(8, "please enter a valid password"),
+  rememberMe: z.boolean().optional().default(false),
 });
 
 export const forgotPasswordSchema = z.object({

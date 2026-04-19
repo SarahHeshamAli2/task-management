@@ -44,6 +44,9 @@ export default async function proxy(request: NextRequest) {
         ? NextResponse.redirect(dashboardUrl)
         : NextResponse.next();
 
+      const sessionType = request.cookies.get("session_type")?.value;
+      const isPersistent = sessionType === "persistent";
+
       response.cookies.set("access_token", newTokens.access_token, {
         httpOnly: true,
         path: "/",
@@ -53,14 +56,14 @@ export default async function proxy(request: NextRequest) {
       response.cookies.set("refresh_token", newTokens.refresh_token, {
         httpOnly: true,
         path: "/",
-        maxAge: 60 * 60 * 24 * 7,
+        maxAge: isPersistent ? 60 * 60 * 24 * 30 : 60 * 3,
       });
       const existingUser = request.cookies.get("user")?.value;
       if (existingUser) {
         response.cookies.set("user", existingUser, {
           sameSite: "lax",
           path: "/",
-          maxAge: 60 * 60 * 24 * 30,
+          maxAge: isPersistent ? 60 * 60 * 24 * 30 : 60 * 3,
         });
       }
 

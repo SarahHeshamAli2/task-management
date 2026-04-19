@@ -30,6 +30,7 @@ export async function registerAction(
 export async function loginAction(
   data: LoginFormValues
 ): Promise<ApiResponse<LoginResponse>> {
+  const { rememberMe, ...credentials } = data;
   const response = await fetch(
     `${process.env.API_URL}/auth/v1/token?grant_type=password`,
     {
@@ -38,7 +39,7 @@ export async function loginAction(
         "Content-Type": "application/json",
         apiKey: `${process.env.API_KEY}`,
       },
-      body: JSON.stringify(data),
+      body: JSON.stringify(credentials),
     }
   );
   const json = await response.json();
@@ -62,7 +63,7 @@ export async function loginAction(
     secure: process.env.NODE_ENV === "production",
     sameSite: "lax",
     path: "/",
-    maxAge: 60 * 60 * 24 * 30,
+    maxAge: rememberMe ? 60 * 60 * 24 * 30 : 60 * 60,
   });
 
   //setting some user propreties in normal cookie
@@ -80,9 +81,14 @@ export async function loginAction(
       secure: process.env.NODE_ENV === "production",
       sameSite: "lax",
       path: "/",
-      maxAge: 60 * 60 * 24 * 30,
+      maxAge: rememberMe ? 60 * 60 * 24 * 30 : 60 * 60,
     }
   );
+  cookieStore.set("session_type", rememberMe ? "persistent" : "session", {
+    sameSite: "lax",
+    path: "/",
+    maxAge: rememberMe ? 60 * 60 * 24 * 30 : 60 * 60,
+  });
   return json;
 }
 

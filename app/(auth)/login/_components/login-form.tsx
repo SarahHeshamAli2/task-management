@@ -94,6 +94,7 @@ export default function LoginForm() {
     checked:bg-surface-highest    
     cursor-pointer transition-colors
   "
+              {...register("rememberMe")}
             />
 
             <label className="ms-2">Remember Me</label>
