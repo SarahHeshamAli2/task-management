@@ -9,6 +9,7 @@ type HeaderProps = {
   linkHref?: string;
   leftIcon?: string | React.ReactElement;
   className?: string;
+  buttonClassName?: string;
 };
 
 export default function Header({
@@ -18,6 +19,7 @@ export default function Header({
   linkHref,
   leftIcon,
   className,
+  buttonClassName,
 }: HeaderProps) {
   return (
     <div className={cn("flex items-center justify-between mb-10", className)}>
@@ -25,7 +27,11 @@ export default function Header({
         <h3 className="font-semibold text-3xl">{title}</h3>
         <p className="text-secondary mt-1">{subtitle}</p>
       </div>
-      <Button iconClassName="me-2" leftIcon={leftIcon} className="rounded-xs">
+      <Button
+        iconClassName="me-2"
+        leftIcon={leftIcon}
+        className={cn("rounded-xs", buttonClassName)}
+      >
         <Link href={linkHref ?? ""}>{buttonText}</Link>
       </Button>
     </div>

@@ -5,16 +5,23 @@ import UserInfo from "./user-info";
 import Logo from "@/components/ui/logo";
 
 export default function Navbar() {
-  const { isCollapsed } = useSidebarCollapsed();
+  const { isCollapsed, toggle } = useSidebarCollapsed();
 
   return (
     <div
       className={cn(
-        "bg-background w-full border-b  border-[#0000001A] min-h-16 flex justify-between",
+        "bg-background w-full border-b px-6 border-[#0000001A] min-h-16 flex justify-between",
         !isCollapsed && "justify-end"
       )}
     >
-      {isCollapsed && <Logo />}
+      {isCollapsed && (
+        <div className="flex gap-4">
+          <button onClick={toggle} className="md:hidden">
+            ☰
+          </button>
+          <Logo />
+        </div>
+      )}
       <UserInfo />
     </div>
   );

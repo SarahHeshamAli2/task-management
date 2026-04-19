@@ -7,8 +7,8 @@ export default function UserInfo() {
   const user = useAppSelector((store) => store.user.data);
 
   return (
-    <div className="flex items-center gap-4 me-6">
-      <div className="my-3">
+    <div className="flex items-center gap-4 md:me-6">
+      <div className="my-3 hidden md:block">
         <p className="text-slate-dark font-semibold text-sm capitalize">
           {user?.name}
         </p>

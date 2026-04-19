@@ -2,6 +2,7 @@ export default function Logo({ className }: { className?: string }) {
   return (
     <div className={`flex items-center gap-1 ${className}`}>
       <svg
+        className="md:block hidden"
         width="18"
         height="20"
         viewBox="0 0 18 20"

@@ -1,3 +1,4 @@
+import CalendarIcon from "@/components/icons/calendar-icon";
 import { formatDate } from "@/lib/utils/format-date";
 
 type ProjectCardProps = {
@@ -20,10 +21,13 @@ complex in the downtown district`,
         <p className="mt-3.5 text-secondary text-sm leading-6">{desc}</p>
       </div>
       <div className="flex justify-between items-center">
-        <span className="text-placeholder font-bold text-xs uppercase">
+        <span className="text-placeholder font-bold text-xs uppercase md:block hidden">
           created at
         </span>
-        <span className="text-secondary font-medium text-sm">
+        <span className="text-secondary font-medium text-sm flex items-center gap-1.5">
+          <span className="sm:hidden">
+            <CalendarIcon />
+          </span>
           {formatDate(createdAt)}
         </span>
       </div>
