@@ -1,3 +1,4 @@
+import { cn } from "@/lib/utils/tailwind-merge";
 import Link from "next/link";
 
 type SharedInputProps = {
@@ -33,7 +34,10 @@ export default function Input({
       {label && (
         <div className="flex items-center justify-between mb-1.5">
           <label
-            className={`text-xs uppercase font-bold flex ${error ? "text-error" : "text-slate-container"}`}
+            className={cn(
+              "text-xs uppercase font-bold flex",
+              error ? "text-error" : "text-slate-container"
+            )}
           >
             {mobileLabel && <span className="md:hidden">{mobileLabel}</span>}
             <span className={mobileLabel ? "hidden md:inline" : ""}>
@@ -49,7 +53,7 @@ export default function Input({
           {link && (
             <Link
               href={href ?? ""}
-              className="text-primary text-xs font-bold  sm:hidden capitalize self-center ms-0.5"
+              className="text-primary text-xs font-bold sm:hidden capitalize self-center ms-0.5"
             >
               {link}
             </Link>
@@ -59,20 +63,23 @@ export default function Input({
 
       <div className="relative">
         <input
-          className={`w-full px-4 py-3.5 rounded-sm text-sm outline-none transition-colors 
-          disabled:opacity-50 disabled:cursor-not-allowed
-          ${rightIcon ? "pe-10" : ""}
-          ${
+          className={cn(
+            "w-full px-4 py-3.5 rounded-sm text-sm outline-none transition-colors",
+            "disabled:opacity-50 disabled:cursor-not-allowed",
+            rightIcon && "pe-10",
             error
               ? "bg-input-error-light text-input-error"
-              : "bg-surface-highest text-placeholder border-slate-300 focus:border-primary placeholder:text-placeholder"
-          }
-          ${className}`}
+              : "bg-surface-highest text-placeholder border-slate-300 focus:border-primary placeholder:text-placeholder",
+            className
+          )}
           {...props}
         />
         {rightIcon && (
           <div
-            className={`absolute inset-y-0 inset-e-0 flex items-center pe-3 pointer-events-none text-placeholder ${iconClassName ?? ""}`}
+            className={cn(
+              "absolute inset-y-0 inset-e-0 flex items-center pe-3 pointer-events-none text-placeholder",
+              iconClassName
+            )}
           >
             {rightIcon}
           </div>
@@ -85,7 +92,7 @@ export default function Input({
       )}
       {error && (
         <p className="text-xs text-error font-medium flex">
-          <span className="me-1.5"> {errorIcon && errorIcon}</span>
+          <span className="me-1.5">{errorIcon && errorIcon}</span>
           {error}
         </p>
       )}

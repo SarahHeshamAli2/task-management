@@ -1,5 +1,6 @@
 "use client";
 
+import { cn } from "@/lib/utils/tailwind-merge";
 import { useState } from "react";
 
 type SharedTextAreaProps = {
@@ -32,7 +33,10 @@ export default function TextArea({
       {label && (
         <div className="flex items-center justify-between mb-1.5">
           <label
-            className={`text-xs uppercase font-bold flex ${error ? "text-error" : "text-slate-container"}`}
+            className={cn(
+              "text-xs uppercase font-bold flex",
+              error ? "text-error" : "text-slate-container"
+            )}
           >
             {label}
           </label>
@@ -45,22 +49,22 @@ export default function TextArea({
       )}
       <div className="relative">
         <textarea
-          className={`w-full px-4 py-3.5 resize-none rounded-sm text-sm outline-none transition-colors 
-          disabled:opacity-50 disabled:cursor-not-allowed
-          ${
+          className={cn(
+            "w-full px-4 py-3.5 resize-none rounded-sm text-sm outline-none transition-colors",
+            "disabled:opacity-50 disabled:cursor-not-allowed",
             error
               ? "bg-input-error-light text-input-error"
-              : "bg-surface-highest text-placeholder border-slate-300 focus:border-primary placeholder:text-placeholder"
-          }
-          ${className}`}
+              : "bg-surface-highest text-placeholder border-slate-300 focus:border-primary placeholder:text-placeholder",
+            className
+          )}
           {...props}
           maxLength={maxLength}
           onChange={handleChange}
-        ></textarea>
+        />
       </div>
       {error && (
         <p className="text-xs text-error font-medium flex">
-          <span className="me-1.5"> {errorIcon && errorIcon}</span>
+          <span className="me-1.5">{errorIcon && errorIcon}</span>
           {error}
         </p>
       )}
