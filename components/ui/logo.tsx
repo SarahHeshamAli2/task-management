@@ -1,6 +1,8 @@
+import Link from "next/link";
+
 export default function Logo({ className }: { className?: string }) {
   return (
-    <div className={`flex items-center gap-1 ${className}`}>
+    <Link href="/" className={`flex items-center gap-1 ${className}`}>
       <svg
         className="md:block hidden"
         width="18"
@@ -15,6 +17,6 @@ export default function Logo({ className }: { className?: string }) {
         />
       </svg>
       <h3 className="uppercase font-bold text-[1.25rem]">taskly</h3>
-    </div>
+    </Link>
   );
 }

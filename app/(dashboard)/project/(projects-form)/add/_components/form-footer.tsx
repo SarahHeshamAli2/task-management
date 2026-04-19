@@ -1,6 +1,6 @@
 export default function FormFooter() {
   return (
-    <div className="bg-surface-low p-6 flex gap-3">
+    <div className="bg-surface-low p-6 flex gap-3 md:mb-0 mb-20">
       <span className="hidden md:block">
         <svg
           width="12"
