@@ -13,28 +13,30 @@ import { useForm } from "react-hook-form";
 import ExclaimMarkIcon from "@/components/icons/exclaim-mark-icon";
 import { addProjectAction } from "@/lib/actions/projects.actions";
 import { useState } from "react";
-import SuccessToast from "@/components/shared/success-toast";
 import SubmissionError from "@/components/shared/submission-error";
 import FormHeader from "./form-header";
 import FormFooter from "./form-footer";
 import Header from "../../../_components/header";
+import { toast } from "sonner";
+import { useRouter } from "next/navigation";
 
 export default function AddProjectForm() {
+  const router = useRouter();
   const { register, handleSubmit, formState } = useForm<ProjectFormValues>({
     resolver: zodResolver(addProjectSchema),
   });
-  const [success, setSuccess] = useState<boolean>(false);
   const [error, setError] = useState<string | undefined>("");
 
   const onSubmit = async (data: ProjectFormValues) => {
     const response = await addProjectAction(data);
     if (!response.success) {
-      console.log(response.error, "ee");
-
       setError(response.error);
       return;
     }
-    setSuccess(true);
+    toast.success("Project created successfully");
+    setTimeout(() => {
+      router.push("/project");
+    }, 1000);
   };
   return (
     <div>
@@ -67,9 +69,15 @@ key milestones..."
               maxLength={500}
             />
             {error && <SubmissionError error={error} />}
-            {success && <SuccessToast title="Project created successfully" />}
             <div className="flex justify-between items-center mt-14 flex-col-reverse md:flex-row">
-              <Button variant="ghost">Cancel</Button>
+              <Button
+                type="button"
+                disabled={formState.isSubmitting}
+                onClick={() => router.back()}
+                variant="ghost"
+              >
+                Cancel
+              </Button>
               <Button
                 className="px-8 w-full md:w-fit"
                 disabled={formState.isSubmitting}
