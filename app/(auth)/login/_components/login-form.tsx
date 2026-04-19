@@ -21,6 +21,7 @@ import { setUser } from "@/lib/store/slices/user-slice";
 export default function LoginForm() {
   const { register, handleSubmit, formState } = useForm<LoginFormValues>({
     resolver: zodResolver(loginSchema),
+    defaultValues: { rememberMe: false },
   });
   const router = useRouter();
   const dispatch = useAppDispatch();
