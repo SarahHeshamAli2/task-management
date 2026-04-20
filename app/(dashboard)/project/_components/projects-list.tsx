@@ -1,48 +1,65 @@
-import { getAllProjectsService } from "@/lib/services/get-projects";
+"use client";
 import ProjectCard from "./project-card";
-import { projectsList } from "@/lib/types/projects.type";
 import EmptyState from "./empty-state";
-import ErrorState from "../../../../components/shared/error-state";
 import Header from "./header";
 import PlusIcon from "@/components/icons/plus-icon";
 import Link from "next/link";
 import Pagination from "./pagination";
-import { redirect } from "next/navigation";
+import UseGetProjects from "../hooks/use-get-projects";
+import ProjectsListSkeleton from "@/components/skeletons/project-card.skeleton";
+import { useIsMobile } from "@/lib/hooks/use-mobile";
+import { useRef, useCallback, useState } from "react";
 
 type Props = {
   searchParams: { page?: string };
 };
 
-export default async function ProjectsList({ searchParams }: Props) {
+export default function ProjectsList({ searchParams }: Props) {
   const limit = 10;
-  const currentPage = Number(searchParams?.page) || 1;
+  const isMobile = useIsMobile();
+
+  const [currentPage, setCurrentPage] = useState(
+    () => Number(searchParams?.page) || 1
+  );
+
   const offset = (currentPage - 1) * limit;
-  let projects: projectsList = [];
-  let total = 0;
-  let projectsPerPage;
 
-  try {
-    const result = await getAllProjectsService({
-      limit,
-      offset,
-    });
+  const { projects, total, isLoading, isInitialLoad, hasMore } = UseGetProjects(
+    { limit, offset, append: isMobile }
+  );
 
-    projects = Array.isArray(result.data) ? result.data : [];
-    total = result.total;
-    projectsPerPage = projects.length;
-  } catch (err) {
-    return <ErrorState />;
+  const observer = useRef<IntersectionObserver | null>(null);
+
+  const lastElementRef = useCallback(
+    (node: HTMLElement | null) => {
+      if (!isMobile) return;
+      if (isLoading) return;
+      if (observer.current) observer.current.disconnect();
+
+      observer.current = new IntersectionObserver((entries) => {
+        if (entries[0].isIntersecting && hasMore && !isLoading) {
+          setCurrentPage((prev) => prev + 1);
+        }
+      });
+
+      if (node) observer.current.observe(node);
+    },
+    [isLoading, hasMore, isMobile]
+  );
+
+  // Show skeleton only on the very first load, not on every paginated fetch
+  if (isInitialLoad && isLoading) {
+    return <ProjectsListSkeleton />;
   }
 
-  if (!Array.isArray(projects) || projects.length === 0) {
+  if (!isLoading && !isInitialLoad && projects.length === 0) {
     return <EmptyState />;
   }
+
   const totalPages = Math.ceil(total / limit);
   const hasNextPage = currentPage < totalPages;
+  const projectsPerPage = projects.length;
 
-  if (currentPage > totalPages && totalPages > 0) {
-    redirect(`/project?page=${totalPages}`);
-  }
   return (
     <>
       <Header
@@ -55,45 +72,66 @@ export default async function ProjectsList({ searchParams }: Props) {
       />
 
       <div className="grid md:grid-cols-3 gap-6">
-        {projects?.map((project) => (
-          <ProjectCard
-            key={project.id}
-            title={project.name}
-            createdAt={project.created_at}
-            desc={project.description}
-          />
-        ))}
+        {projects?.map((project, index) => {
+          const isLast = projects.length === index + 1;
+          return (
+            <ProjectCard
+              // Only attach the scroll observer ref on mobile
+              ref={isLast && isMobile ? lastElementRef : undefined}
+              key={project.id}
+              title={project.name}
+              createdAt={project.created_at}
+              desc={project.description}
+            />
+          );
+        })}
 
-        <div className="bg-white md:flex flex-col gap-3.5 hidden p-6 rounded-lg min-h-55 border-dashed border-slate-light/20 border-2 justify-center items-center">
-          <Link
-            className="min-h-12 min-w-12 bg-surface-low flex items-center justify-center rounded-xl"
-            href={"/project/add"}
-          >
-            <PlusIcon fill="black" />
-          </Link>
+        {/* Loading indicator for inifite scroll */}
+        {isMobile && isLoading && (
+          <div className="col-span-full flex justify-center py-4">
+            <span className="text-secondary text-sm">Loading more...</span>
+          </div>
+        )}
 
-          <span className="uppercase text-secondary text-sm font-bold">
-            add project
-          </span>
-        </div>
-
+        {!isMobile && (
+          <div className="bg-white flex flex-col gap-3.5 p-6 rounded-lg min-h-55 border-dashed border-slate-light/20 border-2 justify-center items-center">
+            <Link
+              className="min-h-12 min-w-12 bg-surface-low flex items-center justify-center rounded-xl"
+              href="/project/add"
+            >
+              <PlusIcon fill="black" />
+            </Link>
+            <span className="uppercase text-secondary text-sm font-bold">
+              add project
+            </span>
+          </div>
+        )}
+      </div>
+      {!hasMore && (
+        <p className=" my-3 text-end font-bold text-sm text-secondary capitalize">
+          no more projects
+        </p>
+      )}
+      {isMobile && (
         <Link
           className="w-14 h-14 sm:hidden rounded-xl ms-auto bg-primary flex items-center justify-center mb-15"
-          href={"/project/add"}
+          href="/project/add"
         >
           <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
             <path d="M6 8H0V6H6V0H8V6H14V8H8V14H6V8Z" fill="white" />
           </svg>
         </Link>
-      </div>
+      )}
 
-      <Pagination
-        projectsPerPage={projectsPerPage}
-        projectsCount={total}
-        currentPage={currentPage}
-        totalPages={totalPages}
-        hasNextPage={hasNextPage}
-      />
+      {!isMobile && (
+        <Pagination
+          projectsPerPage={projectsPerPage}
+          projectsCount={total}
+          currentPage={currentPage}
+          totalPages={totalPages}
+          hasNextPage={hasNextPage}
+        />
+      )}
     </>
   );
 }

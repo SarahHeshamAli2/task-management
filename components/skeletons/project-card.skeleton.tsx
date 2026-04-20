@@ -1,3 +1,5 @@
+import Header from "@/app/(dashboard)/project/_components/header";
+
 function ProjectCardSkeleton() {
   return (
     <div className="bg-white  md:p-6 rounded-lg min-h-62.5 flex flex-col justify-between animate-pulse">
@@ -14,7 +16,15 @@ function ProjectCardSkeleton() {
 }
 export default function ProjectsListSkeleton() {
   return (
-    <div className="grid grid-cols-3 gap-6">
+    <div className="grid md:grid-cols-3 gap-6">
+      <Header
+        title="Projects"
+        subtitle="Manage and curate your projects"
+        buttonText="Create new project"
+        linkHref="/project/add"
+        leftIcon="+"
+        buttonClassName="hidden md:block"
+      />
       {Array.from({ length: 10 }).map((_, i) => (
         <ProjectCardSkeleton key={i} />
       ))}

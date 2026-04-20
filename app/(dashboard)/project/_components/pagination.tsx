@@ -3,15 +3,8 @@
 import LeftChevron from "@/components/icons/left-chevron";
 import RightChevron from "@/components/icons/right-chevron";
 import Button from "@/components/ui/button";
+import { PaginationProps } from "@/lib/types/projects.type";
 import { usePathname, useSearchParams, useRouter } from "next/navigation";
-
-type Props = {
-  currentPage: number;
-  totalPages: number;
-  hasNextPage: boolean;
-  projectsCount: number;
-  projectsPerPage: number;
-};
 
 const navLinkClass =
   "w-8 h-8 border border-slate-light/30 flex items-center justify-center rounded-xs";
@@ -22,7 +15,7 @@ export default function Pagination({
   hasNextPage,
   projectsCount,
   projectsPerPage,
-}: Props) {
+}: PaginationProps) {
   const isFirst = currentPage <= 1;
   const isLast = !hasNextPage;
   const searchParams = useSearchParams();

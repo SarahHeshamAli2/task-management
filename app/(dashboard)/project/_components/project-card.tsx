@@ -1,10 +1,12 @@
 import CalendarIcon from "@/components/icons/calendar-icon";
 import { formatDate } from "@/lib/utils/format-date";
+import { Ref } from "react";
 
 type ProjectCardProps = {
   title: string;
   desc: string;
   createdAt: string;
+  ref?: Ref<HTMLDivElement>;
 };
 
 export default function ProjectCard({
@@ -13,9 +15,13 @@ export default function ProjectCard({
 curation for the high-rise residential
 complex in the downtown district`,
   createdAt = "12 Oct 2025",
+  ref,
 }: ProjectCardProps) {
   return (
-    <div className="bg-white p-6 rounded-lg min-h-55 flex flex-col justify-between">
+    <div
+      ref={ref}
+      className="bg-white p-6 rounded-lg min-h-55 flex flex-col justify-between"
+    >
       <div>
         <h1 className="text-slate-dark font-medium text-lg">{title}</h1>
         <p className="mt-3.5 text-secondary text-sm leading-6">{desc}</p>
