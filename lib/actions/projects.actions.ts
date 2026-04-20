@@ -1,11 +1,11 @@
 "use server";
 
+import { revalidateTag } from "next/cache";
 import { ProjectFormValues } from "../schemes/projects.schema";
 import { getToken } from "../utils/manage-token";
 
 export async function addProjectAction(data: ProjectFormValues) {
   const token = await getToken();
-  console.log(token, "tt");
 
   const response = await fetch(`${process.env.API_URL}/rest/v1/projects `, {
     method: "POST",
@@ -24,6 +24,7 @@ export async function addProjectAction(data: ProjectFormValues) {
       error: `${response.status}: ${errorMsg.message || "No details"}`,
     };
   }
+  revalidateTag("projects", "max");
 
   return { success: true };
 }

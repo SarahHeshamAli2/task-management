@@ -1,8 +1,14 @@
-export default function RightChevron() {
+export default function RightChevron({
+  width = "12",
+  height = "20",
+}: {
+  width?: string;
+  height?: string;
+}) {
   return (
     <svg
-      width="12"
-      height="20"
+      width={width}
+      height={height}
       viewBox="0 0 12 20"
       fill="none"
       xmlns="http://www.w3.org/2000/svg"
