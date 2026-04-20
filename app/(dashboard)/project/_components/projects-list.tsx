@@ -15,7 +15,7 @@ type Props = {
 };
 
 export default function ProjectsList({ searchParams }: Props) {
-  const limit = 10;
+  const limit = 4;
   const isMobile = useIsMobile();
 
   const [currentPage, setCurrentPage] = useState(
@@ -59,6 +59,7 @@ export default function ProjectsList({ searchParams }: Props) {
   const totalPages = Math.ceil(total / limit);
   const hasNextPage = currentPage < totalPages;
   const projectsPerPage = projects.length;
+  const shownUpTo = Math.min(currentPage * limit, total);
 
   return (
     <>
@@ -107,7 +108,7 @@ export default function ProjectsList({ searchParams }: Props) {
           </div>
         )}
       </div>
-      {!hasMore && (
+      {!hasMore && isMobile && (
         <p className=" my-3 text-end font-bold text-sm text-secondary capitalize">
           no more projects
         </p>
@@ -125,7 +126,7 @@ export default function ProjectsList({ searchParams }: Props) {
 
       {!isMobile && (
         <Pagination
-          projectsPerPage={projectsPerPage}
+          projectsPerPage={shownUpTo}
           projectsCount={total}
           currentPage={currentPage}
           totalPages={totalPages}
