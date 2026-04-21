@@ -8,12 +8,16 @@ function getLabel(segment: string): string {
   return labels[segment] ?? segment.charAt(0).toUpperCase() + segment.slice(1);
 }
 
-export function useBreadcrumb() {
+export function getPathSegments(pathname: string): string[] {
+  return pathname.split("/").filter(Boolean);
+}
+
+export function useBreadcrumb(resolvedLabels: Record<string, string> = {}) {
   const pathname = usePathname();
-  const segments = pathname.split("/").filter(Boolean);
+  const segments = getPathSegments(pathname);
 
   return segments.map((segment, index) => ({
-    label: getLabel(segment),
+    label: resolvedLabels[segment] ?? getLabel(segment),
     href: "/" + segments.slice(0, index + 1).join("/"),
     isLast: index === segments.length - 1,
   }));

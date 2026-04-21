@@ -3,7 +3,6 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { cn } from "@/lib/utils/tailwind-merge";
-import { useSidebarCollapsed } from "../context/sidebar-context";
 import {
   mainTabsList,
   projectTabsList,
@@ -11,7 +10,8 @@ import {
 
 export default function BottomNav() {
   const pathname = usePathname();
-  const { activeProjectId } = useSidebarCollapsed();
+  const projectIdMatch = pathname.match(/\/project\/([^/]+)/);
+  const activeProjectId = projectIdMatch ? projectIdMatch[1] : null;
   const tabs = activeProjectId
     ? projectTabsList.map((tab) => ({
         ...tab,

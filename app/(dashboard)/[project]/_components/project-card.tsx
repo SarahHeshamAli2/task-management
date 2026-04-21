@@ -1,10 +1,9 @@
-"use client";
-
 import CalendarIcon from "@/components/icons/calendar-icon";
 import { formatDate } from "@/lib/utils/format-date";
 import Link from "next/link";
 import { Ref } from "react";
 import { useSidebarCollapsed } from "../../context/sidebar-context";
+import Button from "@/components/ui/button";
 
 type ProjectCardProps = {
   title: string;
@@ -23,8 +22,6 @@ complex in the downtown district`,
   ref,
   id,
 }: ProjectCardProps) {
-  const { setActiveProjectId } = useSidebarCollapsed();
-
   return (
     <div
       ref={ref}
@@ -32,16 +29,10 @@ complex in the downtown district`,
     >
       <div>
         <div className="flex justify-between items-center">
-          <Link
-            onClick={() => setActiveProjectId(id ?? "")}
-            href={`project/${id}/epics`}
-          >
+          <Link href={`project/${id}/epics`}>
             <h1 className="text-slate-dark font-medium text-lg">{title}</h1>
           </Link>
-          <Link
-            href={`/project/${id}/edit`}
-            onClick={() => setActiveProjectId(id ?? "")}
-          >
+          <Link href={`/project/${id}/edit`}>
             <svg
               xmlns="http://www.w3.org/2000/svg"
               width="20"

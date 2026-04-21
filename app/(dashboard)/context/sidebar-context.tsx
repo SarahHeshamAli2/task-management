@@ -1,4 +1,5 @@
 "use client";
+import {} from "next/navigation";
 import { createContext, useContext, useState } from "react";
 
 const STORAGE_KEY = "sidebar-collapsed";
@@ -6,8 +7,6 @@ const STORAGE_KEY = "sidebar-collapsed";
 const SidebarContext = createContext<{
   isCollapsed: boolean;
   toggle: () => void;
-  activeProjectId: string | null;
-  setActiveProjectId: (id: string | null) => void;
 } | null>(null);
 
 export function SidebarProvider({ children }: { children: React.ReactNode }) {
@@ -17,7 +16,6 @@ export function SidebarProvider({ children }: { children: React.ReactNode }) {
     const stored = localStorage.getItem(STORAGE_KEY);
     return stored ? stored === "true" : true;
   });
-  const [activeProjectId, setActiveProjectId] = useState<string | null>(null);
 
   const toggle = () => {
     setIsCollapsed((prev) => {
@@ -28,9 +26,7 @@ export function SidebarProvider({ children }: { children: React.ReactNode }) {
   };
 
   return (
-    <SidebarContext.Provider
-      value={{ isCollapsed, toggle, activeProjectId, setActiveProjectId }}
-    >
+    <SidebarContext.Provider value={{ isCollapsed, toggle }}>
       {children}
     </SidebarContext.Provider>
   );

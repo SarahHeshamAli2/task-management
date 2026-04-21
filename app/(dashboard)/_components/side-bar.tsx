@@ -14,7 +14,6 @@ import {
   mainTabsList,
   projectTabsList,
 } from "@/lib/constants/dashboard.constants";
-import { useEffect } from "react";
 
 function SidebarContent({
   isCollapsed,
@@ -25,12 +24,9 @@ function SidebarContent({
 }) {
   const pathname = usePathname();
   const { handleLogout } = useLogout();
-  const { activeProjectId, setActiveProjectId } = useSidebarCollapsed();
-  useEffect(() => {
-    if (pathname === "/project") {
-      setActiveProjectId(null);
-    }
-  }, [pathname, setActiveProjectId]);
+
+  const projectIdMatch = pathname.match(/\/project\/([^/]+)/);
+  const activeProjectId = projectIdMatch ? projectIdMatch[1] : null;
 
   const tabs = activeProjectId
     ? projectTabsList.map((tab) => ({
