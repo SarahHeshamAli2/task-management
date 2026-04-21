@@ -1,4 +1,4 @@
-import Header from "@/app/(dashboard)/project/_components/header";
+import Header from "@/app/(dashboard)/[project]/_components/header";
 
 function ProjectCardSkeleton() {
   return (

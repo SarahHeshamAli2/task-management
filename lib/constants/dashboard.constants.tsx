@@ -11,30 +11,25 @@ type Tabs = {
   id: number;
 };
 
-export const tabsList: Tabs[] = [
+export const mainTabsList: Tabs[] = [
   { icon: <ProjectIcon />, title: "Projects", href: "/project", id: 1 },
-  {
-    icon: <ProjectEpicIcon />,
-    title: "Project Epics",
-    href: "/projects-epic",
-    id: 2,
-  },
-  {
-    icon: <ProjectTaskIcon />,
-    title: "Project Tasks",
-    href: "/projects-tasks",
-    id: 3,
-  },
+];
+
+export const projectTabsList: Tabs[] = [
+  { icon: <ProjectIcon />, title: "Projects", href: "/project", id: 1 },
+
+  { icon: <ProjectEpicIcon />, title: "Project Epics", href: "epics", id: 2 },
+  { icon: <ProjectTaskIcon />, title: "Project Tasks", href: "tasks", id: 3 },
   {
     icon: <ProjectMemeberIcon />,
     title: "Project Members",
-    href: "/projects-member",
+    href: "members",
     id: 4,
   },
   {
     icon: <ProjectDetailsIcon />,
     title: "Project Details",
-    href: "/projects-details",
+    href: "edit",
     id: 5,
   },
 ];

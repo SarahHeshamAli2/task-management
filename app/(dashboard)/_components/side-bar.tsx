@@ -10,7 +10,11 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useLogout } from "@/lib/hooks/use-logout";
 import { useSidebarCollapsed } from "../context/sidebar-context";
-import { tabsList } from "@/lib/constants/dashboard.constants";
+import {
+  mainTabsList,
+  projectTabsList,
+} from "@/lib/constants/dashboard.constants";
+import { useEffect } from "react";
 
 function SidebarContent({
   isCollapsed,
@@ -21,6 +25,21 @@ function SidebarContent({
 }) {
   const pathname = usePathname();
   const { handleLogout } = useLogout();
+  const { activeProjectId, setActiveProjectId } = useSidebarCollapsed();
+  useEffect(() => {
+    if (pathname === "/project") {
+      setActiveProjectId(null);
+    }
+  }, [pathname, setActiveProjectId]);
+
+  const tabs = activeProjectId
+    ? projectTabsList.map((tab) => ({
+        ...tab,
+        href: tab.href.startsWith("/")
+          ? tab.href
+          : `/project/${activeProjectId}/${tab.href}`,
+      }))
+    : mainTabsList;
 
   return (
     <aside className="h-full bg-surface-low px-4 flex flex-col justify-between">
@@ -28,7 +47,7 @@ function SidebarContent({
         {!isCollapsed && <Logo className="mt-4 mb-8" />}
 
         <ul>
-          {tabsList.map((li) => {
+          {tabs.map((li) => {
             const isActive = pathname === li.href;
             return (
               <li key={li.id}>

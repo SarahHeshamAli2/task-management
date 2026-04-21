@@ -3,14 +3,27 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { cn } from "@/lib/utils/tailwind-merge";
-import { tabsList } from "@/lib/constants/dashboard.constants";
+import { useSidebarCollapsed } from "../context/sidebar-context";
+import {
+  mainTabsList,
+  projectTabsList,
+} from "@/lib/constants/dashboard.constants";
 
 export default function BottomNav() {
   const pathname = usePathname();
+  const { activeProjectId } = useSidebarCollapsed();
+  const tabs = activeProjectId
+    ? projectTabsList.map((tab) => ({
+        ...tab,
+        href: tab.href.startsWith("/")
+          ? tab.href
+          : `/project/${activeProjectId}/${tab.href}`,
+      }))
+    : mainTabsList;
 
   return (
     <nav className="md:hidden fixed bottom-0 inset-x-0 z-30 bg-surface-low py-3.5 flex">
-      {tabsList.map((tab) => {
+      {tabs.map((tab) => {
         const isActive = pathname === tab.href;
         return (
           <Link
