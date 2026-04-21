@@ -1,5 +1,5 @@
-import AddProjectForm from "./_components/add-project-form";
+import ProjectForm from "../_components/project-form";
 
 export default function page() {
-  return <AddProjectForm />;
+  return <ProjectForm mode="add" />;
 }
