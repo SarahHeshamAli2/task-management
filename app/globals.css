@@ -32,6 +32,12 @@
   --color-secondary: #434654;
   --color-input-error: #93000a;
   --color-input-error-light: #ffdad6;
+  --background-image-skeleton: linear-gradient(
+    90deg,
+    var(--color-ocean),
+    var(--color-surface-low),
+    var(--color-ocean)
+  );
   /* Typography */
   --font-sans: var(--font-inter);
 }
