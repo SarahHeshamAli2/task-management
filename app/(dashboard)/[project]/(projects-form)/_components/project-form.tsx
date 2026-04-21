@@ -71,8 +71,10 @@ export default function ProjectForm({
         ? await updateProjectAction(data, projectId)
         : await addProjectAction(data);
 
-    console.log(response);
-
+    if (!response.success) {
+      setError(response.error);
+      return;
+    }
     toast.success(successMessage);
     setTimeout(() => router.push(redirectPath), 1000);
   };
@@ -87,7 +89,9 @@ export default function ProjectForm({
       />
       <div className="md:bg-white max-w-2xl mx-auto">
         <form onSubmit={handleSubmit(onSubmit)}>
-          <FormHeader />
+          <FormHeader
+            title={mode == "edit" ? "Edit Project" : "Initialize New Project"}
+          />
 
           <div className="md:p-8 p-6">
             <Input

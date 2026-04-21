@@ -1,4 +1,4 @@
-export default function FormHeader() {
+export default function FormHeader({ title }: { title: string }) {
   return (
     <div className="border-b border-surface-low md:pb-10 flex items-center gap-4 md:p-8 px-6">
       <div className="bg-primary-container/10 w-11.5 h-11 md:flex justify-center items-center rounded-sm hidden">
@@ -16,7 +16,7 @@ export default function FormHeader() {
         </svg>
       </div>
       <div>
-        <p className="font-semibold text-2xl">Initialize New Project</p>
+        <p className="font-semibold text-2xl">{title}</p>
         <span className="text-slate-container text-sm">
           Define the scope and foundational details of your project.
         </span>
