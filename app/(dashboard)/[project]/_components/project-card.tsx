@@ -2,8 +2,6 @@ import CalendarIcon from "@/components/icons/calendar-icon";
 import { formatDate } from "@/lib/utils/format-date";
 import Link from "next/link";
 import { Ref } from "react";
-import { useSidebarCollapsed } from "../../context/sidebar-context";
-import Button from "@/components/ui/button";
 
 type ProjectCardProps = {
   title: string;

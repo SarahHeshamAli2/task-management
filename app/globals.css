@@ -42,7 +42,3 @@
     --foreground: #ededed;
   }
 }
-
-[data-sidebar="collapsed"] .layout-root {
-  flex-direction: column;
-}
