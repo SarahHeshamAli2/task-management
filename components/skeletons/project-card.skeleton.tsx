@@ -16,7 +16,7 @@ function ProjectCardSkeleton() {
 }
 export default function ProjectsListSkeleton() {
   return (
-    <div className="grid md:grid-cols-3 gap-6">
+    <>
       <Header
         title="Projects"
         subtitle="Manage and curate your projects"
@@ -25,9 +25,11 @@ export default function ProjectsListSkeleton() {
         leftIcon="+"
         buttonClassName="hidden md:block"
       />
-      {Array.from({ length: 10 }).map((_, i) => (
-        <ProjectCardSkeleton key={i} />
-      ))}
-    </div>
+      <div className="grid md:grid-cols-3 gap-6">
+        {Array.from({ length: 10 }).map((_, i) => (
+          <ProjectCardSkeleton key={i} />
+        ))}
+      </div>
+    </>
   );
 }
