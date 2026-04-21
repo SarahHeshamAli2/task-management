@@ -9,7 +9,6 @@ import UseGetProjects from "../hooks/use-get-projects";
 import ProjectsListSkeleton from "@/components/skeletons/project-card.skeleton";
 import { useIsMobile } from "@/lib/hooks/use-mobile";
 import { useRef, useCallback, useState } from "react";
-import { useSidebarCollapsed } from "../../context/sidebar-context";
 
 type Props = {
   searchParams: { page?: string };
@@ -18,7 +17,6 @@ type Props = {
 export default function ProjectsList({ searchParams }: Props) {
   const limit = 4;
   const isMobile = useIsMobile();
-  const { setActiveProjectId } = useSidebarCollapsed();
 
   const [currentPage, setCurrentPage] = useState(
     () => Number(searchParams?.page) || 1
@@ -77,19 +75,14 @@ export default function ProjectsList({ searchParams }: Props) {
         {projects?.map((project, index) => {
           const isLast = projects.length === index + 1;
           return (
-            <Link
-              onClick={() => setActiveProjectId(project.id)}
+            <ProjectCard
+              id={project.id}
               key={project.id}
-              href={`project/${project.id}/epics`}
-            >
-              <ProjectCard
-                // Only attach the scroll observer ref on mobile
-                ref={isLast && isMobile ? lastElementRef : undefined}
-                title={project.name}
-                createdAt={project.created_at}
-                desc={project.description}
-              />
-            </Link>
+              ref={isLast && isMobile ? lastElementRef : undefined}
+              title={project.name}
+              createdAt={project.created_at}
+              desc={project.description}
+            />
           );
         })}
 

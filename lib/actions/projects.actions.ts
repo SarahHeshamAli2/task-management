@@ -28,3 +28,35 @@ export async function addProjectAction(data: ProjectFormValues) {
 
   return { success: true };
 }
+export async function updateProjectAction(
+  data: ProjectFormValues,
+  projectId: string
+) {
+  const token = await getToken();
+
+  const response = await fetch(
+    `${process.env.API_URL}/rest/v1/projects?id=eq.${projectId}`,
+    {
+      method: "PATCH",
+      headers: {
+        "Content-Type": "application/json",
+        authorization: `Bearer ${token}`,
+
+        apiKey: `${process.env.API_KEY}`,
+      },
+      body: JSON.stringify(data),
+    }
+  );
+  console.log(response, "update response");
+
+  if (!response.ok) {
+    const errorMsg = await response.json();
+    return {
+      success: false,
+      error: `${response.status}: ${errorMsg.message || "No details"}`,
+    };
+  }
+  revalidateTag("projects", "max");
+
+  return { success: true };
+}
