@@ -4,7 +4,7 @@ export const breadcrumbResolvers: Record<
 > = {
   projects: async (id: string) => {
     try {
-      const res = await fetch(`/api/projectdetail?id=${id}`);
+      const res = await fetch(`/api/project-detail?id=${id}`);
       console.log(res, "rrrr");
 
       if (!res.ok) return null;

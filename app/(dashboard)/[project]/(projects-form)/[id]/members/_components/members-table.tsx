@@ -26,7 +26,7 @@ export default function MembersTable({ members }: { members: Members }) {
           </tr>
         </thead>
         <tbody>
-          {members.data?.map((member) => {
+          {members?.map((member) => {
             const colors = getAvatarColors(
               member.member_id ?? member.metadata.name
             );

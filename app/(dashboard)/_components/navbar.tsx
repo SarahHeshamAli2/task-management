@@ -11,7 +11,7 @@ export default function Navbar() {
     <div
       className={cn(
         "bg-background w-full border-b px-6 border-[#0000001A] min-h-16 flex justify-between",
-        !isCollapsed && "justify-end"
+        !isCollapsed && "justify-end",
       )}
     >
       {isCollapsed && (

@@ -25,15 +25,17 @@ export default function Header({
     <div className={cn("flex items-center justify-between mb-10", className)}>
       <div>
         <h3 className="font-semibold text-3xl">{title}</h3>
-        <p className="text-secondary mt-1">{subtitle}</p>
+        <p className="text-secondary mt-1 max-w-lg">{subtitle}</p>
       </div>
-      <Button
-        iconClassName="me-2"
-        leftIcon={leftIcon}
-        className={cn("rounded-xs", buttonClassName)}
-      >
-        <Link href={linkHref ?? ""}>{buttonText}</Link>
-      </Button>
+      {buttonText && (
+        <Button
+          iconClassName="me-2"
+          leftIcon={leftIcon}
+          className={cn("rounded-xs", buttonClassName)}
+        >
+          <Link href={linkHref ?? ""}>{buttonText}</Link>
+        </Button>
+      )}
     </div>
   );
 }

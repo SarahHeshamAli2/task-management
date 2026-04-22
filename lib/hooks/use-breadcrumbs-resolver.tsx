@@ -4,7 +4,7 @@ import { UUID_REGEX } from "../utils/uuid-checker";
 
 export function useResolveBreadcrumbLabels(segments: string[]) {
   const [resolvedLabels, setResolvedLabels] = useState<Record<string, string>>(
-    {}
+    {},
   );
 
   useEffect(() => {
@@ -23,7 +23,7 @@ export function useResolveBreadcrumbLabels(segments: string[]) {
             return [seg, name ?? seg] as const;
           }
           return null;
-        })
+        }),
       );
 
       if (!cancelled) {

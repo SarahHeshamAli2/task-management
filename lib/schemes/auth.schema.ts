@@ -8,11 +8,11 @@ export const registerSchema = z
       .max(50, "Name must be at most 50 characters")
       .refine(
         (val) => /^[\p{L} ]*$/u.test(val),
-        "Name may only contain letters and spaces"
+        "Name may only contain letters and spaces",
       )
       .refine(
         (val) => !/ {2,}/.test(val),
-        "Name must not contain consecutive spaces"
+        "Name must not contain consecutive spaces",
       ),
 
     email: z.email("please enter a valid email"),
@@ -27,7 +27,7 @@ export const registerSchema = z
       .regex(/[0-9]/, "Password must contain at least one digit")
       .regex(
         /[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?`~]/,
-        "Password must contain at least one special character"
+        "Password must contain at least one special character",
       ),
 
     confirmPassword: z.string().min(1, "Please confirm your password"),
@@ -66,7 +66,7 @@ export const resetPasswordSchema = z
       .regex(/[0-9]/, "Password must contain at least one digit")
       .regex(
         /[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?`~]/,
-        "Password must contain at least one special character"
+        "Password must contain at least one special character",
       ),
 
     confirmPassword: z.string().min(1, "Please confirm your password"),

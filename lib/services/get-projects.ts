@@ -1,7 +1,7 @@
 import { getToken } from "../utils/manage-token";
 
 export async function getAllProjectsService(
-  params: Record<string, string | number> = {}
+  params: Record<string, string | number> = {},
 ) {
   const token = await getToken();
   const url = new URL(`${process.env.API_URL}/rest/v1/rpc/get_projects`);

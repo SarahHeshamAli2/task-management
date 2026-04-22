@@ -31,7 +31,7 @@ export default function BottomNav() {
             href={tab.href}
             className={cn(
               "flex flex-col items-center justify-center flex-1 py-2 text-xs gap-1 transition-colors",
-              isActive ? "text-primary" : "text-slate-dark/70"
+              isActive ? "text-primary" : "text-slate-dark/70",
             )}
           >
             {tab.icon}

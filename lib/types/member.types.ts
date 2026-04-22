@@ -13,6 +13,4 @@ export type Member = {
     phone_verified: boolean;
   };
 };
-export type Members = {
-  data: Member[];
-};
+export type Members = Member[];

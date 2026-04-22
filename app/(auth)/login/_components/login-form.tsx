@@ -45,7 +45,7 @@ export default function LoginForm() {
           email: response.user.email,
           department: response.user.user_metadata.department,
           role: response.user.role,
-        })
+        }),
       );
       router.push("/project");
     }

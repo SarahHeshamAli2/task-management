@@ -11,7 +11,7 @@ export async function getProjectDetail(id: string) {
         apiKey: `${process.env.API_KEY}`,
         "Content-Type": "application/json",
       },
-    }
+    },
   );
 
   if (response.status === 401) {

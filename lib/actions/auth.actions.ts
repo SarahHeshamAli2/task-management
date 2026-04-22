@@ -14,7 +14,7 @@ import {
 import { cookies } from "next/headers";
 
 export async function registerAction(
-  data: SubmittedRegisterValues
+  data: SubmittedRegisterValues,
 ): Promise<ApiResponse<RegisterResponse>> {
   const response = await fetch(`${process.env.API_URL}/auth/v1/signup`, {
     method: "POST",
@@ -28,7 +28,7 @@ export async function registerAction(
   return response.json();
 }
 export async function loginAction(
-  data: LoginFormValues
+  data: LoginFormValues,
 ): Promise<ApiResponse<LoginResponse>> {
   const { rememberMe, ...credentials } = data;
   const response = await fetch(
@@ -40,7 +40,7 @@ export async function loginAction(
         apiKey: `${process.env.API_KEY}`,
       },
       body: JSON.stringify(credentials),
-    }
+    },
   );
   const json = await response.json();
   if (!response.ok) {
@@ -82,7 +82,7 @@ export async function loginAction(
       sameSite: "lax",
       path: "/",
       maxAge: rememberMe ? 60 * 60 * 24 * 30 : 60 * 60,
-    }
+    },
   );
   cookieStore.set("session_type", rememberMe ? "persistent" : "session", {
     sameSite: "lax",
@@ -93,7 +93,7 @@ export async function loginAction(
 }
 
 export async function forgotPasswordAction(
-  data: ForgotPasswordFormValues
+  data: ForgotPasswordFormValues,
 ): Promise<ApiResponse<ForgotPasswordResponse>> {
   const response = await fetch(`${process.env.API_URL}/auth/v1/recover`, {
     method: "POST",
@@ -109,7 +109,7 @@ export async function forgotPasswordAction(
 
 export async function resetPasswordAction(
   data: ResetPasswordFormValues,
-  token: string | null
+  token: string | null,
 ): Promise<ApiResponse<RegisterResponse>> {
   const response = await fetch(`${process.env.API_URL}/auth/v1/user`, {
     method: "PUT",
@@ -135,7 +135,7 @@ export async function refreshAccessToken(refreshToken: string) {
         apiKey: `${process.env.API_KEY}`,
       },
       body: JSON.stringify({ refresh_token: refreshToken }),
-    }
+    },
   );
   if (!res.ok) return null;
   return res.json();
@@ -151,7 +151,7 @@ export async function verifyToken(token: string) {
   return res.ok;
 }
 export async function getUserData(
-  token: string | null | undefined
+  token: string | null | undefined,
 ): Promise<RegisterResponse> {
   const res = await fetch(`${process.env.API_URL}/auth/v1/user`, {
     headers: {

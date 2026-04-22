@@ -4,8 +4,8 @@ import AddMemberIcon from "@/components/icons/add-member-icon";
 import { getProjectMembers } from "@/lib/services/get-project-members";
 
 export default async function MemberCard({ id }: { id: string | null }) {
-  const members = await getProjectMembers(id ?? "");
-  console.log(members);
+  const { data: members } = await getProjectMembers(id ?? "");
+  console.log(members, "memver ");
 
   return (
     <div>

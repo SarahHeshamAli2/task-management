@@ -19,13 +19,13 @@ export default function ProjectsList({ searchParams }: Props) {
   const isMobile = useIsMobile();
 
   const [currentPage, setCurrentPage] = useState(
-    () => Number(searchParams?.page) || 1
+    () => Number(searchParams?.page) || 1,
   );
 
   const offset = (currentPage - 1) * limit;
 
   const { projects, total, isLoading, isInitialLoad, hasMore } = UseGetProjects(
-    { limit, offset, append: isMobile }
+    { limit, offset, append: isMobile },
   );
 
   const observer = useRef<IntersectionObserver | null>(null);
@@ -44,7 +44,7 @@ export default function ProjectsList({ searchParams }: Props) {
 
       if (node) observer.current.observe(node);
     },
-    [isLoading, hasMore, isMobile]
+    [isLoading, hasMore, isMobile],
   );
 
   // Show skeleton only on the very first load, not on every paginated fetch

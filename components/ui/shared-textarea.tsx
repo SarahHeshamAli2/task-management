@@ -35,7 +35,7 @@ export default function TextArea({
           <label
             className={cn(
               "text-xs uppercase font-bold flex",
-              error ? "text-error" : "text-slate-container"
+              error ? "text-error" : "text-slate-container",
             )}
           >
             {label}
@@ -55,7 +55,7 @@ export default function TextArea({
             error
               ? "bg-input-error-light text-input-error"
               : "bg-surface-highest text-placeholder border-slate-300 focus:border-primary placeholder:text-placeholder",
-            className
+            className,
           )}
           {...props}
           maxLength={maxLength}

@@ -10,9 +10,6 @@ const eslintConfig = defineConfig([
   prettierConfig,
   {
     plugins: { prettier: prettierPlugin },
-    rules: {
-      "prettier/prettier": "error",
-    },
   },
   globalIgnores([".next/**", "out/**", "build/**", "next-env.d.ts"]),
 ]);

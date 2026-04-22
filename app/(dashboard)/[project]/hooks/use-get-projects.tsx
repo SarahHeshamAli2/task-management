@@ -31,13 +31,13 @@ export default function UseGetProjects({
         setError(false);
 
         const response = await fetch(
-          `/api/projects?limit=${limit}&offset=${offset}`
+          `/api/projects?limit=${limit}&offset=${offset}`,
         );
         const data = await response.json();
 
         setProjects((prev) =>
           // On first fetch (offset === 0), replace. Otherwise append.
-          !append || offset === 0 ? data.data : [...prev, ...data.data]
+          !append || offset === 0 ? data.data : [...prev, ...data.data],
         );
 
         setTotal(data.total);

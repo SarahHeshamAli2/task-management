@@ -1,3 +1,4 @@
+import { Member } from "../types/member.types";
 import { getToken } from "../utils/manage-token";
 
 export async function getProjectMembers(id: string) {
@@ -22,7 +23,7 @@ export async function getProjectMembers(id: string) {
     throw new Error("NETWORK ERROR");
   }
 
-  const data = await response.json();
+  const data: Member[] = await response.json();
 
   return {
     data,

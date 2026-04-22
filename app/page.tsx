@@ -35,7 +35,7 @@ export default function HomePage() {
         router.replace(`/reset-password?access_token=${accessToken}`);
       } else {
         router.replace(
-          `/reset-password?error=${encodeURIComponent("Invalid or expired reset link.")}`
+          `/reset-password?error=${encodeURIComponent("Invalid or expired reset link.")}`,
         );
       }
     } else {
