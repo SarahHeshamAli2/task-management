@@ -18,7 +18,7 @@ type Props = {
 };
 
 export default function EpicList({ searchParams }: Props) {
-  const limit = 1;
+  const limit = 6;
   const isMobile = useIsMobile();
   const params = useParams();
   const id = params.id as string;
@@ -94,11 +94,14 @@ architectural clarity."
   return (
     <>
       <Header
+        showSearch
         title="Project Epics"
+        searchPlaceholder="Search epics..."
         buttonText="New Epic"
         linkHref={addEpicHref}
         leftIcon="+"
         buttonClassName="hidden md:block"
+        titleClassName="hidden md:block"
       />
 
       <div className="grid md:grid-cols-2 gap-6">

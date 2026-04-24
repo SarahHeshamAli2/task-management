@@ -9,6 +9,7 @@ type SharedInputProps = {
   hint?: string;
   optional?: boolean;
   rightIcon?: React.ReactNode;
+  leftIcon?: React.ReactNode;
   iconClassName?: string;
   link?: string;
   href?: string;
@@ -24,6 +25,7 @@ export default function Input({
   hint,
   optional,
   rightIcon,
+  leftIcon,
   iconClassName,
   link,
   href,
@@ -32,7 +34,7 @@ export default function Input({
   ...props
 }: SharedInputProps) {
   return (
-    <div className="flex flex-col gap-1 mt-6">
+    <div className={cn("flex flex-col gap-1 mt-6", className)}>
       {label && (
         <div className="flex items-center justify-between mb-1.5">
           <label
@@ -70,6 +72,7 @@ export default function Input({
             "w-full px-4 py-3.5 rounded-sm text-sm outline-none transition-colors",
             "disabled:opacity-50 disabled:cursor-not-allowed",
             rightIcon && "pe-10",
+            leftIcon && "ps-10",
             error
               ? "bg-input-error-light text-input-error"
               : "bg-surface-highest text-placeholder border-slate-300 focus:border-primary placeholder:text-placeholder",
@@ -77,6 +80,16 @@ export default function Input({
           )}
           {...props}
         />
+        {leftIcon && (
+          <div
+            className={cn(
+              "absolute inset-y-0 inset-s-0 flex items-center ps-3 pointer-events-none text-placeholder",
+              iconClassName
+            )}
+          >
+            {leftIcon}
+          </div>
+        )}
         {rightIcon && (
           <div
             className={cn(
