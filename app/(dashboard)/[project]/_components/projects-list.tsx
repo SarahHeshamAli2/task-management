@@ -8,14 +8,15 @@ import Pagination from "./pagination";
 import UseGetProjects from "../hooks/use-get-projects";
 import ProjectsListSkeleton from "@/components/skeletons/project-card.skeleton";
 import { useIsMobile } from "@/lib/hooks/use-mobile";
-import { useRef, useCallback, useState } from "react";
+import { useState, useCallback } from "react";
+import { useInfiniteScroll } from "@/lib/hooks/use-infinite-scroll";
 
 type Props = {
   searchParams: { page?: string };
 };
 
 export default function ProjectsList({ searchParams }: Props) {
-  const limit = 4;
+  const limit = 6;
   const isMobile = useIsMobile();
 
   const [currentPage, setCurrentPage] = useState(
@@ -28,24 +29,17 @@ export default function ProjectsList({ searchParams }: Props) {
     { limit, offset, append: isMobile }
   );
 
-  const observer = useRef<IntersectionObserver | null>(null);
+  // Stable callback so the hook's dependency array stays tight
+  const handleLoadMore = useCallback(() => {
+    setCurrentPage((prev) => prev + 1);
+  }, []);
 
-  const lastElementRef = useCallback(
-    (node: HTMLElement | null) => {
-      if (!isMobile) return;
-      if (isLoading) return;
-      if (observer.current) observer.current.disconnect();
-
-      observer.current = new IntersectionObserver((entries) => {
-        if (entries[0].isIntersecting && hasMore && !isLoading) {
-          setCurrentPage((prev) => prev + 1);
-        }
-      });
-
-      if (node) observer.current.observe(node);
-    },
-    [isLoading, hasMore, isMobile]
-  );
+  const { lastElementRef } = useInfiniteScroll({
+    isLoading,
+    hasMore,
+    onLoadMore: handleLoadMore,
+    enabled: isMobile,
+  });
 
   // Show skeleton only on the very first load, not on every paginated fetch
   if (isInitialLoad && isLoading) {
@@ -78,7 +72,7 @@ export default function ProjectsList({ searchParams }: Props) {
             <ProjectCard
               id={project.id}
               key={project.id}
-              ref={isLast && isMobile ? lastElementRef : undefined}
+              ref={isLast ? lastElementRef : undefined}
               title={project.name}
               createdAt={project.created_at}
               desc={project.description}
@@ -86,7 +80,7 @@ export default function ProjectsList({ searchParams }: Props) {
           );
         })}
 
-        {/* Loading indicator for inifite scroll */}
+        {/* Loading indicator for infinite scroll */}
         {isMobile && isLoading && (
           <div className="col-span-full flex justify-center py-4">
             <span className="text-secondary text-sm">Loading more...</span>
@@ -107,11 +101,13 @@ export default function ProjectsList({ searchParams }: Props) {
           </div>
         )}
       </div>
+
       {!hasMore && isMobile && (
-        <p className=" my-3 text-end font-bold text-sm text-secondary capitalize">
+        <p className="my-3 text-end font-bold text-sm text-secondary capitalize">
           no more projects
         </p>
       )}
+
       {isMobile && (
         <Link
           className="w-14 h-14 sm:hidden rounded-xl ms-auto bg-primary flex items-center justify-center mb-15"

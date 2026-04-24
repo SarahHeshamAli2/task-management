@@ -3,13 +3,14 @@ import PlusIcon from "@/components/icons/plus-icon";
 import Link from "next/link";
 import ProjectsListSkeleton from "@/components/skeletons/project-card.skeleton";
 import { useIsMobile } from "@/lib/hooks/use-mobile";
-import { useRef, useCallback, useState } from "react";
+import { useState, useCallback } from "react";
 import Header from "@/app/(dashboard)/[project]/_components/header";
 import Pagination from "@/app/(dashboard)/[project]/_components/pagination";
 import EmptyState from "@/app/(dashboard)/[project]/_components/empty-state";
 import { useParams } from "next/navigation";
 import useGetEpics from "../hooks/use-get-epics";
 import EpicCard from "./epic-card";
+import { useInfiniteScroll } from "@/lib/hooks/use-infinite-scroll";
 
 type Props = {
   searchParams: { page?: string };
@@ -33,29 +34,18 @@ export default function EpicList({ searchParams }: Props) {
     append: isMobile,
     id,
   });
-  console.log(epics, "epopo");
-  console.log(offset, "d");
 
-  const observer = useRef<IntersectionObserver | null>(null);
+  const handleLoadMore = useCallback(() => {
+    setCurrentPage((prev) => prev + 1);
+  }, []);
 
-  const lastElementRef = useCallback(
-    (node: HTMLElement | null) => {
-      if (!isMobile) return;
-      if (isLoading) return;
-      if (observer.current) observer.current.disconnect();
+  const { lastElementRef } = useInfiniteScroll({
+    isLoading,
+    hasMore,
+    onLoadMore: handleLoadMore,
+    enabled: isMobile,
+  });
 
-      observer.current = new IntersectionObserver((entries) => {
-        if (entries[0].isIntersecting && hasMore && !isLoading) {
-          setCurrentPage((prev) => prev + 1);
-        }
-      });
-
-      if (node) observer.current.observe(node);
-    },
-    [isLoading, hasMore, isMobile]
-  );
-
-  // Show skeleton only on the very first load, not on every paginated fetch
   if (isInitialLoad && isLoading) {
     return <ProjectsListSkeleton />;
   }
@@ -86,7 +76,7 @@ export default function EpicList({ searchParams }: Props) {
             <EpicCard
               id={epic.epic_id}
               key={epic.id}
-              ref={isLast && isMobile ? lastElementRef : undefined}
+              ref={isLast ? lastElementRef : undefined}
               title={epic.title}
               createdAt={epic.created_at}
               userName={epic.assignee.name}
@@ -97,7 +87,7 @@ export default function EpicList({ searchParams }: Props) {
           );
         })}
 
-        {/* Loading indicator for inifite scroll */}
+        {/* Loading indicator for infinite scroll */}
         {isMobile && isLoading && (
           <div className="col-span-full flex justify-center py-4">
             <span className="text-secondary text-sm">Loading more...</span>
@@ -118,11 +108,13 @@ export default function EpicList({ searchParams }: Props) {
           </div>
         )}
       </div>
+
       {!hasMore && isMobile && (
-        <p className=" my-3 text-end font-bold text-sm text-secondary capitalize">
+        <p className="my-3 text-end font-bold text-sm text-secondary capitalize">
           no more epics
         </p>
       )}
+
       {isMobile && (
         <Link
           className="w-14 h-14 sm:hidden rounded-xl ms-auto bg-primary flex items-center justify-center mb-15"

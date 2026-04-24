@@ -5,7 +5,14 @@ import RulerIcon from "@/components/icons/ruler-icon";
 import Button from "@/components/ui/button";
 import Link from "next/link";
 
-export default function EmptyState() {
+type EmptyStateProps = {
+  title?: string;
+};
+
+export default function EmptyState({
+  title = `You don’t have any projects yet. Start by defining your first
+        architectural workspace to begin tracking tasks and epics.`,
+}: EmptyStateProps) {
   return (
     <div className="flex flex-col items-center justify-center min-h-full">
       <div
@@ -30,8 +37,7 @@ export default function EmptyState() {
 
       <h3 className="font-semibold text-4xl mt-11">No Projects</h3>
       <p className="leading-7 text-secondary max-w-108.5 text-lg text-center mt-4 mb-11">
-        You don’t have any projects yet. Start by defining your first
-        architectural workspace to begin tracking tasks and epics.
+        {title}
       </p>
       <Button className="px-8" iconClassName="me-3" leftIcon={<PlusIcon />}>
         <Link href={"/project/add"}>Create New Project</Link>

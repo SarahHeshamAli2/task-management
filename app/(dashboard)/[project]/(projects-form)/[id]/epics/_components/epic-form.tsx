@@ -55,26 +55,29 @@ export default function EpicForm({
   const { register, handleSubmit, formState } = useForm<EpicFormValues>({
     resolver: zodResolver(addEpicSchema),
     defaultValues: {
+      assignee_id: undefined,
+      deadline: undefined,
       title: defaultValues?.name ?? "",
       description: defaultValues?.description ?? undefined,
       project_id: projectId,
     },
   });
 
-  console.log(members, "mm");
-  console.log(projectId, "id");
-
   const [error, setError] = useState<string | undefined>();
   console.log(formState.errors, "ee");
 
   const onSubmit = async (data: EpicFormValues) => {
+    const payload = {
+      ...data,
+      assignee_id: data.assignee_id || undefined,
+      deadline: data.deadline || undefined,
+    };
     // const response =
     //   mode === "edit" && projectId
     //     ? await updateProjectAction(data, projectId)
     //     : await addEpicAction(data);
 
-    const response = await addEpicAction(data);
-    console.log(response, "rr");
+    const response = await addEpicAction(payload);
 
     if (!response.success) {
       setError(response.error);

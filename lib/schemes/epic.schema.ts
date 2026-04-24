@@ -1,5 +1,8 @@
 import { z } from "zod";
 
+const today = new Date();
+today.setHours(0, 0, 0, 0);
+
 export const addEpicSchema = z.object({
   title: z
     .string()
@@ -9,9 +12,15 @@ export const addEpicSchema = z.object({
     .string()
     .max(500, "Description cannot exceed 500 characters.")
     .optional(),
-  assignee_id: z.string().min(1, "Assignee is required"),
+  assignee_id: z.string().optional(),
   project_id: z.string(),
-  deadline: z.string().min(1, "Deadline is required"),
+  deadline: z
+    .string()
+    .optional()
+    .refine(
+      (val) => !val || new Date(val) >= today,
+      "Deadline must be today or a future date."
+    ),
 });
 
 export type EpicFormValues = z.infer<typeof addEpicSchema>;
