@@ -1,23 +1,24 @@
 "use client";
 import PlusIcon from "@/components/icons/plus-icon";
 import Link from "next/link";
-import ProjectsListSkeleton from "@/components/skeletons/project-card.skeleton";
 import { useIsMobile } from "@/lib/hooks/use-mobile";
 import { useState, useCallback } from "react";
 import Header from "@/app/(dashboard)/[project]/_components/header";
 import Pagination from "@/app/(dashboard)/[project]/_components/pagination";
-import EmptyState from "@/app/(dashboard)/[project]/_components/empty-state";
 import { useParams } from "next/navigation";
 import useGetEpics from "../hooks/use-get-epics";
 import EpicCard from "./epic-card";
 import { useInfiniteScroll } from "@/lib/hooks/use-infinite-scroll";
+import EmptyState from "@/components/shared/empty-state";
+import { EpicGridDecoration } from "@/components/ui/epic-grid-decoration";
+import EpicCardListSkeleton from "@/components/skeletons/epic-card.skeleton";
 
 type Props = {
   searchParams: { page?: string };
 };
 
 export default function EpicList({ searchParams }: Props) {
-  const limit = 10;
+  const limit = 1;
   const isMobile = useIsMobile();
   const params = useParams();
   const id = params.id as string;
@@ -47,11 +48,42 @@ export default function EpicList({ searchParams }: Props) {
   });
 
   if (isInitialLoad && isLoading) {
-    return <ProjectsListSkeleton />;
+    return <EpicCardListSkeleton />;
   }
 
   if (!isLoading && !isInitialLoad && epics?.length === 0) {
-    return <EmptyState />;
+    return (
+      <EmptyState
+        icon={<EpicGridDecoration />}
+        centralClassName="bg-white"
+        cardBackground="white"
+        borderGradient={null}
+        decoratorIconStart={null}
+        decoratorIconEnd={null}
+        heading="No epics in this project yet."
+        description="Break down your large project into manageable
+epics to track progress better and maintain
+architectural clarity."
+        action={{
+          label: "Create First Epic",
+          href: `/project/${id}/epics/new`,
+          icon: (
+            <svg
+              width="16"
+              height="20"
+              viewBox="0 0 16 20"
+              fill="none"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <path
+                d="M6.55 16.2L11.725 10H7.725L8.45 4.325L3.825 11H7.3L6.55 16.2ZM4 20L5 13H0L9 0H11L10 8H16L6 20H4Z"
+                fill="white"
+              />
+            </svg>
+          ),
+        }}
+      />
+    );
   }
 
   const totalPages = Math.ceil(total / limit);
@@ -74,6 +106,7 @@ export default function EpicList({ searchParams }: Props) {
           const isLast = epics.length === index + 1;
           return (
             <EpicCard
+              epicId={epic.id}
               id={epic.epic_id}
               key={epic.id}
               ref={isLast ? lastElementRef : undefined}

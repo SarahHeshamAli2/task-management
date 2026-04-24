@@ -1,4 +1,6 @@
 import CalendarIcon from "@/components/icons/calendar-icon";
+import EditIcon from "@/components/icons/edit-icon";
+import DropdownMenu from "@/components/ui/dropdown-menu";
 import { formatDate } from "@/lib/utils/format-date";
 import Link from "next/link";
 import { Ref } from "react";
@@ -11,6 +13,13 @@ type ProjectCardProps = {
   id?: string | null;
 };
 
+const menuItems = [
+  {
+    label: "Edit",
+    icon: <EditIcon />,
+    onClick: () => {},
+  },
+];
 export default function ProjectCard({
   title = `Skyline Residence Phase II`,
   desc = `Structural review and aesthetic
@@ -30,22 +39,7 @@ complex in the downtown district`,
           <Link href={`project/${id}/epics`}>
             <h1 className="text-slate-dark font-medium text-lg">{title}</h1>
           </Link>
-          <Link href={`/project/${id}/edit`}>
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              width="20"
-              height="20"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="2"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-            >
-              <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7" />
-              <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z" />
-            </svg>
-          </Link>
+          <DropdownMenu href={`/project/${id}/edit`} items={menuItems} />
         </div>
         <p className="mt-3.5 text-secondary text-sm leading-6">{desc}</p>
       </div>

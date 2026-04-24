@@ -25,7 +25,6 @@ export default function Pagination({
   const handlePage = (newPage: number) => {
     const params = new URLSearchParams(searchParams.toString());
     params.set("page", String(newPage));
-    params.set("totalPages", String(totalPages));
     router.push(`${pathname}?${params.toString()}`);
   };
 

@@ -4,6 +4,7 @@ import Link from "next/link";
 import { getPathSegments } from "@/lib/hooks/use-breadcrumbs";
 import { useResolveBreadcrumbLabels } from "@/lib/hooks/use-breadcrumbs-resolver";
 import { UUID_REGEX } from "@/lib/utils/uuid-checker";
+import { CrumbSkeleton } from "../skeletons/bread-crumb.skeleton";
 
 function getLabel(segment: string): string {
   const labels: Record<string, string> = {
@@ -22,6 +23,7 @@ export default function Breadcrumb() {
 
   const crumbs = segments.map((segment, index) => {
     const isUUID = UUID_REGEX.test(segment);
+
     const defaultHref = "/" + segments.slice(0, index + 1).join("/");
     return {
       label: resolvedLabels[segment] ?? getLabel(segment),
@@ -35,27 +37,39 @@ export default function Breadcrumb() {
       aria-label="breadcrumb"
       className="flex items-center gap-1 text-xs font-bold uppercase"
     >
-      {crumbs.map((crumb, index) => (
-        <span key={crumb.href} className="flex items-center gap-1">
-          {index > 0 && <span className="text-[#43465499]">{">"}</span>}
-          {crumb.isLast || !crumb.isClickable ? (
-            <span
-              className={
-                crumb.isLast ? "text-primary uppercase" : "text-secondary/60"
-              }
-            >
-              {crumb.label}
-            </span>
-          ) : (
-            <Link
-              href={crumb.href}
-              className="text-secondary/60 hover:text-secondary/80"
-            >
-              {crumb.label}
-            </Link>
-          )}
-        </span>
-      ))}
+      {crumbs.map((crumb, index) => {
+        const segment = segments[index];
+        const isUUID = UUID_REGEX.test(segment);
+        const isLoading = isUUID && !resolvedLabels[segment];
+
+        return (
+          <span
+            key={`${index}-${crumb.href}`}
+            className="flex items-center gap-1"
+          >
+            {index > 0 && <span className="text-[#43465499]">{">"}</span>}
+
+            {isLoading ? (
+              <CrumbSkeleton />
+            ) : crumb.isLast || !crumb.isClickable ? (
+              <span
+                className={
+                  crumb.isLast ? "text-primary uppercase" : "text-secondary/60"
+                }
+              >
+                {crumb.label}
+              </span>
+            ) : (
+              <Link
+                href={crumb.href}
+                className="text-secondary/60 hover:text-secondary/80"
+              >
+                {crumb.label}
+              </Link>
+            )}
+          </span>
+        );
+      })}
     </nav>
   );
 }
