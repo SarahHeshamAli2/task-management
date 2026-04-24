@@ -9,11 +9,8 @@ import { useForm } from "react-hook-form";
 import ExclaimMarkIcon from "@/components/icons/exclaim-mark-icon";
 import { useState } from "react";
 import SubmissionError from "@/components/shared/submission-error";
-
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
-
-import FormFooter from "@/app/(auth)/_components/form-footer";
 import Header from "@/app/(dashboard)/[project]/_components/header";
 import Select from "@/components/ui/shared-select";
 import { Members } from "@/lib/types/member.types";
@@ -89,8 +86,8 @@ export default function EpicForm({
   };
 
   return (
-    <div className="w-212 mx-auto">
-      <Header className="md:flex hidden" title={title} subtitle={subtitle} />
+    <div className="max-w-212 mx-auto">
+      <Header title={title} subtitle={subtitle} />
       <div className="md:bg-white  mx-auto">
         <form onSubmit={handleSubmit(onSubmit)}>
           <div className="md:p-8 p-6">

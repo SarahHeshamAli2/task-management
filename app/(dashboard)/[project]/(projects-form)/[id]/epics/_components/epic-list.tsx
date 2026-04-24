@@ -1,22 +1,25 @@
 "use client";
-import ProjectCard from "./project-card";
-import EmptyState from "./empty-state";
-import Header from "./header";
 import PlusIcon from "@/components/icons/plus-icon";
 import Link from "next/link";
-import Pagination from "./pagination";
-import UseGetProjects from "../hooks/use-get-projects";
 import ProjectsListSkeleton from "@/components/skeletons/project-card.skeleton";
 import { useIsMobile } from "@/lib/hooks/use-mobile";
 import { useRef, useCallback, useState } from "react";
+import Header from "@/app/(dashboard)/[project]/_components/header";
+import Pagination from "@/app/(dashboard)/[project]/_components/pagination";
+import EmptyState from "@/app/(dashboard)/[project]/_components/empty-state";
+import { useParams } from "next/navigation";
+import useGetEpics from "../hooks/use-get-epics";
+import EpicCard from "./epic-card";
 
 type Props = {
   searchParams: { page?: string };
 };
 
-export default function ProjectsList({ searchParams }: Props) {
-  const limit = 4;
+export default function EpicList({ searchParams }: Props) {
+  const limit = 10;
   const isMobile = useIsMobile();
+  const params = useParams();
+  const id = params.id as string;
 
   const [currentPage, setCurrentPage] = useState(
     () => Number(searchParams?.page) || 1
@@ -24,9 +27,14 @@ export default function ProjectsList({ searchParams }: Props) {
 
   const offset = (currentPage - 1) * limit;
 
-  const { projects, total, isLoading, isInitialLoad, hasMore } = UseGetProjects(
-    { limit, offset, append: isMobile }
-  );
+  const { epics, total, isLoading, isInitialLoad, hasMore } = useGetEpics({
+    limit,
+    offset,
+    append: isMobile,
+    id,
+  });
+  console.log(epics, "epopo");
+  console.log(offset, "d");
 
   const observer = useRef<IntersectionObserver | null>(null);
 
@@ -52,36 +60,39 @@ export default function ProjectsList({ searchParams }: Props) {
     return <ProjectsListSkeleton />;
   }
 
-  if (!isLoading && !isInitialLoad && projects.length === 0) {
+  if (!isLoading && !isInitialLoad && epics?.length === 0) {
     return <EmptyState />;
   }
 
   const totalPages = Math.ceil(total / limit);
   const hasNextPage = currentPage < totalPages;
   const shownUpTo = Math.min(currentPage * limit, total);
+  const addEpicHref = `/project/${id}/epics/new`;
 
   return (
     <>
       <Header
-        title="Projects"
-        subtitle="Manage and curate your projects"
-        buttonText="Create new project"
-        linkHref="/project/add"
+        title="Project Epics"
+        buttonText="New Epic"
+        linkHref={addEpicHref}
         leftIcon="+"
         buttonClassName="hidden md:block"
       />
 
-      <div className="grid md:grid-cols-3 gap-6">
-        {projects?.map((project, index) => {
-          const isLast = projects.length === index + 1;
+      <div className="grid md:grid-cols-2 gap-6">
+        {epics?.map((epic, index) => {
+          const isLast = epics.length === index + 1;
           return (
-            <ProjectCard
-              id={project.id}
-              key={project.id}
+            <EpicCard
+              id={epic.epic_id}
+              key={epic.id}
               ref={isLast && isMobile ? lastElementRef : undefined}
-              title={project.name}
-              createdAt={project.created_at}
-              desc={project.description}
+              title={epic.title}
+              createdAt={epic.created_at}
+              userName={epic.assignee.name}
+              createdBy={epic.created_by.name}
+              deadline={epic.deadline}
+              asigneeName={epic.assignee.name}
             />
           );
         })}
@@ -97,25 +108,25 @@ export default function ProjectsList({ searchParams }: Props) {
           <div className="bg-white flex flex-col gap-3.5 p-6 rounded-lg min-h-55 border-dashed border-slate-light/20 border-2 justify-center items-center">
             <Link
               className="min-h-12 min-w-12 bg-surface-low flex items-center justify-center rounded-xl"
-              href="/project/add"
+              href={addEpicHref}
             >
               <PlusIcon fill="black" />
             </Link>
             <span className="uppercase text-secondary text-sm font-bold">
-              add project
+              add epic
             </span>
           </div>
         )}
       </div>
       {!hasMore && isMobile && (
         <p className=" my-3 text-end font-bold text-sm text-secondary capitalize">
-          no more projects
+          no more epics
         </p>
       )}
       {isMobile && (
         <Link
           className="w-14 h-14 sm:hidden rounded-xl ms-auto bg-primary flex items-center justify-center mb-15"
-          href="/project/add"
+          href={addEpicHref}
         >
           <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
             <path d="M6 8H0V6H6V0H8V6H14V8H8V14H6V8Z" fill="white" />

@@ -20,13 +20,16 @@ export default function Breadcrumb() {
   const segmentsToResolve = segments.filter((seg) => seg !== "edit");
   const resolvedLabels = useResolveBreadcrumbLabels(segmentsToResolve);
 
-  const crumbs = segments.map((segment, index) => ({
-    label: resolvedLabels[segment] ?? getLabel(segment),
-    href: "/" + segments.slice(0, index + 1).join("/"),
-    isLast: index === segments.length - 1,
-    isClickable: !UUID_REGEX.test(segment),
-  }));
-
+  const crumbs = segments.map((segment, index) => {
+    const isUUID = UUID_REGEX.test(segment);
+    const defaultHref = "/" + segments.slice(0, index + 1).join("/");
+    return {
+      label: resolvedLabels[segment] ?? getLabel(segment),
+      href: isUUID ? `/${segments[0]}/${segment}/edit` : defaultHref,
+      isLast: index === segments.length - 1,
+      isClickable: true,
+    };
+  });
   return (
     <nav
       aria-label="breadcrumb"
