@@ -6,11 +6,11 @@ import { SidebarProvider } from "./context/sidebar-context";
 export default function Layout({ children }: { children: React.ReactNode }) {
   return (
     <SidebarProvider>
-      <div className="flex min-h-screen">
+      <div className="flex h-screen overflow-hidden">
         {/* Sidebar */}
         <SideBar />
 
-        <div className="flex flex-col flex-1">
+        <div className="flex flex-col flex-1 h-full overflow-hidden">
           {/* Navbar */}
           <Navbar />
 

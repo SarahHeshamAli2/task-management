@@ -12,6 +12,7 @@ import { useInfiniteScroll } from "@/lib/hooks/use-infinite-scroll";
 import EmptyState from "@/components/shared/empty-state";
 import { EpicGridDecoration } from "@/components/ui/epic-grid-decoration";
 import EpicCardListSkeleton from "@/components/skeletons/epic-card.skeleton";
+import { ROUTES } from "@/lib/constants/routes.constants";
 
 type Props = {
   searchParams: { page?: string };
@@ -66,7 +67,7 @@ epics to track progress better and maintain
 architectural clarity."
         action={{
           label: "Create First Epic",
-          href: `/project/${id}/epics/new`,
+          href: ROUTES.epics.add(id),
           icon: (
             <svg
               width="16"
@@ -89,7 +90,7 @@ architectural clarity."
   const totalPages = Math.ceil(total / limit);
   const hasNextPage = currentPage < totalPages;
   const shownUpTo = Math.min(currentPage * limit, total);
-  const addEpicHref = `/project/${id}/epics/new`;
+  const addEpicHref = ROUTES.epics.add(id);
 
   return (
     <>
@@ -161,7 +162,6 @@ architectural clarity."
           </svg>
         </Link>
       )}
-
       {!isMobile && (
         <Pagination
           projectsPerPage={shownUpTo}

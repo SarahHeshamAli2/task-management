@@ -39,7 +39,7 @@ function SidebarContent({
 
   return (
     <aside className="h-full bg-surface-low px-4 flex flex-col justify-between">
-      <div>
+      <div className="overflow-y-auto flex-1">
         {!isCollapsed && <Logo className="mt-4 mb-8" />}
 
         <ul>
@@ -55,13 +55,13 @@ function SidebarContent({
                       ? "bg-white text-primary shadow-sm"
                       : "text-slate-dark hover:bg-slate-100",
                     isCollapsed && !isActive && "text-[#041B3C99]",
-                    isCollapsed && "mt-6",
+                    isCollapsed && "mt-6"
                   )}
                 >
                   <span
                     className={cn(
                       isCollapsed &&
-                        "h-12 w-12 flex items-center justify-center",
+                        "h-12 w-12 flex items-center justify-center"
                     )}
                   >
                     {li.icon}
@@ -107,8 +107,8 @@ export default function SideBar() {
       {/* ── Desktop: always in flow, collapsible ── */}
       <div
         className={cn(
-          "hidden md:block shrink-0 transition-all duration-300",
-          isCollapsed ? "w-20" : "w-[16rem]",
+          "hidden md:flex md:flex-col shrink-0 h-full transition-all duration-300",
+          isCollapsed ? "w-20" : "w-[16rem]"
         )}
       >
         <SidebarContent isCollapsed={isCollapsed} toggle={toggle} />
@@ -118,7 +118,7 @@ export default function SideBar() {
       <div
         className={cn(
           "md:hidden fixed inset-0 z-40 transition-all duration-300",
-          isCollapsed ? "pointer-events-none" : "pointer-events-auto",
+          isCollapsed ? "pointer-events-none" : "pointer-events-auto"
         )}
       >
         {/* Backdrop */}
@@ -126,7 +126,7 @@ export default function SideBar() {
           onClick={toggle}
           className={cn(
             "absolute inset-0 bg-black/40 transition-opacity duration-300",
-            isCollapsed ? "opacity-0" : "opacity-100",
+            isCollapsed ? "opacity-0" : "opacity-100"
           )}
         />
 
@@ -134,7 +134,7 @@ export default function SideBar() {
         <div
           className={cn(
             "absolute left-0 top-0 h-full w-[16rem] transition-transform duration-300 shadow-xl",
-            isCollapsed ? "-translate-x-full" : "translate-x-0",
+            isCollapsed ? "-translate-x-full" : "translate-x-0"
           )}
         >
           <SidebarContent isCollapsed={false} toggle={toggle} />

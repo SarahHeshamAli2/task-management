@@ -10,6 +10,7 @@ import ProjectsListSkeleton from "@/components/skeletons/project-card.skeleton";
 import { useIsMobile } from "@/lib/hooks/use-mobile";
 import { useState, useCallback } from "react";
 import { useInfiniteScroll } from "@/lib/hooks/use-infinite-scroll";
+import { ROUTES } from "@/lib/constants/routes.constants";
 
 type Props = {
   searchParams: { page?: string };
@@ -60,7 +61,7 @@ export default function ProjectsList({ searchParams }: Props) {
         title="Projects"
         subtitle="Manage and curate your projects"
         buttonText="Create new project"
-        linkHref="/project/add"
+        linkHref={ROUTES.project.add}
         leftIcon="+"
         buttonClassName="hidden md:block"
       />
@@ -91,7 +92,7 @@ export default function ProjectsList({ searchParams }: Props) {
           <div className="bg-white flex flex-col gap-3.5 p-6 rounded-lg min-h-55 border-dashed border-slate-light/20 border-2 justify-center items-center">
             <Link
               className="min-h-12 min-w-12 bg-surface-low flex items-center justify-center rounded-xl"
-              href="/project/add"
+              href={ROUTES.project.add}
             >
               <PlusIcon fill="black" />
             </Link>
@@ -111,7 +112,7 @@ export default function ProjectsList({ searchParams }: Props) {
       {isMobile && (
         <Link
           className="w-14 h-14 sm:hidden rounded-xl ms-auto bg-primary flex items-center justify-center mb-15"
-          href="/project/add"
+          href={ROUTES.project.add}
         >
           <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
             <path d="M6 8H0V6H6V0H8V6H14V8H8V14H6V8Z" fill="white" />

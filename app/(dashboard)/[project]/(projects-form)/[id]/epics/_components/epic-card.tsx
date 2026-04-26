@@ -6,10 +6,10 @@ import { getInitials } from "@/lib/utils/get-name-initials";
 import { Ref, useState } from "react";
 import EmptyTask from "./empty-task";
 import DropdownMenu from "@/components/ui/dropdown-menu";
-import { useParams } from "next/navigation";
 import CreatedByIcon from "@/components/icons/created-by-icon";
 import EditIcon from "@/components/icons/edit-icon";
 import UnassignedIcon from "@/components/icons/unassigned-icon";
+import { ROUTES } from "@/lib/constants/routes.constants";
 
 type EpicCardProps = {
   title: string;
@@ -53,10 +53,7 @@ export default function EpicCard({
           <span className="text-xs font-bold text-[#005235] bg-[#82F9BE] min-w-17 h-6 rounded-xs flex items-center justify-center tracking-wider">
             {id}
           </span>
-          <DropdownMenu
-            href={`/project/${epicId}/epics/edit`}
-            items={menuItems}
-          />
+          <DropdownMenu href={ROUTES.epics.edit(epicId)} items={menuItems} />
         </div>
 
         {/* Title + Modal */}

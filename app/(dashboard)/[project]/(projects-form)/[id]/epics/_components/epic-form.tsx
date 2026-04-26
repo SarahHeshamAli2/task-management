@@ -16,6 +16,7 @@ import Select from "@/components/ui/shared-select";
 import { Members } from "@/lib/types/member.types";
 import { addEpicSchema, EpicFormValues } from "@/lib/schemes/epic.schema";
 import { addEpicAction } from "@/lib/actions/epics.actions";
+import { ROUTES } from "@/lib/constants/routes.constants";
 
 type Mode = "add" | "edit";
 
@@ -84,7 +85,7 @@ export default function EpicForm({
       return;
     }
     toast.success(successMessage);
-    setTimeout(() => router.push(`/project/${projectId}/epics`), 1000);
+    setTimeout(() => router.push(ROUTES.project.epics(projectId)), 1000);
     console.log(data, "d");
   };
 
