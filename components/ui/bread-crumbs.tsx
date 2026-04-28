@@ -6,15 +6,24 @@ import { useResolveBreadcrumbLabels } from "@/lib/hooks/use-breadcrumbs-resolver
 import { UUID_REGEX } from "@/lib/utils/uuid-checker";
 import { CrumbSkeleton } from "../skeletons/bread-crumb.skeleton";
 
-function getLabel(segment: string): string {
-  const labels: Record<string, string> = {
+function getLabel(segment: string, index: number, segments: string[]): string {
+  const prev = segments[index - 1];
+
+  const labels: Record<string, Record<string, string> | string> = {
     project: "Projects",
     add: "Add New Project",
     edit: "Edit",
+    new: {
+      tasks: "New Task",
+      project: "New Project",
+    },
   };
-  return labels[segment] ?? segment.charAt(0).toUpperCase() + segment.slice(1);
-}
 
+  const label = labels[segment];
+
+  if (typeof label === "object") return label[prev] ?? "New";
+  return label ?? segment.charAt(0).toUpperCase() + segment.slice(1);
+}
 export default function Breadcrumb() {
   const pathname = usePathname();
   const segments = getPathSegments(pathname);
@@ -26,7 +35,7 @@ export default function Breadcrumb() {
 
     const defaultHref = "/" + segments.slice(0, index + 1).join("/");
     return {
-      label: resolvedLabels[segment] ?? getLabel(segment),
+      label: resolvedLabels[segment] ?? getLabel(segment, index, segments),
       href: isUUID ? `/${segments[0]}/${segment}/edit` : defaultHref,
       isLast: index === segments.length - 1,
       isClickable: true,

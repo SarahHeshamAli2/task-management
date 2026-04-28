@@ -1,10 +1,12 @@
 import { configureStore } from "@reduxjs/toolkit";
 import { userSliceReducer } from "./slices/user-slice";
+import { breadcrumbLabelsReducer } from "./slices/breadcrumb-slice";
 
 export const makeStore = () => {
   return configureStore({
     reducer: {
       user: userSliceReducer,
+      breadcrumbLabels: breadcrumbLabelsReducer,
     },
   });
 };

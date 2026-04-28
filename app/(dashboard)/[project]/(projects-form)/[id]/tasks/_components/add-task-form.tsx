@@ -58,8 +58,9 @@ export default function AddTaskForm() {
   };
 
   return (
-    <div className="md:max-w-232 mx-auto">
+    <div>
       <Header
+        subTitleClassName="max-w-full"
         title={"Create New Task"}
         subtitle={
           "Initialize a new work item within the Architectural Workspace ecosystem."
