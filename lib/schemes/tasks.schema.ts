@@ -12,8 +12,17 @@ export const addTaskSchema = z.object({
     .string()
     .max(500, "Description cannot exceed 500 characters.")
     .optional(),
-  assignee_id: z.string().nullable().optional(),
-  epic_id: z.string().nullable().optional(),
+  assignee_id: z
+    .string()
+    .optional()
+    .nullable()
+    .transform((val) => (val === "" ? null : val)),
+
+  epic_id: z
+    .string()
+    .optional()
+    .nullable()
+    .transform((val) => (val === "" ? null : val)),
   status: z.string().optional(),
   project_id: z.string(),
   due_date: z
@@ -23,7 +32,9 @@ export const addTaskSchema = z.object({
     .refine(
       (val) => !val || new Date(val) >= today,
       "Due date must be today or a future date."
-    ),
+    )
+    .transform((val) => (val === "" ? null : val)),
 });
 
-export type TaskFormValues = z.infer<typeof addTaskSchema>;
+export type TaskFormValues = z.input<typeof addTaskSchema>;
+export type TaskFormOutput = z.output<typeof addTaskSchema>;

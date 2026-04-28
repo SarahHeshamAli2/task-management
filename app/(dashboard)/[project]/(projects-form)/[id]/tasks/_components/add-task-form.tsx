@@ -4,12 +4,12 @@ import Input from "@/components/ui/shared-input";
 import Button from "@/components/ui/button";
 import TextArea from "@/components/ui/shared-textarea";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useForm } from "react-hook-form";
+import { Controller, useForm } from "react-hook-form";
 import ExclaimMarkIcon from "@/components/icons/exclaim-mark-icon";
 import { useState } from "react";
 import SubmissionError from "@/components/shared/submission-error";
 import { toast } from "sonner";
-import { useParams, useRouter } from "next/navigation";
+import { useParams, useRouter, useSearchParams } from "next/navigation";
 import Header from "@/app/(dashboard)/[project]/_components/header";
 import Select from "@/components/ui/shared-select";
 import { ROUTES } from "@/lib/constants/routes.constants";
@@ -22,15 +22,24 @@ import { addTasksAction } from "@/lib/actions/tasks.actions";
 export default function AddTaskForm() {
   const params = useParams();
   const projectId = params.id as string;
+  const searchParams = useSearchParams();
+  const defaultEpicId = searchParams.get("epicId") ?? undefined;
 
   const router = useRouter();
   const { members } = useGetProjectMembers({ id: projectId });
   const { epics } = useGetEpics({ id: projectId });
 
-  const { register, handleSubmit, formState } = useForm<TaskFormValues>({
-    resolver: zodResolver(addTaskSchema),
-    defaultValues: { project_id: projectId, status: "TO_DO" },
-  });
+  const { register, handleSubmit, formState, control } =
+    useForm<TaskFormValues>({
+      resolver: zodResolver(addTaskSchema),
+      defaultValues: {
+        assignee_id: undefined,
+        due_date: undefined,
+        project_id: projectId,
+        status: "TO_DO",
+        epic_id: defaultEpicId ?? undefined,
+      },
+    });
 
   const [error, setError] = useState<string | undefined>();
   console.log(formState.errors, "ee");
@@ -45,8 +54,7 @@ export default function AddTaskForm() {
       return;
     }
     toast.success("task created successfully");
-    // setTimeout(() => router.push(ROUTES.tasks.list("id")), 1000);
-    console.log(data, "d");
+    setTimeout(() => router.push(ROUTES.tasks.list(projectId)), 1000);
   };
 
   return (
@@ -72,7 +80,6 @@ export default function AddTaskForm() {
               <Select
                 error={formState.errors.status?.message}
                 label="status"
-                defaultValue="TO_DO"
                 placeholder="select a status"
                 options={
                   STATUS_VALUES?.map((status) => ({
@@ -97,17 +104,24 @@ export default function AddTaskForm() {
             </div>
 
             {/* Epic Select */}
-            <Select
-              error={formState.errors.epic_id?.message}
-              label="Epic"
-              placeholder="Select Epic Link"
-              options={
-                epics?.map((epic) => ({
-                  value: epic.id,
-                  label: epic.title,
-                })) ?? []
-              }
-              {...register("epic_id")}
+            <Controller
+              control={control}
+              name="epic_id"
+              render={({ field }) => (
+                <Select
+                  {...field}
+                  value={field.value ?? ""}
+                  label="Epic"
+                  placeholder="Select Epic Link"
+                  error={formState.errors.epic_id?.message}
+                  options={
+                    epics?.map((epic) => ({
+                      value: epic.id,
+                      label: epic.title,
+                    })) ?? []
+                  }
+                />
+              )}
             />
             <Input
               type="date"

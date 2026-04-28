@@ -2,7 +2,6 @@
 
 import CalendarIcon from "@/components/icons/calendar-icon";
 import Modal from "@/components/shared/modal";
-import Button from "@/components/ui/button";
 import { formatDate } from "@/lib/utils/format-date";
 import { Ref, useState } from "react";
 import EmptyTask from "./empty-task";
@@ -292,18 +291,17 @@ export default function EpicCard({
             </div>
 
             {error && <SubmissionError error={error} />}
-
             <div className="mt-8 text-slate-dark flex justify-between items-center font-semibold">
               <p>Tasks</p>
               <Link
-                href={ROUTES.tasks.add(projectId)}
+                href={`${ROUTES.tasks.add(projectId)}?epicId=${epicId}`}
                 className="text-primary"
                 onClick={(e) => e.stopPropagation()}
               >
                 Add Task
               </Link>
             </div>
-            <EmptyTask projectId={projectId} />
+            <EmptyTask projectId={projectId} epicId={epicId} />
           </Modal>
         </div>
       </div>
