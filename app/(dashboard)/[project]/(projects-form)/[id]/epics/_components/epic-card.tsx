@@ -16,6 +16,8 @@ import { Member } from "@/lib/types/member.types";
 import { EpicList } from "@/lib/types/epic.types";
 import Avatar from "@/components/shared/avatar";
 import EpicAssigneeField from "./epic-assignee-field";
+import Link from "next/link";
+import { ROUTES } from "@/lib/constants/routes.constants";
 
 type EpicCardProps = {
   title: string;
@@ -293,16 +295,15 @@ export default function EpicCard({
 
             <div className="mt-8 text-slate-dark flex justify-between items-center font-semibold">
               <p>Tasks</p>
-              <Button
+              <Link
+                href={ROUTES.tasks.add(projectId)}
                 className="text-primary"
-                variant="ghost"
-                leftIcon="+"
-                iconClassName="me-1"
+                onClick={(e) => e.stopPropagation()}
               >
                 Add Task
-              </Button>
+              </Link>
             </div>
-            <EmptyTask />
+            <EmptyTask projectId={projectId} />
           </Modal>
         </div>
       </div>

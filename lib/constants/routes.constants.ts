@@ -11,4 +11,8 @@ export const ROUTES = {
 
     edit: (id: string | null | undefined) => `/project/${id}/epics/edit`,
   },
+  tasks: {
+    list: "/project",
+    add: (id: string | null | undefined) => `/project/${id}/tasks/new`,
+  },
 };
