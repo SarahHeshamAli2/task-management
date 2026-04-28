@@ -82,7 +82,6 @@ export default function EpicForm({
     }
     toast.success(successMessage);
     setTimeout(() => router.push(ROUTES.project.epics(projectId)), 1000);
-    console.log(data, "d");
   };
 
   return (

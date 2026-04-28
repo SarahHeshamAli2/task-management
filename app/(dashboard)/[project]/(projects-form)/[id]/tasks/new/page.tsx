@@ -1,3 +1,5 @@
+import AddTaskForm from "../_components/add-task-form";
+
 export default function page() {
-  return <div>page</div>;
+  return <AddTaskForm />;
 }

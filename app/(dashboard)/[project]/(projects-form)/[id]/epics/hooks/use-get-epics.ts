@@ -1,5 +1,6 @@
 import { useEffect, useState, useRef, useCallback } from "react";
 import { EpicList } from "@/lib/types/epic.types";
+import { ParamValue } from "next/dist/server/request/params";
 
 export default function useGetEpics({
   limit,
@@ -10,7 +11,7 @@ export default function useGetEpics({
   limit?: number;
   offset?: number;
   append?: boolean;
-  id: string;
+  id: string | ParamValue;
 }) {
   const [epics, setEpics] = useState<EpicList>([]);
   const [total, setTotal] = useState<number>(0);
@@ -34,10 +35,6 @@ export default function useGetEpics({
 
   const getAllEpics = useCallback(async () => {
     if (isFetchingRef.current) return;
-
-    // // Abort any in-flight request
-    // abortControllerRef.current?.abort();
-    // abortControllerRef.current = new AbortController();
 
     try {
       isFetchingRef.current = true;

@@ -1,11 +1,12 @@
 import { useEffect, useState } from "react";
 import { Members } from "@/lib/types/member.types";
+import { ParamValue } from "next/dist/server/request/params";
 
 export default function useGetProjectMembers({
   id,
   enabled = true,
 }: {
-  id: string;
+  id: string | ParamValue;
   enabled?: boolean;
 }) {
   const [members, setMembers] = useState<Members>([]);
