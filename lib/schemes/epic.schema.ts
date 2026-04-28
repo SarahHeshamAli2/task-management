@@ -12,10 +12,11 @@ export const addEpicSchema = z.object({
     .string()
     .max(500, "Description cannot exceed 500 characters.")
     .optional(),
-  assignee_id: z.string().optional(),
+  assignee_id: z.string().nullable().optional(),
   project_id: z.string(),
   deadline: z
     .string()
+    .nullable()
     .optional()
     .refine(
       (val) => !val || new Date(val) >= today,
@@ -24,3 +25,14 @@ export const addEpicSchema = z.object({
 });
 
 export type EpicFormValues = z.infer<typeof addEpicSchema>;
+
+export const updateEpicSchema = addEpicSchema
+  .pick({
+    title: true,
+    description: true,
+    assignee_id: true,
+    deadline: true,
+  })
+  .partial();
+
+export type UpdateEpicFormValues = z.infer<typeof updateEpicSchema>;

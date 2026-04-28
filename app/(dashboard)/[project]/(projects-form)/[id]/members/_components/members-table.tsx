@@ -1,6 +1,6 @@
 import { Members } from "@/lib/types/member.types";
-import { getInitials } from "@/lib/utils/get-name-initials";
 import { getAvatarColors } from "@/lib/utils/get-random-avatar-color";
+import Avatar from "@/components/shared/avatar";
 
 const roleBadge: Record<string, string> = {
   OWNER: "bg-blue-600 text-white",
@@ -42,7 +42,16 @@ export default function MembersTable({ members }: { members: Members }) {
                       className="w-10 h-10 rounded-xl flex items-center justify-center text-sm font-semibold"
                       style={{ backgroundColor: colors.bg, color: colors.text }}
                     >
-                      {getInitials(member.metadata.name)}
+                      <Avatar
+                        name={member.metadata.name}
+                        src={
+                          member.metadata.avatar_url ??
+                          member.metadata.picture ??
+                          member.metadata.avatar
+                        }
+                        sizeClassName="w-10 h-10"
+                        className="bg-transparent text-inherit"
+                      />
                     </div>
                     <div>
                       <div className="text-sm font-semibold text-slate-800">

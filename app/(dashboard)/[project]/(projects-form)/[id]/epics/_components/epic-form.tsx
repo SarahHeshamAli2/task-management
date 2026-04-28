@@ -73,10 +73,6 @@ export default function EpicForm({
       assignee_id: data.assignee_id || undefined,
       deadline: data.deadline || undefined,
     };
-    // const response =
-    //   mode === "edit" && projectId
-    //     ? await updateProjectAction(data, projectId)
-    //     : await addEpicAction(data);
 
     const response = await addEpicAction(payload);
 

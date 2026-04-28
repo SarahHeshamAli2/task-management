@@ -1,15 +1,21 @@
+"use client";
+
 import CalendarIcon from "@/components/icons/calendar-icon";
 import Modal from "@/components/shared/modal";
 import Button from "@/components/ui/button";
 import { formatDate } from "@/lib/utils/format-date";
-import { getInitials } from "@/lib/utils/get-name-initials";
 import { Ref, useState } from "react";
 import EmptyTask from "./empty-task";
-import DropdownMenu from "@/components/ui/dropdown-menu";
 import CreatedByIcon from "@/components/icons/created-by-icon";
-import EditIcon from "@/components/icons/edit-icon";
-import UnassignedIcon from "@/components/icons/unassigned-icon";
-import { ROUTES } from "@/lib/constants/routes.constants";
+import { updateEpicAction } from "@/lib/actions/epics.actions";
+import { toast } from "sonner";
+import TextArea from "@/components/ui/shared-textarea";
+import SubmissionError from "@/components/shared/submission-error";
+import useGetProjectMembers from "../../members/hooks/use-get-project-members";
+import { Member } from "@/lib/types/member.types";
+import { EpicList } from "@/lib/types/epic.types";
+import Avatar from "@/components/shared/avatar";
+import EpicAssigneeField from "./epic-assignee-field";
 
 type EpicCardProps = {
   title: string;
@@ -18,89 +24,258 @@ type EpicCardProps = {
   id?: string | null;
   userName: string;
   createdBy: string;
-  deadline: string;
+  deadline: string | null;
   asigneeName: string;
   epicId: string;
+  description?: string;
+  assigneeId?: string | null;
+  projectId: string;
+  onUpdate?: (patch: Partial<EpicList[0]>) => void;
 };
 
 export default function EpicCard({
-  title = "Skyline Residence Phase II",
-  createdAt = "12 Oct 2025",
+  title,
+  createdAt,
   ref,
   id,
   createdBy,
   deadline,
   asigneeName,
   epicId,
+  description,
+  assigneeId,
+  projectId,
+  onUpdate,
 }: EpicCardProps) {
-  const [isOpen, setIsOpen] = useState<boolean>(false);
+  // UI-only state
+  const [isOpen, setIsOpen] = useState(false);
+  const [isEditingTitle, setIsEditingTitle] = useState(false);
+  const [isEditingAssignee, setIsEditingAssignee] = useState(false);
+  const [isUpdatingAssignee, setIsUpdatingAssignee] = useState(false);
+  const [isSavingTitle, setIsSavingTitle] = useState(false);
+  const [isSavingDescription, setIsSavingDescription] = useState(false);
+  const [isSavingDeadline, setIsSavingDeadline] = useState(false);
+  const [error, setError] = useState("");
+  const [optimisticAssignee, setOptimisticAssignee] = useState<{
+    id: string | null;
+    name: string;
+  } | null>(null);
 
-  const menuItems = [
-    {
-      label: "Edit",
-      icon: <EditIcon />,
-    },
-  ];
+  // Editing buffers — only used while actively editing, not for display
+  const [draftTitle, setDraftTitle] = useState(title);
+  const [draftDescription, setDraftDescription] = useState(description ?? "");
+  const [draftDeadline, setDraftDeadline] = useState<string | null>(deadline);
+
+  const { members } = useGetProjectMembers({
+    id: projectId,
+    enabled: isOpen,
+  });
+
+  const getMemberAvatar = (member: Member) =>
+    member.metadata?.avatar_url ??
+    member.metadata?.picture ??
+    member.metadata?.avatar ??
+    null;
+
+  const updateField = async (
+    payload: Partial<EpicList[0]>,
+    successMessage: string,
+    errorMessage = "Failed to update epic. Please try again."
+  ) => {
+    const res = await updateEpicAction(epicId, payload);
+    if (res.success) {
+      toast.success(successMessage);
+      onUpdate?.(payload); // patch parent list — no refetch
+    } else {
+      toast.error(errorMessage);
+    }
+    return res.success;
+  };
+
+  const handleTitleSave = async () => {
+    if (draftTitle === title) {
+      setIsEditingTitle(false);
+      return;
+    }
+    setIsSavingTitle(true);
+    const ok = await updateField({ title: draftTitle }, "Title updated");
+    if (!ok) setDraftTitle(title); // revert draft on failure
+    setIsSavingTitle(false);
+    setIsEditingTitle(false);
+  };
+
+  const handleDescriptionSave = async () => {
+    if (draftDescription === description) return;
+    setIsSavingDescription(true);
+    const ok = await updateField(
+      { description: draftDescription },
+      "Description updated successfully"
+    );
+    if (!ok) setDraftDescription(description ?? "");
+    setIsSavingDescription(false);
+  };
+
+  const handleDeadlineSave = async () => {
+    if (draftDeadline) {
+      const today = new Date().toISOString().split("T")[0];
+      if (draftDeadline < today) {
+        setError("Deadline must be today or a future date");
+        setDraftDeadline(deadline);
+        return;
+      }
+    }
+    setIsSavingDeadline(true);
+    const ok = await updateField(
+      { deadline: draftDeadline },
+      "Deadline updated successfully"
+    );
+    if (ok) setError("");
+    else setDraftDeadline(deadline);
+    setIsSavingDeadline(false);
+  };
+
+  const handleAssigneeChange = async (selectedId: string) => {
+    console.log("handleAssigneeChange called", {
+      selectedId,
+      assigneeId,
+      isUpdatingAssignee,
+      optimisticAssignee,
+    });
+    const nextAssigneeId = selectedId === "unassigned" ? null : selectedId;
+    const currentAssigneeId = optimisticAssignee?.id ?? assigneeId ?? null;
+    const currentAssigneeName = optimisticAssignee?.name ?? asigneeName ?? "";
+
+    if (nextAssigneeId === currentAssigneeId) {
+      setIsEditingAssignee(false);
+      return;
+    }
+
+    const nextMember = members.find((m) => m.user_id === nextAssigneeId);
+    const nextName = nextMember?.metadata?.name ?? "";
+    setOptimisticAssignee({ id: nextAssigneeId, name: nextName });
+
+    setIsUpdatingAssignee(true);
+    const ok = await updateField(
+      { assignee_id: nextAssigneeId },
+      nextAssigneeId ? "Assignee updated" : "Assignee removed"
+    );
+
+    if (!ok) {
+      setOptimisticAssignee({
+        id: currentAssigneeId,
+        name: currentAssigneeName,
+      });
+    }
+    setIsUpdatingAssignee(false);
+    setIsEditingAssignee(false);
+  };
+
+  const displayAssigneeId = optimisticAssignee?.id ?? assigneeId ?? null;
+  const displayAssigneeName = optimisticAssignee?.name ?? asigneeName ?? "";
+  const currentMember = members.find((m) => m.user_id === displayAssigneeId);
+  const currentAvatarSrc = currentMember
+    ? getMemberAvatar(currentMember)
+    : null;
 
   return (
     <div
+      onClick={() => setIsOpen((prev) => !prev)}
       ref={ref}
-      className="bg-white p-6 rounded-lg min-h-55 flex flex-col justify-between border-[#004E32] md:border-s-4"
+      className="cursor-pointer bg-white p-6 rounded-lg min-h-55 flex flex-col justify-between border-[#004E32] md:border-s-4"
     >
       <div>
-        {/* Header: ID badge + dropdown menu */}
         <div className="flex mb-4 justify-between">
           <span className="text-xs font-bold text-[#005235] bg-[#82F9BE] min-w-17 h-6 rounded-xs flex items-center justify-center tracking-wider">
             {id}
           </span>
-          <DropdownMenu href={ROUTES.epics.edit(epicId)} items={menuItems} />
         </div>
-
-        {/* Title + Modal */}
         <div className="flex justify-between items-center">
-          <Button variant="ghost" onClick={() => setIsOpen((prev) => !prev)}>
-            <h1 className="text-slate-dark font-medium text-lg">{title}</h1>
-          </Button>
+          <h3 className="text-slate-dark font-medium text-lg">{title}</h3>
 
           <Modal
             size="2xl"
             isOpen={isOpen}
             onClose={() => setIsOpen(false)}
-            title={title}
+            title={
+              isSavingTitle ? (
+                <div className="h-7 w-64 rounded bg-skeleton animate-pulse" />
+              ) : isEditingTitle ? (
+                <input
+                  value={draftTitle}
+                  onChange={(e) => setDraftTitle(e.target.value)}
+                  onBlur={handleTitleSave}
+                  autoFocus
+                  className="border-0 outline-0 rounded px-2 py-1"
+                />
+              ) : (
+                <h2
+                  className="text-slate-dark font-medium text-lg cursor-pointer"
+                  onClick={() => {
+                    setDraftTitle(title);
+                    setIsEditingTitle(true);
+                  }}
+                >
+                  {title}
+                </h2>
+              )
+            }
             eyebrow={id}
           >
+            {isSavingDescription ? (
+              <div className="space-y-2">
+                <div className="h-3 w-full rounded bg-skeleton animate-pulse" />
+                <div className="h-3 w-4/5 rounded bg-skeleton animate-pulse" />
+                <div className="h-3 w-3/5 rounded bg-skeleton animate-pulse" />
+              </div>
+            ) : (
+              <TextArea
+                className="bg-transparent p-0"
+                value={draftDescription}
+                onChange={(e) => setDraftDescription(e.target.value)}
+                onBlur={handleDescriptionSave}
+                placeholder="No description provided"
+              />
+            )}
+
             <div className="grid md:grid-cols-3 grid-cols-2">
               <div>
                 <p className="text-slate-dark/40 font-bold text-[10px] uppercase">
                   created by
                 </p>
                 <p className="flex items-center gap-2 text-slate-dark font-medium text-sm mt-2">
-                  <span className="bg-primary-container text-white w-7 h-7 flex items-center justify-center rounded-xl">
-                    {getInitials(createdBy)}
-                  </span>
+                  <Avatar
+                    name={createdBy}
+                    sizeClassName="w-7 h-7"
+                    textClassName="text-[10px]"
+                  />
                   {createdBy}
                 </p>
               </div>
 
-              <div>
+              <EpicAssigneeField
+                members={members}
+                displayAssigneeName={displayAssigneeName}
+                currentAvatarSrc={currentAvatarSrc}
+                isEditing={isEditingAssignee}
+                isUpdating={isUpdatingAssignee}
+                onStartEdit={() => setIsEditingAssignee(true)}
+                onSelectAssignee={handleAssigneeChange}
+              />
+
+              <div className="border-t col-span-2 md:col-span-1 pt-2 border-ocean mt-5 md:mt-0 md:border-0">
                 <p className="text-slate-dark/40 font-bold text-[10px] uppercase">
-                  Assignee
+                  Deadline
                 </p>
-                <p className="flex items-center gap-2 text-slate-dark font-medium text-sm mt-2">
-                  {asigneeName ? (
-                    <>
-                      <span className="bg-primary-container text-white w-7 h-7 flex items-center justify-center rounded-xl">
-                        {getInitials(asigneeName)}
-                      </span>
-                      <span>{asigneeName}</span>
-                    </>
-                  ) : (
-                    <>
-                      <UnassignedIcon />
-                      <span>Unassigned</span>
-                    </>
-                  )}
-                </p>
+                {isSavingDeadline ? (
+                  <div className="h-9 w-full rounded bg-skeleton animate-pulse mt-2" />
+                ) : (
+                  <input
+                    type="date"
+                    value={draftDeadline ?? ""}
+                    onChange={(e) => setDraftDeadline(e.target.value || null)}
+                    onBlur={handleDeadlineSave}
+                  />
+                )}
               </div>
 
               <div className="border-t col-span-2 md:col-span-1 pt-2 border-ocean mt-5 md:mt-0 md:border-0">
@@ -113,6 +288,8 @@ export default function EpicCard({
                 </p>
               </div>
             </div>
+
+            {error && <SubmissionError error={error} />}
 
             <div className="mt-8 text-slate-dark flex justify-between items-center font-semibold">
               <p>Tasks</p>
@@ -128,45 +305,8 @@ export default function EpicCard({
             <EmptyTask />
           </Modal>
         </div>
-
-        {/* Assignee + Deadline */}
-        <div className="flex items-center mt-3 justify-between mb-6">
-          <div className="flex items-center gap-3">
-            {asigneeName ? (
-              <span className="md:w-10 md:h-10 h-7 w-7 bg-[#65DCA4] text-[#002113] font-bold flex items-center justify-center rounded-xl text-[10px] md:text-sm">
-                {getInitials(asigneeName)}
-              </span>
-            ) : (
-              <UnassignedIcon />
-            )}
-            {asigneeName ? (
-              <div>
-                <span className="text-secondary text-xs font-medium">
-                  Assignee
-                </span>
-                <p className="text-slate-dark font-semibold text-sm">
-                  {asigneeName}
-                </p>
-              </div>
-            ) : (
-              <div className="text-secondary text-xs font-medium">
-                Unassigned
-              </div>
-            )}
-          </div>
-
-          <div className="sm:hidden">
-            <span className="text-placeholder uppercase font-bold text-[10px]">
-              deadline
-            </span>
-            <p className="text-slate-dark text-xs font-medium">
-              {formatDate(deadline)}
-            </p>
-          </div>
-        </div>
       </div>
 
-      {/* Footer: Created by + Date (desktop only) */}
       <div className="justify-between items-center border-t border-surface-low pt-4 md:flex hidden">
         <span className="text-placeholder text-xs capitalize flex gap-2">
           <CreatedByIcon />

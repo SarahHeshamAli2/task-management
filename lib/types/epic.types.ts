@@ -1,4 +1,4 @@
-type User = {
+type Asignee = {
   sub: string;
   name: string;
   email: string;
@@ -6,15 +6,16 @@ type User = {
 };
 
 export type Epic = {
-  assignee: User;
+  assignee: Asignee;
   created_at: string;
-  created_by: User;
-  deadline: string;
+  created_by: Asignee;
+  deadline: string | null;
   description: string;
   epic_id: string;
   id: string;
   project_id: string;
   title: string;
+  assignee_id: string | null;
 };
 
 export type EpicList = Epic[];

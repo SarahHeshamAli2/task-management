@@ -108,7 +108,7 @@ export default function Modal({
       >
         {/* ── Header ── */}
         {(eyebrow || title) && (
-          <div className="flex items-start justify-between px-6 pt-6 mb-8 border-b pb-8 border-slate-light/30 shrink-0">
+          <div className=" items-start justify-between px-6 pt-6 mb-8 border-b pb-8 border-slate-light/30 shrink-0">
             <div className="flex flex-col gap-1 pr-8">
               {eyebrow && (
                 <div className="flex items-center gap-2 text-xs font-semibold text-slate-400 uppercase tracking-widest">
@@ -135,12 +135,12 @@ export default function Modal({
                 </div>
               )}
               {title && (
-                <h2
+                <div
                   id="modal-title"
                   className="text-2xl font-semibold text-slate-800 leading-snug"
                 >
                   {title}
-                </h2>
+                </div>
               )}
             </div>
           </div>

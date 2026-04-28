@@ -1,4 +1,4 @@
-import { useEffect, useState, useRef } from "react";
+import { useEffect, useState, useRef, useCallback } from "react";
 import { EpicList } from "@/lib/types/epic.types";
 
 export default function useGetEpics({
@@ -22,45 +22,86 @@ export default function useGetEpics({
   const isFirstFetch = useRef(true);
   const isFetchingRef = useRef(false);
 
+  // Reset initial load state when project changes
   useEffect(() => {
-    const getAllEpics = async () => {
-      if (isFetchingRef.current) return;
+    isFirstFetch.current = true;
+    setIsInitialLoad(true);
+    setEpics([]);
+    setTotal(0);
+    setHasMore(false);
+    setError(false);
+  }, [id]);
 
-      try {
-        isFetchingRef.current = true;
+  const getAllEpics = useCallback(async () => {
+    if (isFetchingRef.current) return;
 
-        setIsLoading(true);
-        setError(false);
+    // // Abort any in-flight request
+    // abortControllerRef.current?.abort();
+    // abortControllerRef.current = new AbortController();
 
-        const response = await fetch(
-          `/api/epics/${id}?limit=${limit}&offset=${offset}`
-        );
-        const data = await response.json();
+    try {
+      isFetchingRef.current = true;
+      setIsLoading(true);
+      setError(false);
 
-        setEpics((prev) =>
-          // On first fetch (offset === 0), replace. Otherwise append.
-          !append || offset === 0 ? data.data : [...prev, ...data.data]
-        );
+      const response = await fetch(
+        `/api/epics/${id}?limit=${limit}&offset=${offset}`
+      );
 
-        setTotal(data.total);
-
-        // hasMore is true only if there are still unseen items
-        setHasMore((offset ?? 0) + data.data.length < data.total);
-      } catch (err) {
-        setError(true);
-      } finally {
-        isFetchingRef.current = false;
-
-        setIsLoading(false);
-        if (isFirstFetch.current) {
-          setIsInitialLoad(false);
-          isFirstFetch.current = false;
-        }
+      if (!response.ok) {
+        throw new Error(`Request failed with status ${response.status}`);
       }
-    };
 
+      const data = await response.json();
+      const incoming: EpicList = data.data ?? [];
+
+      setEpics((prev) =>
+        !append || offset === 0 ? incoming : [...prev, ...incoming]
+      );
+      setTotal(data.total ?? 0);
+      setHasMore((offset ?? 0) + incoming.length < (data.total ?? 0));
+    } catch (err) {
+      if (err instanceof DOMException && err.name === "AbortError") return;
+      setError(true);
+    } finally {
+      isFetchingRef.current = false;
+      setIsLoading(false);
+      if (isFirstFetch.current) {
+        setIsInitialLoad(false);
+        isFirstFetch.current = false;
+      }
+    }
+  }, [id, limit, offset, append]);
+
+  useEffect(() => {
     getAllEpics();
-  }, [limit, offset, append]);
+  }, [getAllEpics]);
 
-  return { epics, total, isLoading, isInitialLoad, error, hasMore };
+  // Patch a single epic in local state without refetching
+  const updateEpic = useCallback(
+    (epicId: string, patch: Partial<EpicList[0]>) => {
+      setEpics((prev) =>
+        prev.map((epic) => (epic.id === epicId ? { ...epic, ...patch } : epic))
+      );
+    },
+    []
+  );
+
+  // Add a newly created epic to the top of the list without refetching
+  const addEpic = useCallback((epic: EpicList[0]) => {
+    setEpics((prev) => [epic, ...prev]);
+    setTotal((t) => t + 1);
+  }, []);
+
+  return {
+    epics,
+    total,
+    isLoading,
+    isInitialLoad,
+    error,
+    hasMore,
+    refetch: getAllEpics,
+    updateEpic,
+    addEpic,
+  };
 }

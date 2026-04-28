@@ -4,6 +4,7 @@ export async function getAllEpicsService(
   params: Record<string, string | number> = {}
 ) {
   const token = await getToken();
+  const hasOrder = Object.prototype.hasOwnProperty.call(params, "order");
   const url = new URL(
     `${process.env.API_URL}/rest/v1/project_epics?project_id=eq.${params.id}`
   );
@@ -12,6 +13,11 @@ export async function getAllEpicsService(
     if (key === "id") return;
     url.searchParams.append(key, String(value));
   });
+
+  // Keep list ordering stable across refetches (e.g. after modal edits).
+  if (!hasOrder) {
+    url.searchParams.append("order", "created_at.desc");
+  }
   const response = await fetch(url.toString(), {
     headers: {
       Authorization: `Bearer ${token}`,
@@ -21,7 +27,6 @@ export async function getAllEpicsService(
     },
     next: { tags: ["epics"] },
   });
-  console.log(response, "rr");
 
   if (response.status === 401) {
     throw new Error("UNAUTHORIZED");

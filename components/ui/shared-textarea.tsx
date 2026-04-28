@@ -21,6 +21,7 @@ export default function TextArea({
   errorIcon,
   maxLength,
   onChange,
+  hint,
   ...props
 }: SharedTextAreaProps) {
   const [charCount, setCharCount] = useState(0);
@@ -35,7 +36,7 @@ export default function TextArea({
           <label
             className={cn(
               "text-xs uppercase font-bold flex",
-              error ? "text-error" : "text-slate-container",
+              error ? "text-error" : "text-slate-container"
             )}
           >
             {label}
@@ -55,13 +56,14 @@ export default function TextArea({
             error
               ? "bg-input-error-light text-input-error"
               : "bg-surface-highest text-placeholder border-slate-300 focus:border-primary placeholder:text-placeholder",
-            className,
+            className
           )}
           {...props}
           maxLength={maxLength}
           onChange={handleChange}
         />
       </div>
+      {hint && !error && <p className="text-sm text-secondary mt-2">{hint}</p>}
       {error && (
         <p className="text-xs text-error font-medium flex">
           <span className="me-1.5">{errorIcon && errorIcon}</span>

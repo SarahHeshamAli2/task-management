@@ -5,7 +5,6 @@ import { getProjectMembers } from "@/lib/services/get-project-members";
 
 export default async function MemberCard({ id }: { id: string | null }) {
   const { data: members } = await getProjectMembers(id ?? "");
-  console.log(members, "memver ");
 
   return (
     <div>

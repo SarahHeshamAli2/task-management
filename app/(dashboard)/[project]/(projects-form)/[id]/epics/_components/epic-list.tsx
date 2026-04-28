@@ -30,12 +30,13 @@ export default function EpicList({ searchParams }: Props) {
 
   const offset = (currentPage - 1) * limit;
 
-  const { epics, total, isLoading, isInitialLoad, hasMore } = useGetEpics({
-    limit,
-    offset,
-    append: isMobile,
-    id,
-  });
+  const { epics, total, isLoading, isInitialLoad, hasMore, updateEpic } =
+    useGetEpics({
+      limit,
+      offset,
+      append: isMobile,
+      id,
+    });
 
   const handleLoadMore = useCallback(() => {
     setCurrentPage((prev) => prev + 1);
@@ -107,6 +108,8 @@ architectural clarity."
 
       <div className="grid md:grid-cols-2 gap-6">
         {epics?.map((epic, index) => {
+          console.log(epic, "epic");
+
           const isLast = epics.length === index + 1;
           return (
             <EpicCard
@@ -120,6 +123,10 @@ architectural clarity."
               createdBy={epic.created_by.name}
               deadline={epic.deadline}
               asigneeName={epic.assignee.name}
+              description={epic.description}
+              assigneeId={epic.assignee.sub}
+              projectId={id}
+              onUpdate={(patch) => updateEpic(epic.id, patch)}
             />
           );
         })}
