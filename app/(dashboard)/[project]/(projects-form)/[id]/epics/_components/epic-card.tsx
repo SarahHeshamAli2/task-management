@@ -16,6 +16,9 @@ import { Member } from "@/lib/types/member.types";
 import { EpicList } from "@/lib/types/epic.types";
 import Avatar from "@/components/shared/avatar";
 import EpicAssigneeField from "./epic-assignee-field";
+import useGetTasks from "../../tasks/hooks/use-get-tasks";
+import TaskList from "../../tasks/_components/tasks-list";
+import TaskCardSkeleton from "@/components/skeletons/task-card.skeleton";
 
 type EpicCardProps = {
   title: string;
@@ -65,6 +68,10 @@ export default function EpicCard({
   const [draftTitle, setDraftTitle] = useState(title);
   const [draftDescription, setDraftDescription] = useState(description ?? "");
   const [draftDeadline, setDraftDeadline] = useState<string | null>(deadline);
+  const { tasks, isLoading } = useGetTasks({
+    params: { epic_id: `eq.${epicId}` },
+    enabled: isOpen,
+  });
 
   const { members } = useGetProjectMembers({
     id: projectId,
@@ -135,12 +142,6 @@ export default function EpicCard({
   };
 
   const handleAssigneeChange = async (selectedId: string) => {
-    console.log("handleAssigneeChange called", {
-      selectedId,
-      assigneeId,
-      isUpdatingAssignee,
-      optimisticAssignee,
-    });
     const nextAssigneeId = selectedId === "unassigned" ? null : selectedId;
     const currentAssigneeId = optimisticAssignee?.id ?? assigneeId ?? null;
     const currentAssigneeName = optimisticAssignee?.name ?? asigneeName ?? "";
@@ -302,7 +303,13 @@ export default function EpicCard({
                 Add Task
               </Button>
             </div>
-            <EmptyTask />
+            {isLoading ? (
+              <TaskCardSkeleton count={3} />
+            ) : tasks?.length === 0 ? (
+              <EmptyTask />
+            ) : (
+              <TaskList tasks={tasks} />
+            )}
           </Modal>
         </div>
       </div>

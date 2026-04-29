@@ -8,13 +8,16 @@ export type DropdownMenuItem = {
   label: string;
   icon?: React.ReactNode;
   className?: string;
+  onClick?: () => void;
+  href?: string;
 };
 
 type DropdownMenuProps = {
   items: DropdownMenuItem[];
   triggerClassName?: string;
   menuClassName?: string;
-  href: string;
+  href?: string;
+  trigger?: React.ReactNode; // custom trigger
 };
 
 export default function DropdownMenu({
@@ -22,6 +25,7 @@ export default function DropdownMenu({
   triggerClassName = "",
   menuClassName = "",
   href,
+  trigger,
 }: DropdownMenuProps) {
   const [isOpen, setIsOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
@@ -42,34 +46,53 @@ export default function DropdownMenu({
 
   return (
     <div ref={dropdownRef} className="relative">
-      <button
-        onClick={() => setIsOpen((prev) => !prev)}
-        className={`flex items-center justify-center rounded hover:bg-gray-100 p-1 transition-colors ${triggerClassName}`}
-        aria-label="Open menu"
-      >
-        <MenuIcon />
-      </button>
+      {trigger ? (
+        <div
+          onClick={() => setIsOpen((prev) => !prev)}
+          className="cursor-pointer"
+        >
+          {trigger}
+        </div>
+      ) : (
+        <button
+          onClick={() => setIsOpen((prev) => !prev)}
+          className={`flex items-center justify-center rounded hover:bg-gray-100 p-1 transition-colors ${triggerClassName}`}
+          aria-label="Open menu"
+        >
+          <MenuIcon />
+        </button>
+      )}
 
       {isOpen && (
         <div
-          className={`absolute right-0 top-full mt-1 z-50 bg-white border border-gray-200 rounded-md shadow-lg min-w-30 py-1 ${menuClassName}`}
+          className={`absolute start-0 top-full mt-1 z-50 bg-white border border-gray-200 rounded-md shadow-lg min-w-40 py-1 ${menuClassName}`}
         >
           {items.map((item, index) => (
             <div
               key={index}
-              role="link"
+              role="button"
               tabIndex={0}
               onClick={() => {
                 setIsOpen(false);
-                router.push(href);
+                if (item.onClick) {
+                  item.onClick();
+                } else if (item.href) {
+                  router.push(item.href);
+                } else if (href) {
+                  router.push(href);
+                }
               }}
               onKeyDown={(e) => {
                 if (e.key === "Enter" || e.key === " ") {
                   setIsOpen(false);
-                  router.push(href);
+                  if (item.onClick) {
+                    item.onClick();
+                  } else if (item.href ?? href) {
+                    router.push((item.href ?? href)!);
+                  }
                 }
               }}
-              className={`w-full text-left px-4 py-2 text-sm text-slate-700 hover:bg-gray-50 flex items-center gap-2 transition-colors cursor-pointer ${item.className ?? ""}`}
+              className={`w-full text-start px-4 py-2 text-sm text-slate-700 hover:bg-gray-50 flex items-center gap-2 transition-colors cursor-pointer ${item.className ?? ""}`}
             >
               {item.icon}
               {item.label}

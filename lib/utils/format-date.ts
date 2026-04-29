@@ -1,10 +1,14 @@
-export function formatDate(dateString: string | null | undefined) {
+export function formatDate(
+  dateString: string | null | undefined,
+  showYear = true,
+  defaultFormat = "en-us"
+) {
   if (!dateString) return "No deadline";
 
   const date = new Date(dateString);
-  return date.toLocaleDateString("en-us", {
+  return date.toLocaleDateString(defaultFormat, {
     day: "2-digit",
     month: "short",
-    year: "numeric",
+    ...(showYear && { year: "numeric" }),
   });
 }

@@ -1,18 +1,12 @@
 import { getToken } from "../utils/manage-token";
 
-export async function getAllEpicsService(
+export async function getTasksService(
   params: Record<string, string | number> = {}
 ) {
   const token = await getToken();
-  const url = new URL(
-    `${process.env.API_URL}/rest/v1/project_epics?project_id=eq.${params.id}&order=created_at.asc`
-  );
+  const url = new URL(`${process.env.API_URL}/rest/v1/project_tasks`);
+
   Object.entries(params).forEach(([key, value]) => {
-    if (key === "id") return;
-    if (key === "search") {
-      url.searchParams.append("title", `ilike.%${value}%`);
-      return;
-    }
     url.searchParams.append(key, String(value));
   });
 
@@ -23,7 +17,7 @@ export async function getAllEpicsService(
       "Content-Type": "application/json",
       Prefer: "count=exact",
     },
-    next: { tags: ["epics"] },
+    next: { tags: ["tasks"] },
   });
 
   if (response.status === 401) {
