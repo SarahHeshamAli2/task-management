@@ -17,13 +17,6 @@ function EpicCardSkeleton() {
 export default function EpicCardListSkeleton() {
   return (
     <>
-      <Header
-        title="Project Epics"
-        buttonText="New Epic"
-        linkHref={""}
-        leftIcon="+"
-        buttonClassName="hidden md:block"
-      />
       <div className="grid md:grid-cols-3 gap-6">
         {Array.from({ length: 10 }).map((_, i) => (
           <EpicCardSkeleton key={i} />

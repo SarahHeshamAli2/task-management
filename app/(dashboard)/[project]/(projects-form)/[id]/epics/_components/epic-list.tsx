@@ -2,10 +2,10 @@
 import PlusIcon from "@/components/icons/plus-icon";
 import Link from "next/link";
 import { useIsMobile } from "@/lib/hooks/use-mobile";
-import { useState, useCallback } from "react";
+import { useState, useCallback, useEffect } from "react";
 import Header from "@/app/(dashboard)/[project]/_components/header";
 import Pagination from "@/app/(dashboard)/[project]/_components/pagination";
-import { useParams } from "next/navigation";
+import { useParams, useRouter, usePathname } from "next/navigation";
 import useGetEpics from "../hooks/use-get-epics";
 import EpicCard from "./epic-card";
 import { useInfiniteScroll } from "@/lib/hooks/use-infinite-scroll";
@@ -15,31 +15,56 @@ import EpicCardListSkeleton from "@/components/skeletons/epic-card.skeleton";
 import { ROUTES } from "@/lib/constants/routes.constants";
 
 type Props = {
-  searchParams: { page?: string };
+  searchParams: { page?: string; search?: string };
 };
 
 export default function EpicList({ searchParams }: Props) {
   const limit = 6;
   const isMobile = useIsMobile();
   const params = useParams();
+  const router = useRouter();
+  const pathname = usePathname();
   const id = params.id as string;
 
-  const [currentPage, setCurrentPage] = useState(
-    () => Number(searchParams?.page) || 1
+  const currentPage = Number(searchParams?.page) || 1;
+
+  const [searchInput, setSearchInput] = useState(
+    () => searchParams?.search || ""
+  );
+  const [search, setSearch] = useState(() => searchParams?.search || "");
+  const [mobilePage, setMobilePage] = useState(1);
+
+  const updateSearchInUrl = useCallback(
+    (newSearch: string) => {
+      const urlParams = new URLSearchParams();
+      if (newSearch) urlParams.set("search", newSearch);
+      router.replace(
+        `${pathname}${urlParams.toString() ? `?${urlParams.toString()}` : ""}`,
+        { scroll: false }
+      );
+    },
+    [router, pathname]
   );
 
-  const offset = (currentPage - 1) * limit;
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      if (searchInput === search) return;
+      setSearch(searchInput);
+      setMobilePage(1); // ← reset mobile page on new search
+      updateSearchInUrl(searchInput);
+    }, 400);
+    return () => clearTimeout(timer);
+  }, [searchInput, search, updateSearchInUrl]);
+
+  const offset = isMobile
+    ? (mobilePage - 1) * limit
+    : (currentPage - 1) * limit;
 
   const { epics, total, isLoading, isInitialLoad, hasMore, updateEpic } =
-    useGetEpics({
-      limit,
-      offset,
-      append: isMobile,
-      id,
-    });
+    useGetEpics({ limit, offset, append: isMobile, id, search });
 
   const handleLoadMore = useCallback(() => {
-    setCurrentPage((prev) => prev + 1);
+    setMobilePage((prev) => prev + 1);
   }, []);
 
   const { lastElementRef } = useInfiniteScroll({
@@ -49,67 +74,81 @@ export default function EpicList({ searchParams }: Props) {
     enabled: isMobile,
   });
 
+  const addEpicHref = ROUTES.epics.add(id);
+
+  // Define header once, reuse everywhere
+  const header = (
+    <Header
+      showSearch
+      title="Project Epics"
+      searchValue={searchInput}
+      onSearchChange={setSearchInput}
+      searchPlaceholder="Search epics..."
+      buttonText="New Epic"
+      linkHref={addEpicHref}
+      leftIcon="+"
+      buttonClassName="hidden md:block"
+      titleClassName="hidden md:block"
+    />
+  );
+
   if (isInitialLoad && isLoading) {
-    return <EpicCardListSkeleton />;
+    return (
+      <>
+        {header}
+        <EpicCardListSkeleton />
+      </>
+    );
   }
 
   if (!isLoading && !isInitialLoad && epics?.length === 0) {
     return (
-      <EmptyState
-        icon={<EpicGridDecoration />}
-        centralClassName="bg-white"
-        cardBackground="white"
-        borderGradient={null}
-        decoratorIconStart={null}
-        decoratorIconEnd={null}
-        heading="No epics in this project yet."
-        description="Break down your large project into manageable
+      <>
+        {header}
+        <EmptyState
+          icon={<EpicGridDecoration />}
+          centralClassName="bg-white"
+          cardBackground="white"
+          borderGradient={null}
+          decoratorIconStart={null}
+          decoratorIconEnd={null}
+          heading="No epics in this project yet."
+          description="Break down your large project into manageable
 epics to track progress better and maintain
 architectural clarity."
-        action={{
-          label: "Create First Epic",
-          href: ROUTES.epics.add(id),
-          icon: (
-            <svg
-              width="16"
-              height="20"
-              viewBox="0 0 16 20"
-              fill="none"
-              xmlns="http://www.w3.org/2000/svg"
-            >
-              <path
-                d="M6.55 16.2L11.725 10H7.725L8.45 4.325L3.825 11H7.3L6.55 16.2ZM4 20L5 13H0L9 0H11L10 8H16L6 20H4Z"
-                fill="white"
-              />
-            </svg>
-          ),
-        }}
-      />
+          action={{
+            label: "Create First Epic",
+            href: addEpicHref,
+            icon: (
+              <svg
+                width="16"
+                height="20"
+                viewBox="0 0 16 20"
+                fill="none"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <path
+                  d="M6.55 16.2L11.725 10H7.725L8.45 4.325L3.825 11H7.3L6.55 16.2ZM4 20L5 13H0L9 0H11L10 8H16L6 20H4Z"
+                  fill="white"
+                />
+              </svg>
+            ),
+          }}
+        />
+      </>
     );
   }
 
   const totalPages = Math.ceil(total / limit);
   const hasNextPage = currentPage < totalPages;
   const shownUpTo = Math.min(currentPage * limit, total);
-  const addEpicHref = ROUTES.epics.add(id);
 
   return (
     <>
-      <Header
-        showSearch
-        title="Project Epics"
-        searchPlaceholder="Search epics..."
-        buttonText="New Epic"
-        linkHref={addEpicHref}
-        leftIcon="+"
-        buttonClassName="hidden md:block"
-        titleClassName="hidden md:block"
-      />
+      {header}
 
       <div className="grid md:grid-cols-2 gap-6">
         {epics?.map((epic, index) => {
-          console.log(epic, "epic");
-
           const isLast = epics.length === index + 1;
           return (
             <EpicCard
@@ -131,7 +170,6 @@ architectural clarity."
           );
         })}
 
-        {/* Loading indicator for infinite scroll */}
         {isMobile && isLoading && (
           <div className="col-span-full flex justify-center py-4">
             <span className="text-secondary text-sm">Loading more...</span>
@@ -169,6 +207,7 @@ architectural clarity."
           </svg>
         </Link>
       )}
+
       {!isMobile && (
         <Pagination
           projectsPerPage={shownUpTo}

@@ -93,7 +93,7 @@ export default function Header({
             trigger={
               <Button
                 variant="ghost"
-                className="bg-white px-6 text-black flex gap-3"
+                className="bg-white px-6 text-black flex gap-3  "
               >
                 {currentView.icon}
                 {currentView.label}

@@ -10,15 +10,10 @@ type UseGetEpicsParams = {
 export default function useGetEpics({
   limit,
   offset,
-  append = false,
+  append,
   id,
-}: {
-  limit?: number;
-  offset?: number;
-  append?: boolean;
-  id: string;
-  search?: string;
-}) {
+  search,
+}: UseGetEpicsParams) {
   const [epics, setEpics] = useState<EpicList>([]);
   const [total, setTotal] = useState<number>(0);
   const [isLoading, setIsLoading] = useState<boolean>(true);
@@ -42,17 +37,13 @@ export default function useGetEpics({
   const getAllEpics = useCallback(async () => {
     if (isFetchingRef.current) return;
 
-    // // Abort any in-flight request
-    // abortControllerRef.current?.abort();
-    // abortControllerRef.current = new AbortController();
-
     try {
       isFetchingRef.current = true;
       setIsLoading(true);
       setError(false);
 
       const response = await fetch(
-        `/api/epics/${id}?limit=${limit}&offset=${offset}`
+        `/api/epics/${id}?limit=${limit}&offset=${offset}${search ? `&search=${encodeURIComponent(search)}` : ""}`
       );
 
       if (!response.ok) {
@@ -78,7 +69,16 @@ export default function useGetEpics({
         isFirstFetch.current = false;
       }
     }
-  }, [id, limit, offset, append]);
+  }, [id, limit, offset, append, search]);
+
+  useEffect(() => {
+    isFirstFetch.current = true;
+    setIsInitialLoad(true);
+    setEpics([]);
+    setTotal(0);
+    setHasMore(false);
+    setError(false);
+  }, [search]);
 
   useEffect(() => {
     getAllEpics();
