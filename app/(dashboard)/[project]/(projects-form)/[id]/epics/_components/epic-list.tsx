@@ -2,7 +2,7 @@
 import PlusIcon from "@/components/icons/plus-icon";
 import Link from "next/link";
 import { useIsMobile } from "@/lib/hooks/use-mobile";
-import { useState, useCallback, useEffect } from "react";
+import { useState, useCallback, useEffect, useRef } from "react";
 import Header from "@/app/(dashboard)/[project]/_components/header";
 import Pagination from "@/app/(dashboard)/[project]/_components/pagination";
 import { useParams, useRouter, usePathname } from "next/navigation";
@@ -33,32 +33,43 @@ export default function EpicList({ searchParams }: Props) {
   );
   const [search, setSearch] = useState(() => searchParams?.search || "");
   const [mobilePage, setMobilePage] = useState(1);
-
   const updateSearchInUrl = useCallback(
     (newSearch: string) => {
-      const urlParams = new URLSearchParams();
-      if (newSearch) urlParams.set("search", newSearch);
+      const params = new URLSearchParams(window.location.search);
+
+      if (newSearch) {
+        params.set("search", newSearch);
+      } else {
+        params.delete("search");
+        params.set("page", "1");
+      }
+
       router.replace(
-        `${pathname}${urlParams.toString() ? `?${urlParams.toString()}` : ""}`,
+        `${pathname}${params.toString() ? `?${params.toString()}` : ""}`,
         { scroll: false }
       );
     },
     [router, pathname]
   );
-
+  const searchParamsRef = useRef(searchParams);
+  useEffect(() => {
+    searchParamsRef.current = searchParams;
+  }, [searchParams]);
   useEffect(() => {
     const timer = setTimeout(() => {
       if (searchInput === search) return;
       setSearch(searchInput);
       setMobilePage(1); // ← reset mobile page on new search
-      updateSearchInUrl(searchInput);
+      updateSearchInUrl(searchInput); // true = reset page to 1
     }, 400);
     return () => clearTimeout(timer);
-  }, [searchInput, search, updateSearchInUrl]);
+  }, [searchInput]);
 
-  const offset = isMobile
-    ? (mobilePage - 1) * limit
-    : (currentPage - 1) * limit;
+  const offset = search
+    ? 0
+    : isMobile
+      ? (mobilePage - 1) * limit
+      : (currentPage - 1) * limit;
 
   const { epics, total, isLoading, isInitialLoad, hasMore, updateEpic } =
     useGetEpics({ limit, offset, append: isMobile, id, search });

@@ -1,5 +1,3 @@
-import Header from "@/app/(dashboard)/[project]/_components/header";
-
 function EpicCardSkeleton() {
   return (
     <div className="bg-white  md:p-6 rounded-lg min-h-62.5 flex flex-col justify-between animate-pulse">
