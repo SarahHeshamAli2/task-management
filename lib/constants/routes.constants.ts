@@ -6,9 +6,14 @@ export const ROUTES = {
     epics: (id: string | null | undefined) => `/project/${id}/epics`,
   },
   epics: {
-    list: "/project",
     add: (id: string | null | undefined) => `/project/${id}/epics/new`,
 
     edit: (id: string | null | undefined) => `/project/${id}/epics/edit`,
+  },
+  tasks: {
+    list: (id: string | null | undefined) => `
+/project/${id}/tasks?view=board
+`,
+    add: (id: string | null | undefined) => `/project/${id}/tasks/new`,
   },
 };

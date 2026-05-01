@@ -20,6 +20,7 @@ import TaskList from "../../tasks/_components/tasks-list";
 import TaskCardSkeleton from "@/components/skeletons/task-card.skeleton";
 import Link from "next/link";
 import { useIsMobile } from "@/lib/hooks/use-mobile";
+import { ROUTES } from "@/lib/constants/routes.constants";
 
 type EpicCardProps = {
   title: string;
@@ -299,7 +300,7 @@ export default function EpicCard({
                 <p>Tasks</p>
                 <Link
                   onClick={(e) => e.stopPropagation()}
-                  href={`/project/${projectId}/task/new`}
+                  href={`${ROUTES.tasks.add(projectId)}?epic=${epicId}`}
                   className="text-primary"
                 >
                   Add Task
@@ -308,7 +309,7 @@ export default function EpicCard({
               {isLoading ? (
                 <TaskCardSkeleton count={3} />
               ) : tasks?.length === 0 ? (
-                <EmptyTask />
+                <EmptyTask epicId={epicId} projectId={projectId} />
               ) : (
                 <TaskList tasks={tasks} />
               )}

@@ -20,6 +20,7 @@ type HeaderProps = {
   className?: string;
   buttonClassName?: string;
   titleClassName?: string;
+  subTitleClassName?: string;
 
   // search props
   showSearch?: boolean;
@@ -49,6 +50,7 @@ export default function Header({
   viewOptions,
   selectedView,
   onViewChange,
+  subTitleClassName,
 }: HeaderProps) {
   const currentView =
     viewOptions?.find((v) => v.value === selectedView) ?? viewOptions?.[0];
@@ -59,7 +61,9 @@ export default function Header({
     >
       <div className={cn(titleClassName)}>
         <h3 className="font-semibold text-3xl">{title}</h3>
-        <p className="text-secondary mt-1 max-w-lg">{subtitle}</p>
+        <p className={cn("text-secondary mt-1 max-w-lg", subTitleClassName)}>
+          {subtitle}
+        </p>
       </div>
 
       <div className="md:flex items-center gap-3">

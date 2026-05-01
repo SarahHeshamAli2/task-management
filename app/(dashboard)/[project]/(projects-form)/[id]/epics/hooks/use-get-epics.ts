@@ -1,17 +1,18 @@
 import { useEffect, useState, useRef, useCallback } from "react";
 import { EpicList } from "@/lib/types/epic.types";
 type UseGetEpicsParams = {
-  limit: number;
-  offset: number;
-  append: boolean;
   id: string;
+  limit?: number;
+  offset?: number;
+  append?: boolean;
   search?: string;
 };
+
 export default function useGetEpics({
-  limit,
-  offset,
-  append,
   id,
+  limit = 100,
+  offset = 0,
+  append = false,
   search,
 }: UseGetEpicsParams) {
   const [epics, setEpics] = useState<EpicList>([]);

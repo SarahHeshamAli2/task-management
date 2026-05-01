@@ -74,7 +74,6 @@ export default function Select({
 
       <div className="relative">
         <select
-          defaultValue={""}
           className={cn(
             "w-full px-4 py-3.5 pe-10 rounded-sm text-sm outline-none transition-colors appearance-none cursor-pointer",
             "disabled:opacity-50 disabled:cursor-not-allowed",
