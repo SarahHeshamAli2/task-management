@@ -33,7 +33,10 @@ export const addTaskSchema = z.object({
       (val) => !val || new Date(val) >= today,
       "Due date must be today or a future date."
     )
-    .transform((val) => (val === "" ? null : val)),
+    .transform((val) => {
+      if (!val || val === "") return null;
+      return new Date(val).toISOString();
+    }),
 });
 
 export type TaskFormValues = z.input<typeof addTaskSchema>;

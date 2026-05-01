@@ -118,7 +118,10 @@ export default function AddTaskForm() {
                   options={
                     epics?.map((epic) => ({
                       value: epic.id,
-                      label: epic.title,
+                      label:
+                        epic.title.length > 100
+                          ? `${epic.title.slice(0, 100)}…`
+                          : epic.title,
                     })) ?? []
                   }
                 />
