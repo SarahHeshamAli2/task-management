@@ -8,6 +8,8 @@ import useGetTasks from "../hooks/use-get-tasks";
 import { useParams } from "next/navigation";
 import { STATUS_CONFIG } from "@/lib/constants/tasks.constants";
 import { TaskTableSkeleton } from "@/components/skeletons/tasks-list-table.skeleton";
+import { useState } from "react";
+import TaskDetailModal from "./task-detail-modal";
 
 export default function ListView() {
   const params = useParams();
@@ -16,6 +18,8 @@ export default function ListView() {
   const { tasks, isLoading, error } = useGetTasks({
     params: { project_id: `eq.${projectId}` },
   });
+
+  const [selectedTaskId, setSelectedTaskId] = useState<string | null>(null);
 
   return (
     <div className="bg-slate-50 rounded-2xl min-h-104 mb-10 md:mb-0">
@@ -70,6 +74,7 @@ export default function ListView() {
 
                 return (
                   <tr
+                    onClick={() => setSelectedTaskId(task.id)}
                     key={task.id}
                     className={cn(
                       "border-b last:border-0 border-slate-100 hover:bg-slate-50 transition-colors"
@@ -138,6 +143,15 @@ export default function ListView() {
               })}
           </tbody>
         </table>
+
+        {selectedTaskId && (
+          <TaskDetailModal
+            isOpen={!!selectedTaskId}
+            onClose={() => setSelectedTaskId(null)}
+            taskId={selectedTaskId}
+            projectId={projectId as string}
+          />
+        )}
       </div>
     </div>
   );

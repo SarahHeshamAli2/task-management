@@ -7,7 +7,8 @@ import Avatar from "@/components/shared/avatar";
 import { Task } from "@/lib/types/tasks.type";
 import { formatDate } from "@/lib/utils/format-date";
 import { cn } from "@/lib/utils/tailwind-merge";
-import { Ref } from "react";
+import { Ref, useState } from "react";
+import TaskDetailModal from "./task-detail-modal";
 
 type ProjectCardProps = {
   ref?: Ref<HTMLDivElement>;
@@ -16,9 +17,10 @@ type ProjectCardProps = {
 
 export default function BoardView({ ref, task }: ProjectCardProps) {
   const { title, due_date, assignee } = task;
+  const [open, setOpen] = useState(false);
 
   return (
-    <div ref={ref}>
+    <div ref={ref} onClick={() => setOpen(true)} className="cursor-pointer">
       <div
         className={cn(
           "bg-white p-4 rounded-lg min-h-25 min-w-[288px]",
@@ -50,6 +52,16 @@ export default function BoardView({ ref, task }: ProjectCardProps) {
           )}
         </div>
       </div>
+      {open && (
+        <div onClick={(e) => e.stopPropagation()}>
+          <TaskDetailModal
+            isOpen={open}
+            onClose={() => setOpen(false)}
+            taskId={task.id}
+            projectId={task.project_id}
+          />
+        </div>
+      )}
     </div>
   );
 }

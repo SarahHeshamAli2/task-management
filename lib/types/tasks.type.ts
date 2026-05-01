@@ -11,6 +11,11 @@ export type Task = {
   due_date?: string;
   assignee: {
     name: string;
+    department: string;
+  };
+  epic: {
+    epic_id: string;
+    title: string;
   };
 };
 

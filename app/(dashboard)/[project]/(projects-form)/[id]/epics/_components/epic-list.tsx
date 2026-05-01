@@ -32,6 +32,7 @@ export default function EpicList({ searchParams }: Props) {
     () => searchParams?.search || ""
   );
   const [search, setSearch] = useState(() => searchParams?.search || "");
+
   const [mobilePage, setMobilePage] = useState(1);
   const updateSearchInUrl = useCallback(
     (newSearch: string) => {
@@ -41,7 +42,6 @@ export default function EpicList({ searchParams }: Props) {
         params.set("search", newSearch);
       } else {
         params.delete("search");
-        params.set("page", "1");
       }
 
       router.replace(
@@ -87,7 +87,6 @@ export default function EpicList({ searchParams }: Props) {
 
   const addEpicHref = ROUTES.epics.add(id);
 
-  // Define header once, reuse everywhere
   const header = (
     <Header
       showSearch

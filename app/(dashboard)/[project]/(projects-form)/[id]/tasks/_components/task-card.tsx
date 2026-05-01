@@ -1,16 +1,28 @@
+"use client";
+
 import TaskCheckIcon from "@/components/icons/task-check-icon";
 import UnassignedIcon from "@/components/icons/unassigned-icon";
 import Avatar from "@/components/shared/avatar";
 import { TasksList } from "@/lib/types/tasks.type";
 import { formatDate } from "@/lib/utils/format-date";
+import { useState } from "react";
+import TaskDetailModal from "./task-detail-modal";
 
 type TaskCardProps = {
   task: TasksList[number];
 };
 
 export default function TaskCard({ task }: TaskCardProps) {
+  const [open, setOpen] = useState(false);
+
   return (
-    <div className="flex justify-between border-b py-4 border-slate-light/15">
+    <div
+      onClick={(e) => {
+        e.stopPropagation();
+        setOpen(true);
+      }}
+      className="flex justify-between border-b py-4 border-slate-light/15"
+    >
       <div className="flex items-center gap-4">
         <TaskCheckIcon />
         <div>
@@ -40,6 +52,14 @@ export default function TaskCard({ task }: TaskCardProps) {
         </p>
       ) : (
         <span>No Due Date </span>
+      )}
+      {open && (
+        <TaskDetailModal
+          isOpen={open}
+          onClose={() => setOpen(false)}
+          taskId={task.id}
+          projectId={task.project_id}
+        />
       )}
     </div>
   );
