@@ -23,7 +23,6 @@ export default function TaskDetailModal({
     params: { project_id: `eq.${projectId}`, id: `eq.${taskId}` },
     enabled: isOpen && !!taskId && !!projectId,
   });
-  console.log(tasks, "tasks from detail modal");
   const currentTask = tasks[0];
   return (
     <>

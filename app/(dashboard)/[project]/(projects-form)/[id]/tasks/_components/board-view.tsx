@@ -7,15 +7,15 @@ import Avatar from "@/components/shared/avatar";
 import { Task } from "@/lib/types/tasks.type";
 import { formatDate } from "@/lib/utils/format-date";
 import { cn } from "@/lib/utils/tailwind-merge";
-import { Ref, useState } from "react";
+import { useState } from "react";
 import TaskDetailModal from "./task-detail-modal";
 
-type ProjectCardProps = {
-  ref?: Ref<HTMLDivElement>;
+type TaskProps = {
+  ref?: (node: HTMLDivElement | null) => void;
   task: Task;
 };
 
-export default function BoardView({ ref, task }: ProjectCardProps) {
+export default function BoardView({ ref, task }: TaskProps) {
   const { title, due_date, assignee } = task;
   const [open, setOpen] = useState(false);
 

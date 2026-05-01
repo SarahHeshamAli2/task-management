@@ -2,7 +2,7 @@
 import PlusIcon from "@/components/icons/plus-icon";
 import Link from "next/link";
 import { useIsMobile } from "@/lib/hooks/use-mobile";
-import { useState, useCallback, useEffect, useRef } from "react";
+import { useState, useCallback, useEffect } from "react";
 import Header from "@/app/(dashboard)/[project]/_components/header";
 import Pagination from "@/app/(dashboard)/[project]/_components/pagination";
 import { useParams, useRouter, usePathname } from "next/navigation";
@@ -13,6 +13,7 @@ import EmptyState from "@/components/shared/empty-state";
 import { EpicGridDecoration } from "@/components/ui/epic-grid-decoration";
 import EpicCardListSkeleton from "@/components/skeletons/epic-card.skeleton";
 import { ROUTES } from "@/lib/constants/routes.constants";
+import { useDebounce } from "@/lib/hooks/use-debounce";
 
 type Props = {
   searchParams: { page?: string; search?: string };
@@ -31,9 +32,14 @@ export default function EpicList({ searchParams }: Props) {
   const [searchInput, setSearchInput] = useState(
     () => searchParams?.search || ""
   );
-  const [search, setSearch] = useState(() => searchParams?.search || "");
+  const search = useDebounce(searchInput, 400);
+  const [lastSearch, setLastSearch] = useState(search);
 
   const [mobilePage, setMobilePage] = useState(1);
+  if (search !== lastSearch) {
+    setLastSearch(search);
+    setMobilePage(1);
+  }
   const updateSearchInUrl = useCallback(
     (newSearch: string) => {
       const params = new URLSearchParams(window.location.search);
@@ -51,19 +57,10 @@ export default function EpicList({ searchParams }: Props) {
     },
     [router, pathname]
   );
-  const searchParamsRef = useRef(searchParams);
+
   useEffect(() => {
-    searchParamsRef.current = searchParams;
-  }, [searchParams]);
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      if (searchInput === search) return;
-      setSearch(searchInput);
-      setMobilePage(1); // ← reset mobile page on new search
-      updateSearchInUrl(searchInput); // true = reset page to 1
-    }, 400);
-    return () => clearTimeout(timer);
-  }, [searchInput]);
+    updateSearchInUrl(search);
+  }, [search]);
 
   const offset = search
     ? 0
@@ -220,8 +217,8 @@ architectural clarity."
 
       {!isMobile && (
         <Pagination
-          projectsPerPage={shownUpTo}
-          projectsCount={total}
+          perPage={shownUpTo}
+          totalCount={total}
           currentPage={currentPage}
           totalPages={totalPages}
           hasNextPage={hasNextPage}

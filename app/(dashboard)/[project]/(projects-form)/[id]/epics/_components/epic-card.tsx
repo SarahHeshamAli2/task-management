@@ -19,6 +19,7 @@ import useGetTasks from "../../tasks/hooks/use-get-tasks";
 import TaskList from "../../tasks/_components/tasks-list";
 import TaskCardSkeleton from "@/components/skeletons/task-card.skeleton";
 import Link from "next/link";
+import { useIsMobile } from "@/lib/hooks/use-mobile";
 
 type EpicCardProps = {
   title: string;
@@ -99,6 +100,7 @@ export default function EpicCard({
     return res.success;
   };
 
+  const isMobile = useIsMobile();
   const handleTitleSave = async () => {
     if (draftTitle === title) {
       setIsEditingTitle(false);
@@ -326,6 +328,28 @@ export default function EpicCard({
           {formatDate(createdAt)}
         </span>
       </div>
+
+      {isMobile && (
+        <div className="flex justify-between items-center border-t border-surface-low pt-4">
+          {displayAssigneeName ? (
+            <span className="text-xs flex  items-center gap-2">
+              <Avatar
+                name={displayAssigneeName}
+                sizeClassName="w-6 h-6"
+                className="rounded-lg"
+                textClassName="text-[10px]"
+              />
+              {displayAssigneeName}
+            </span>
+          ) : (
+            <span className="text-xs">Unassigned</span>
+          )}
+          <span className="text-secondary font-medium text-sm flex items-center gap-1.5">
+            <span className="text-xs">DEADLINE</span>
+            {formatDate(draftDeadline)}
+          </span>
+        </div>
+      )}
     </div>
   );
 }

@@ -10,7 +10,8 @@ export type PaginationProps = {
   currentPage: number;
   totalPages: number;
   hasNextPage: boolean;
-  projectsCount: number;
-  projectsPerPage: number;
+  totalCount: number;
+  perPage: number;
+  label?: string;
 };
 export type projectsList = project[];

@@ -5,19 +5,27 @@ import Avatar from "@/components/shared/avatar";
 import { formatDate } from "@/lib/utils/format-date";
 import { cn } from "@/lib/utils/tailwind-merge";
 import useGetTasks from "../hooks/use-get-tasks";
-import { useParams } from "next/navigation";
+import { useParams, useSearchParams } from "next/navigation";
 import { STATUS_CONFIG } from "@/lib/constants/tasks.constants";
 import { TaskTableSkeleton } from "@/components/skeletons/tasks-list-table.skeleton";
 import { useState } from "react";
 import TaskDetailModal from "./task-detail-modal";
+import Pagination from "@/app/(dashboard)/[project]/_components/pagination";
 
 export default function ListView() {
+  const LIMIT = 5;
   const params = useParams();
   const projectId = params.id;
+  const searchParams = useSearchParams();
+  const page = Number(searchParams.get("page") ?? 1);
+  const offset = (page - 1) * LIMIT;
 
-  const { tasks, isLoading, error } = useGetTasks({
+  const { tasks, total, isLoading, error } = useGetTasks({
+    limit: LIMIT,
+    offset,
     params: { project_id: `eq.${projectId}` },
   });
+  const totalPages = Math.ceil(total / LIMIT);
 
   const [selectedTaskId, setSelectedTaskId] = useState<string | null>(null);
 
@@ -152,6 +160,19 @@ export default function ListView() {
             projectId={projectId as string}
           />
         )}
+
+        <div className="px-5">
+          {totalPages > 1 && (
+            <Pagination
+              currentPage={page}
+              totalPages={totalPages}
+              hasNextPage={page < totalPages}
+              totalCount={total}
+              perPage={LIMIT}
+              label="tasks"
+            />
+          )}
+        </div>
       </div>
     </div>
   );

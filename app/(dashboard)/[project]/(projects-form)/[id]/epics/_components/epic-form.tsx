@@ -65,7 +65,6 @@ export default function EpicForm({
   });
 
   const [error, setError] = useState<string | undefined>();
-  console.log(formState.errors, "ee");
 
   const onSubmit = async (data: EpicFormValues) => {
     const payload = {
@@ -82,7 +81,6 @@ export default function EpicForm({
     }
     toast.success(successMessage);
     setTimeout(() => router.push(ROUTES.project.epics(projectId)), 1000);
-    console.log(data, "d");
   };
 
   return (
