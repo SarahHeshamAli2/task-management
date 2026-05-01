@@ -65,7 +65,6 @@ export default function EpicForm({
   });
 
   const [error, setError] = useState<string | undefined>();
-  console.log(formState.errors, "ee");
 
   const onSubmit = async (data: EpicFormValues) => {
     const payload = {

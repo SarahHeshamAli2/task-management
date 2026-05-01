@@ -1,5 +1,3 @@
-import Header from "@/app/(dashboard)/[project]/_components/header";
-
 function EpicCardSkeleton() {
   return (
     <div className="bg-white  md:p-6 rounded-lg min-h-62.5 flex flex-col justify-between animate-pulse">
@@ -17,13 +15,6 @@ function EpicCardSkeleton() {
 export default function EpicCardListSkeleton() {
   return (
     <>
-      <Header
-        title="Project Epics"
-        buttonText="New Epic"
-        linkHref={""}
-        leftIcon="+"
-        buttonClassName="hidden md:block"
-      />
       <div className="grid md:grid-cols-3 gap-6">
         {Array.from({ length: 10 }).map((_, i) => (
           <EpicCardSkeleton key={i} />

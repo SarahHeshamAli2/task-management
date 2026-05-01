@@ -1,18 +1,20 @@
 import { useEffect, useState, useRef, useCallback } from "react";
 import { EpicList } from "@/lib/types/epic.types";
-import { ParamValue } from "next/dist/server/request/params";
-
-export default function useGetEpics({
-  limit,
-  offset,
-  append = false,
-  id,
-}: {
+type UseGetEpicsParams = {
+  id: string;
   limit?: number;
   offset?: number;
   append?: boolean;
-  id: string | ParamValue;
-}) {
+  search?: string;
+};
+
+export default function useGetEpics({
+  id,
+  limit = 100,
+  offset = 0,
+  append = false,
+  search,
+}: UseGetEpicsParams) {
   const [epics, setEpics] = useState<EpicList>([]);
   const [total, setTotal] = useState<number>(0);
   const [isLoading, setIsLoading] = useState<boolean>(true);
@@ -42,7 +44,7 @@ export default function useGetEpics({
       setError(false);
 
       const response = await fetch(
-        `/api/epics/${id}?limit=${limit}&offset=${offset}`
+        `/api/epics/${id}?limit=${limit}&offset=${offset}${search ? `&search=${encodeURIComponent(search)}` : ""}`
       );
 
       if (!response.ok) {
@@ -68,7 +70,16 @@ export default function useGetEpics({
         isFirstFetch.current = false;
       }
     }
-  }, [id, limit, offset, append]);
+  }, [id, limit, offset, append, search]);
+
+  useEffect(() => {
+    isFirstFetch.current = true;
+    setIsInitialLoad(true);
+    setEpics([]);
+    setTotal(0);
+    setHasMore(false);
+    setError(false);
+  }, [search]);
 
   useEffect(() => {
     getAllEpics();

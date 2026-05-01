@@ -50,8 +50,9 @@ export default function Pagination({
   currentPage,
   totalPages,
   hasNextPage,
-  projectsCount,
-  projectsPerPage,
+  totalCount,
+  perPage,
+  label = "items",
 }: PaginationProps) {
   const isFirst = currentPage <= 1;
   const isLast = !hasNextPage;
@@ -70,7 +71,8 @@ export default function Pagination({
   return (
     <div className="my-20 flex items-center justify-between">
       <p className="text-secondary text-xs font-medium">
-        Showing {projectsPerPage} of {projectsCount} active projects
+        Showing {Math.min(currentPage * perPage, totalCount)} of {totalCount}{" "}
+        {label}
       </p>
       <div className="flex gap-2">
         <Button

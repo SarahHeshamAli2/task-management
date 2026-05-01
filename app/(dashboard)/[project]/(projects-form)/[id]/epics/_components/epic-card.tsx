@@ -15,7 +15,11 @@ import { Member } from "@/lib/types/member.types";
 import { EpicList } from "@/lib/types/epic.types";
 import Avatar from "@/components/shared/avatar";
 import EpicAssigneeField from "./epic-assignee-field";
+import useGetTasks from "../../tasks/hooks/use-get-tasks";
+import TaskList from "../../tasks/_components/tasks-list";
+import TaskCardSkeleton from "@/components/skeletons/task-card.skeleton";
 import Link from "next/link";
+import { useIsMobile } from "@/lib/hooks/use-mobile";
 import { ROUTES } from "@/lib/constants/routes.constants";
 
 type EpicCardProps = {
@@ -66,6 +70,10 @@ export default function EpicCard({
   const [draftTitle, setDraftTitle] = useState(title);
   const [draftDescription, setDraftDescription] = useState(description ?? "");
   const [draftDeadline, setDraftDeadline] = useState<string | null>(deadline);
+  const { tasks, isLoading } = useGetTasks({
+    params: { epic_id: `eq.${epicId}` },
+    enabled: isOpen,
+  });
 
   const { members } = useGetProjectMembers({
     id: projectId,
@@ -93,6 +101,7 @@ export default function EpicCard({
     return res.success;
   };
 
+  const isMobile = useIsMobile();
   const handleTitleSave = async () => {
     if (draftTitle === title) {
       setIsEditingTitle(false);
@@ -136,12 +145,6 @@ export default function EpicCard({
   };
 
   const handleAssigneeChange = async (selectedId: string) => {
-    console.log("handleAssigneeChange called", {
-      selectedId,
-      assigneeId,
-      isUpdatingAssignee,
-      optimisticAssignee,
-    });
     const nextAssigneeId = selectedId === "unassigned" ? null : selectedId;
     const currentAssigneeId = optimisticAssignee?.id ?? assigneeId ?? null;
     const currentAssigneeName = optimisticAssignee?.name ?? asigneeName ?? "";
@@ -193,116 +196,125 @@ export default function EpicCard({
         <div className="flex justify-between items-center">
           <h3 className="text-slate-dark font-medium text-lg">{title}</h3>
 
-          <Modal
-            size="2xl"
-            isOpen={isOpen}
-            onClose={() => setIsOpen(false)}
-            title={
-              isSavingTitle ? (
-                <div className="h-7 w-64 rounded bg-skeleton animate-pulse" />
-              ) : isEditingTitle ? (
-                <input
-                  value={draftTitle}
-                  onChange={(e) => setDraftTitle(e.target.value)}
-                  onBlur={handleTitleSave}
-                  autoFocus
-                  className="border-0 outline-0 rounded px-2 py-1"
-                />
-              ) : (
-                <h2
-                  className="text-slate-dark font-medium text-lg cursor-pointer"
-                  onClick={() => {
-                    setDraftTitle(title);
-                    setIsEditingTitle(true);
-                  }}
-                >
-                  {title}
-                </h2>
-              )
-            }
-            eyebrow={id}
-          >
-            {isSavingDescription ? (
-              <div className="space-y-2">
-                <div className="h-3 w-full rounded bg-skeleton animate-pulse" />
-                <div className="h-3 w-4/5 rounded bg-skeleton animate-pulse" />
-                <div className="h-3 w-3/5 rounded bg-skeleton animate-pulse" />
-              </div>
-            ) : (
-              <TextArea
-                className="bg-transparent p-0"
-                value={draftDescription}
-                onChange={(e) => setDraftDescription(e.target.value)}
-                onBlur={handleDescriptionSave}
-                placeholder="No description provided"
-              />
-            )}
-
-            <div className="grid md:grid-cols-3 grid-cols-2">
-              <div>
-                <p className="text-slate-dark/40 font-bold text-[10px] uppercase">
-                  created by
-                </p>
-                <p className="flex items-center gap-2 text-slate-dark font-medium text-sm mt-2">
-                  <Avatar
-                    name={createdBy}
-                    sizeClassName="w-7 h-7"
-                    textClassName="text-[10px]"
-                  />
-                  {createdBy}
-                </p>
-              </div>
-
-              <EpicAssigneeField
-                members={members}
-                displayAssigneeName={displayAssigneeName}
-                currentAvatarSrc={currentAvatarSrc}
-                isEditing={isEditingAssignee}
-                isUpdating={isUpdatingAssignee}
-                onStartEdit={() => setIsEditingAssignee(true)}
-                onSelectAssignee={handleAssigneeChange}
-              />
-
-              <div className="border-t col-span-2 md:col-span-1 pt-2 border-ocean mt-5 md:mt-0 md:border-0">
-                <p className="text-slate-dark/40 font-bold text-[10px] uppercase">
-                  Deadline
-                </p>
-                {isSavingDeadline ? (
-                  <div className="h-9 w-full rounded bg-skeleton animate-pulse mt-2" />
-                ) : (
+          <div onClick={(e) => e.stopPropagation()}>
+            <Modal
+              size="2xl"
+              isOpen={isOpen}
+              onClose={() => setIsOpen(false)}
+              title={
+                isSavingTitle ? (
+                  <div className="h-7 w-64 rounded bg-skeleton animate-pulse" />
+                ) : isEditingTitle ? (
                   <input
-                    type="date"
-                    value={draftDeadline ?? ""}
-                    onChange={(e) => setDraftDeadline(e.target.value || null)}
-                    onBlur={handleDeadlineSave}
+                    value={draftTitle}
+                    onChange={(e) => setDraftTitle(e.target.value)}
+                    onBlur={handleTitleSave}
+                    autoFocus
+                    className="border-0 outline-0 rounded px-2 py-1"
                   />
-                )}
+                ) : (
+                  <h2
+                    className="text-slate-dark font-medium text-lg cursor-pointer"
+                    onClick={() => {
+                      setDraftTitle(title);
+                      setIsEditingTitle(true);
+                    }}
+                  >
+                    {title}
+                  </h2>
+                )
+              }
+              eyebrow={id}
+            >
+              {isSavingDescription ? (
+                <div className="space-y-2">
+                  <div className="h-3 w-full rounded bg-skeleton animate-pulse" />
+                  <div className="h-3 w-4/5 rounded bg-skeleton animate-pulse" />
+                  <div className="h-3 w-3/5 rounded bg-skeleton animate-pulse" />
+                </div>
+              ) : (
+                <TextArea
+                  className="bg-transparent p-0"
+                  value={draftDescription}
+                  onChange={(e) => setDraftDescription(e.target.value)}
+                  onBlur={handleDescriptionSave}
+                  placeholder="No description provided"
+                />
+              )}
+
+              <div className="grid md:grid-cols-3 grid-cols-2">
+                <div>
+                  <p className="text-slate-dark/40 font-bold text-[10px] uppercase">
+                    created by
+                  </p>
+                  <p className="flex items-center gap-2 text-slate-dark font-medium text-sm mt-2">
+                    <Avatar
+                      name={createdBy}
+                      sizeClassName="w-7 h-7"
+                      textClassName="text-[10px]"
+                    />
+                    {createdBy}
+                  </p>
+                </div>
+
+                <EpicAssigneeField
+                  members={members}
+                  displayAssigneeName={displayAssigneeName}
+                  currentAvatarSrc={currentAvatarSrc}
+                  isEditing={isEditingAssignee}
+                  isUpdating={isUpdatingAssignee}
+                  onStartEdit={() => setIsEditingAssignee(true)}
+                  onSelectAssignee={handleAssigneeChange}
+                />
+
+                <div className="border-t col-span-2 md:col-span-1 pt-2 border-ocean mt-5 md:mt-0 md:border-0">
+                  <p className="text-slate-dark/40 font-bold text-[10px] uppercase">
+                    Deadline
+                  </p>
+                  {isSavingDeadline ? (
+                    <div className="h-9 w-full rounded bg-skeleton animate-pulse mt-2" />
+                  ) : (
+                    <input
+                      type="date"
+                      value={draftDeadline ?? ""}
+                      onChange={(e) => setDraftDeadline(e.target.value || null)}
+                      onBlur={handleDeadlineSave}
+                    />
+                  )}
+                </div>
+
+                <div className="border-t col-span-2 md:col-span-1 pt-2 border-ocean mt-5 md:mt-0 md:border-0">
+                  <p className="text-slate-dark/40 font-bold text-[10px] uppercase">
+                    Created At
+                  </p>
+                  <p className="flex items-center gap-2 text-slate-dark font-medium text-sm mt-2">
+                    <CalendarIcon />
+                    {formatDate(createdAt)}
+                  </p>
+                </div>
               </div>
 
-              <div className="border-t col-span-2 md:col-span-1 pt-2 border-ocean mt-5 md:mt-0 md:border-0">
-                <p className="text-slate-dark/40 font-bold text-[10px] uppercase">
-                  Created At
-                </p>
-                <p className="flex items-center gap-2 text-slate-dark font-medium text-sm mt-2">
-                  <CalendarIcon />
-                  {formatDate(createdAt)}
-                </p>
-              </div>
-            </div>
+              {error && <SubmissionError error={error} />}
 
-            {error && <SubmissionError error={error} />}
-            <div className="mt-8 text-slate-dark flex justify-between items-center font-semibold">
-              <p>Tasks</p>
-              <Link
-                href={`${ROUTES.tasks.add(projectId)}?epicId=${epicId}`}
-                className="text-primary"
-                onClick={(e) => e.stopPropagation()}
-              >
-                Add Task
-              </Link>
-            </div>
-            <EmptyTask projectId={projectId} epicId={epicId} />
-          </Modal>
+              <div className="mt-8 text-slate-dark flex justify-between items-center font-semibold">
+                <p>Tasks</p>
+                <Link
+                  onClick={(e) => e.stopPropagation()}
+                  href={`${ROUTES.tasks.add(projectId)}?epic=${epicId}`}
+                  className="text-primary"
+                >
+                  Add Task
+                </Link>
+              </div>
+              {isLoading ? (
+                <TaskCardSkeleton count={3} />
+              ) : tasks?.length === 0 ? (
+                <EmptyTask epicId={epicId} projectId={projectId} />
+              ) : (
+                <TaskList tasks={tasks} />
+              )}
+            </Modal>
+          </div>
         </div>
       </div>
 
@@ -317,6 +329,28 @@ export default function EpicCard({
           {formatDate(createdAt)}
         </span>
       </div>
+
+      {isMobile && (
+        <div className="flex justify-between items-center border-t border-surface-low pt-4">
+          {displayAssigneeName ? (
+            <span className="text-xs flex  items-center gap-2">
+              <Avatar
+                name={displayAssigneeName}
+                sizeClassName="w-6 h-6"
+                className="rounded-lg"
+                textClassName="text-[10px]"
+              />
+              {displayAssigneeName}
+            </span>
+          ) : (
+            <span className="text-xs">Unassigned</span>
+          )}
+          <span className="text-secondary font-medium text-sm flex items-center gap-1.5">
+            <span className="text-xs">DEADLINE</span>
+            {formatDate(draftDeadline)}
+          </span>
+        </div>
+      )}
     </div>
   );
 }

@@ -1,7 +1,15 @@
+import ChevronDown from "@/components/icons/chevron-down";
 import Button from "@/components/ui/button";
+import DropdownMenu from "@/components/ui/dropdown-menu";
 import Input from "@/components/ui/shared-input";
 import { cn } from "@/lib/utils/tailwind-merge";
 import Link from "next/link";
+
+export type ViewOption = {
+  label: string;
+  value: string;
+  icon?: React.ReactNode;
+};
 
 type HeaderProps = {
   title?: string;
@@ -19,6 +27,11 @@ type HeaderProps = {
   searchValue?: string;
   onSearchChange?: (value: string) => void;
   searchPlaceholder?: string;
+
+  // view dropdown props
+  viewOptions?: ViewOption[];
+  selectedView?: string;
+  onViewChange?: (value: string) => void;
 };
 
 export default function Header({
@@ -34,8 +47,14 @@ export default function Header({
   onSearchChange,
   searchPlaceholder = "Search...",
   titleClassName,
+  viewOptions,
+  selectedView,
+  onViewChange,
   subTitleClassName,
 }: HeaderProps) {
+  const currentView =
+    viewOptions?.find((v) => v.value === selectedView) ?? viewOptions?.[0];
+
   return (
     <div
       className={cn("md:flex items-center justify-between mb-10", className)}
@@ -69,6 +88,27 @@ export default function Header({
             }
             onChange={(e) => onSearchChange?.(e.target.value)}
             placeholder={searchPlaceholder}
+          />
+        )}
+
+        {/* Only renders if viewOptions are passed */}
+        {viewOptions && viewOptions.length > 0 && currentView && (
+          <DropdownMenu
+            trigger={
+              <Button
+                variant="ghost"
+                className="bg-white px-6 text-black flex gap-3  "
+              >
+                {currentView.icon}
+                {currentView.label}
+                <ChevronDown />
+              </Button>
+            }
+            items={viewOptions.map((opt) => ({
+              label: opt.label,
+              icon: opt.icon,
+              onClick: () => onViewChange?.(opt.value),
+            }))}
           />
         )}
 

@@ -20,7 +20,7 @@ export default function EmptyTask({
       </span>
       <Link
         onClick={(e) => e.stopPropagation()}
-        href={`${ROUTES.tasks.add(projectId)}?epicId=${epicId}`}
+        href={`${ROUTES.tasks.add(projectId)}?epic=${epicId}`}
         className="capitalize text-white text-sm min-w-37 bg-primary flex  py-2.5 items-center justify-center gap-2"
       >
         <LargePlusIcon /> add task

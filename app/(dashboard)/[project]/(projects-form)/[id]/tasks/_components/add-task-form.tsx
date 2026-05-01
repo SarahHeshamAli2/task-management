@@ -23,7 +23,8 @@ export default function AddTaskForm() {
   const params = useParams();
   const projectId = params.id as string;
   const searchParams = useSearchParams();
-  const defaultEpicId = searchParams.get("epicId") ?? undefined;
+  const defaultEpicId = searchParams.get("epic") ?? undefined;
+  const defaultStatus = searchParams.get("status") ?? "TO_DO";
 
   const router = useRouter();
   const { members } = useGetProjectMembers({ id: projectId });
@@ -36,8 +37,8 @@ export default function AddTaskForm() {
         assignee_id: undefined,
         due_date: undefined,
         project_id: projectId,
-        status: "TO_DO",
-        epic_id: defaultEpicId ?? undefined,
+        status: defaultStatus,
+        epic_id: defaultEpicId ?? "",
       },
     });
 
@@ -94,12 +95,13 @@ export default function AddTaskForm() {
                 error={formState.errors.assignee_id?.message}
                 label="asignee"
                 placeholder="select a team member"
-                options={
-                  members?.map((member) => ({
+                options={[
+                  { value: "", label: "No assignee" },
+                  ...(members?.map((member) => ({
                     value: member.user_id,
                     label: member.metadata.name,
-                  })) ?? []
-                }
+                  })) ?? []),
+                ]}
                 {...register("assignee_id")}
               />
             </div>

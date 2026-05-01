@@ -30,7 +30,7 @@ export async function addProjectAction(data: ProjectFormValues) {
 }
 export async function updateProjectAction(
   data: ProjectFormValues,
-  projectId: string,
+  projectId: string
 ) {
   const token = await getToken();
 
@@ -45,9 +45,8 @@ export async function updateProjectAction(
         apiKey: `${process.env.API_KEY}`,
       },
       body: JSON.stringify(data),
-    },
+    }
   );
-  console.log(response, "update response");
 
   if (!response.ok) {
     const errorMsg = await response.json();

@@ -122,8 +122,8 @@ export default function ProjectsList({ searchParams }: Props) {
 
       {!isMobile && (
         <Pagination
-          projectsPerPage={shownUpTo}
-          projectsCount={total}
+          perPage={shownUpTo}
+          totalCount={total}
           currentPage={currentPage}
           totalPages={totalPages}
           hasNextPage={hasNextPage}
