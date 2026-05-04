@@ -6,6 +6,7 @@ import ListViewIcon from "@/components/icons/list-view-icon";
 import { ROUTES } from "@/lib/constants/routes.constants";
 import ListView from "./_components/list-view";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
+import { useSearchParam } from "@/lib/hooks/use-search-param";
 
 export default function Page() {
   const router = useRouter();
@@ -18,6 +19,9 @@ export default function Page() {
     params.set("view", val);
     router.replace(`${pathname}?${params.toString()}`);
   };
+  const { searchInput, setSearchInput, debouncedSearch } = useSearchParam(
+    searchParams.get("search") ?? ""
+  );
 
   return (
     <>
@@ -32,9 +36,15 @@ export default function Page() {
           { label: "List View", value: "list", icon: <ListViewIcon /> },
         ]}
         selectedView={currentView}
+        searchValue={searchInput}
+        onSearchChange={setSearchInput}
         onViewChange={(val) => updateView(val as "board" | "list")}
       />
-      {currentView === "board" ? <TaskListBoardView /> : <ListView />}
+      {currentView === "board" ? (
+        <TaskListBoardView search={debouncedSearch} />
+      ) : (
+        <ListView search={debouncedSearch} />
+      )}
     </>
   );
 }

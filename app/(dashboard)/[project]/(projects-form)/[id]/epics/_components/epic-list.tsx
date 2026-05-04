@@ -2,10 +2,10 @@
 import PlusIcon from "@/components/icons/plus-icon";
 import Link from "next/link";
 import { useIsMobile } from "@/lib/hooks/use-mobile";
-import { useState, useCallback, useEffect } from "react";
+import { useCallback } from "react";
 import Header from "@/app/(dashboard)/[project]/_components/header";
 import Pagination from "@/app/(dashboard)/[project]/_components/pagination";
-import { useParams, useRouter, usePathname } from "next/navigation";
+import { useParams } from "next/navigation";
 import useGetEpics from "../hooks/use-get-epics";
 import EpicCard from "./epic-card";
 import { useInfiniteScroll } from "@/lib/hooks/use-infinite-scroll";
@@ -13,7 +13,7 @@ import EmptyState from "@/components/shared/empty-state";
 import { EpicGridDecoration } from "@/components/ui/epic-grid-decoration";
 import EpicCardListSkeleton from "@/components/skeletons/epic-card.skeleton";
 import { ROUTES } from "@/lib/constants/routes.constants";
-import { useDebounce } from "@/lib/hooks/use-debounce";
+import { useSearchParam } from "@/lib/hooks/use-search-param";
 
 type Props = {
   searchParams: { page?: string; search?: string };
@@ -23,53 +23,32 @@ export default function EpicList({ searchParams }: Props) {
   const limit = 6;
   const isMobile = useIsMobile();
   const params = useParams();
-  const router = useRouter();
-  const pathname = usePathname();
+
   const id = params.id as string;
 
+  const {
+    searchInput,
+    setSearchInput,
+    debouncedSearch,
+    mobilePage,
+    setMobilePage,
+  } = useSearchParam(searchParams?.search);
   const currentPage = Number(searchParams?.page) || 1;
 
-  const [searchInput, setSearchInput] = useState(
-    () => searchParams?.search || ""
-  );
-  const search = useDebounce(searchInput, 400);
-  const [lastSearch, setLastSearch] = useState(search);
-
-  const [mobilePage, setMobilePage] = useState(1);
-  if (search !== lastSearch) {
-    setLastSearch(search);
-    setMobilePage(1);
-  }
-  const updateSearchInUrl = useCallback(
-    (newSearch: string) => {
-      const params = new URLSearchParams(window.location.search);
-
-      if (newSearch) {
-        params.set("search", newSearch);
-      } else {
-        params.delete("search");
-      }
-
-      router.replace(
-        `${pathname}${params.toString() ? `?${params.toString()}` : ""}`,
-        { scroll: false }
-      );
-    },
-    [router, pathname]
-  );
-
-  useEffect(() => {
-    updateSearchInUrl(search);
-  }, [search]);
-
-  const offset = search
+  const offset = searchInput
     ? 0
     : isMobile
       ? (mobilePage - 1) * limit
       : (currentPage - 1) * limit;
 
   const { epics, total, isLoading, isInitialLoad, hasMore, updateEpic } =
-    useGetEpics({ limit, offset, append: isMobile, id, search });
+    useGetEpics({
+      limit,
+      offset,
+      append: isMobile,
+      id,
+      search: debouncedSearch,
+    });
 
   const handleLoadMore = useCallback(() => {
     setMobilePage((prev) => prev + 1);

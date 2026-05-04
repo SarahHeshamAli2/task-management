@@ -24,19 +24,17 @@ export default function useGetTasks({
   const [hasMore, setHasMore] = useState<boolean>(false);
 
   const isFirstFetch = useRef(true);
-  const isFetchingRef = useRef(false);
-
   useEffect(() => {
     const hasFilters = Object.keys(filterParams).length > 0;
     if (!enabled || !hasFilters) return;
 
-    const getTasks = async () => {
-      if (isFetchingRef.current) return;
+    const controller = new AbortController(); // 👈
 
+    const getTasks = async () => {
       try {
-        isFetchingRef.current = true;
         setIsLoading(true);
         setError(false);
+        if (offset === 0) setTasks([]);
 
         const params = new URLSearchParams();
         if (limit !== undefined) params.append("limit", String(limit));
@@ -45,7 +43,9 @@ export default function useGetTasks({
           params.append(key, value);
         });
 
-        const response = await fetch(`/api/tasks?${params.toString()}`);
+        const response = await fetch(`/api/tasks?${params.toString()}`, {
+          signal: controller.signal, // 👈
+        });
         const data = await response.json();
 
         setTasks((prev) =>
@@ -54,9 +54,9 @@ export default function useGetTasks({
         setTotal(data.total);
         setHasMore((offset ?? 0) + data.data.length < data.total);
       } catch (err) {
+        if ((err as DOMException).name === "AbortError") return; // 👈 ignore cancelled fetches
         setError(true);
       } finally {
-        isFetchingRef.current = false;
         setIsLoading(false);
         if (isFirstFetch.current) {
           setIsInitialLoad(false);
@@ -66,6 +66,8 @@ export default function useGetTasks({
     };
 
     getTasks();
+
+    return () => controller.abort(); // 👈 cancel on re-fetch
   }, [limit, offset, append, enabled, JSON.stringify(filterParams)]);
 
   return { tasks, total, isLoading, isInitialLoad, error, hasMore };

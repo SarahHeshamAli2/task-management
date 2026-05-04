@@ -5,30 +5,42 @@ import Avatar from "@/components/shared/avatar";
 import { formatDate } from "@/lib/utils/format-date";
 import { cn } from "@/lib/utils/tailwind-merge";
 import useGetTasks from "../hooks/use-get-tasks";
-import { useParams, useSearchParams } from "next/navigation";
+import { useParams, useRouter, useSearchParams } from "next/navigation";
 import { STATUS_CONFIG } from "@/lib/constants/tasks.constants";
 import { TaskTableSkeleton } from "@/components/skeletons/tasks-list-table.skeleton";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import TaskDetailModal from "./task-detail-modal";
 import Pagination from "@/app/(dashboard)/[project]/_components/pagination";
 
-export default function ListView() {
+export default function ListView({ search }: { search: string }) {
   const LIMIT = 5;
   const params = useParams();
   const projectId = params.id;
   const searchParams = useSearchParams();
-  const page = Number(searchParams.get("page") ?? 1);
+
+  const page = search ? 1 : Number(searchParams.get("page") ?? 1);
   const offset = (page - 1) * LIMIT;
 
   const { tasks, total, isLoading, error } = useGetTasks({
     limit: LIMIT,
     offset,
-    params: { project_id: `eq.${projectId}` },
+    params: {
+      project_id: `eq.${projectId}`,
+      ...(search && { title: `ilike.%${search}%` }),
+    },
   });
   const totalPages = Math.ceil(total / LIMIT);
 
   const [selectedTaskId, setSelectedTaskId] = useState<string | null>(null);
+  const router = useRouter();
 
+  useEffect(() => {
+    if (search) {
+      const params = new URLSearchParams(searchParams.toString());
+      params.set("page", "1");
+      router.replace(`?${params.toString()}`);
+    }
+  }, [search]);
   return (
     <div className="bg-slate-50 rounded-2xl min-h-104 mb-10 md:mb-0">
       <div className="bg-white rounded-lg overflow-hidden shadow-sm ">

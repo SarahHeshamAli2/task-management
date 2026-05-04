@@ -1,27 +1,40 @@
 import Link from "next/link";
 import useGetTasks from "../hooks/use-get-tasks";
-import { useState, useCallback } from "react";
+import { useState, useCallback, useEffect } from "react";
 import PlusIcon from "@/components/icons/plus-icon";
 import BoardView from "./board-view";
 import { ParamValue } from "next/dist/server/request/params";
 import { useInfiniteScroll } from "@/lib/hooks/use-infinite-scroll";
 
-const LIMIT = 2;
+const LIMIT = 1;
 
 type Props = {
   status: { label: string; value: string };
   projectId: string | ParamValue;
   dotColor: string;
+  search: string;
 };
 
-export default function TaskColumn({ status, projectId, dotColor }: Props) {
+export default function TaskColumn({
+  status,
+  projectId,
+  dotColor,
+  search,
+}: Props) {
   const [offset, setOffset] = useState(0);
+  useEffect(() => {
+    setOffset(0);
+  }, [search]);
 
   const { tasks, total, isLoading, error, hasMore } = useGetTasks({
     limit: LIMIT,
     offset,
     append: true,
-    params: { project_id: `eq.${projectId}`, status: `eq.${status.value}` },
+    params: {
+      project_id: `eq.${projectId}`,
+      status: `eq.${status.value}`,
+      ...(search && { title: `ilike.%${search}%` }),
+    },
   });
 
   const loadMore = useCallback(() => {

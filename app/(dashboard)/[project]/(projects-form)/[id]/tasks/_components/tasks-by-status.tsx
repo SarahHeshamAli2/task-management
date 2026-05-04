@@ -12,9 +12,10 @@ const STATUS_DOT_COLORS: Record<string, string> = {
   review: "bg-purple-400",
 };
 
-export default function TaskListBoardView() {
+export default function TaskListBoardView({ search }: { search: string }) {
   const params = useParams();
   const projectId = params.id;
+
   return (
     <>
       <div className="flex gap-8 overflow-x-auto no-scrollbar mt-6">
@@ -25,6 +26,7 @@ export default function TaskListBoardView() {
 
           return (
             <TaskColumn
+              search={search}
               key={status.value}
               status={status}
               projectId={projectId}
