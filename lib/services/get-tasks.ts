@@ -10,6 +10,9 @@ export async function getTasksService(
     url.searchParams.append(key, String(value));
   });
 
+  url.searchParams.append("order", "created_at.asc");
+  console.log("Tasks URL:", url.toString());
+
   const response = await fetch(url.toString(), {
     headers: {
       Authorization: `Bearer ${token}`,
@@ -17,6 +20,7 @@ export async function getTasksService(
       "Content-Type": "application/json",
       Prefer: "count=exact",
     },
+    cache: "no-store",
     next: { tags: ["tasks"] },
   });
 
