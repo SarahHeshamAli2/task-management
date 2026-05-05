@@ -23,11 +23,14 @@ export function useInfiniteScroll({
       // Disconnect previous observer before attaching a new one
       if (observer.current) observer.current.disconnect();
 
-      observer.current = new IntersectionObserver((entries) => {
-        if (entries[0].isIntersecting && hasMore && !isLoading) {
-          onLoadMore();
-        }
-      });
+      observer.current = new IntersectionObserver(
+        (entries) => {
+          if (entries[0].isIntersecting && hasMore && !isLoading) {
+            onLoadMore();
+          }
+        },
+        { rootMargin: "0px 0px -100px 0px", threshold: 0 }
+      );
 
       if (node) observer.current.observe(node);
     },

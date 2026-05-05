@@ -27,7 +27,7 @@ export default function Page() {
     <>
       <Header
         title="Active Workboard"
-        showSearch
+        // showSearch
         searchPlaceholder="search tasks..."
         subtitle="Curating Project Alpha's production pipeline and milestones."
         linkHref={ROUTES.project.add}
