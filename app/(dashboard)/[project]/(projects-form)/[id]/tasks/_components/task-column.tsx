@@ -8,6 +8,7 @@ import { useInfiniteScroll } from "@/lib/hooks/use-infinite-scroll";
 import { useDroppable } from "@dnd-kit/core";
 import { cn } from "@/lib/utils/tailwind-merge";
 import { Task } from "@/lib/types/tasks.type";
+import TaskCardBoardViewSkeleton from "@/components/skeletons/task-board-view.skeleton";
 
 const LIMIT = 10;
 
@@ -85,7 +86,7 @@ export default function TaskColumn({
   }, [rawTasks, optimisticMoves, status.value]);
 
   return (
-    <div className="flex-1 min-w-[288px]">
+    <div className="flex-1 min-w-[288px] flex flex-col">
       <div className="flex items-center gap-2 mb-4">
         <span className={`size-2 rounded-full shrink-0 ${dotColor}`} />
         <p className="uppercase text-placeholder font-bold text-xs">
@@ -106,19 +107,24 @@ export default function TaskColumn({
       <div
         ref={setNodeRef}
         className={cn(
-          "flex flex-col gap-3 min-h-24 rounded-lg transition-colors duration-150",
+          "flex flex-col gap-3 rounded-lg transition-colors duration-150",
+          "flex-1 min-h-24", // flex-1 makes it grow, remove fixed min-h or keep as fallback
           isOver && "bg-primary/5 ring-2 ring-primary/20"
         )}
       >
-        {isLoading && offset === 0 && (
-          <p className="text-placeholder text-xs text-center py-6">Loading…</p>
+        {tasks.length === 0 && !isLoading && !error && (
+          <p className="text-placeholder text-xs text-center py-6">No tasks</p>
         )}
+
         {!isLoading && error && (
           <p className="text-error text-xs text-center py-6">Failed to load</p>
         )}
-        {!isLoading && !error && tasks.length === 0 && (
-          <p className="text-placeholder text-xs text-center py-6">No tasks</p>
-        )}
+
+        {isLoading &&
+          offset === 0 &&
+          Array.from({ length: 3 }).map((_, i) => (
+            <TaskCardBoardViewSkeleton key={i} />
+          ))}
 
         {tasks.map((task, i) => {
           const isLast = i === tasks.length - 1;

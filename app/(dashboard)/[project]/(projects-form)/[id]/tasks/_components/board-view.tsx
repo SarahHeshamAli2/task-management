@@ -60,15 +60,13 @@ export default function BoardView({ ref, task, isOverlay }: TaskProps) {
   return (
     <div
       ref={mergedRef}
-      // Spread listeners first, THEN override onPointerDown with our merger.
-      // This ensures our handler runs AND dnd-kit's drag detection still fires.
       {...listeners}
       onPointerDown={handlePointerDown}
       onClick={handleClick}
       {...attributes}
       className={cn(
-        "cursor-grab active:cursor-grabbing",
-        isDragging && "opacity-40"
+        !isOverlay && "cursor-grab active:cursor-grabbing",
+        !isOverlay && isDragging && "opacity-40" // only dim the source, not the overlay
       )}
     >
       <div

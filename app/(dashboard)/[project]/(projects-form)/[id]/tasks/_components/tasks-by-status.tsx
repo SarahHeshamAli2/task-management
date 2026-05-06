@@ -95,7 +95,7 @@ export default function TaskListBoardView({ search }: { search: string }) {
       }
       onDragEnd={handleDragEnd}
     >
-      <div className="flex gap-8 overflow-x-auto no-scrollbar mt-6">
+      <div className="flex gap-8 overflow-x-auto items-stretch mt-6 h-full">
         {STATUS_VALUES.map((status) => {
           const dotColor =
             STATUS_DOT_COLORS[status.value.toLocaleLowerCase()] ??
@@ -117,7 +117,8 @@ export default function TaskListBoardView({ search }: { search: string }) {
 
       <DragOverlay>
         {draggedTask ? (
-          <div className=" opacity-90 shadow-xl">
+          <div className="opacity-95 shadow-xl w-[288px] rotate-1">
+            {" "}
             <BoardView task={draggedTask} isOverlay />
           </div>
         ) : null}
