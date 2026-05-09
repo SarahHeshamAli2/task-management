@@ -7,7 +7,7 @@ import Avatar from "@/components/shared/avatar";
 import UnassignedIcon from "@/components/icons/unassigned-icon";
 import { formatDate } from "@/lib/utils/format-date";
 import { TaskDetailModalSkeleton } from "@/components/skeletons/task-detail-modal.skeleton";
-import { useRef, useState } from "react";
+import { useCallback, useRef, useState } from "react";
 import { updateTaskAction } from "@/lib/actions/tasks.actions";
 import { toast } from "sonner";
 import useGetProjectMembers from "../../members/hooks/use-get-project-members";
@@ -121,7 +121,7 @@ export default function TaskDetailModal({
     );
   };
 
-  const handleClose = async () => {
+  const handleClose = useCallback(async () => {
     const dirty = dirtyFields.current;
     const hasDirty = Object.keys(dirty).length > 0;
 
@@ -176,7 +176,14 @@ export default function TaskDetailModal({
     }
 
     onClose();
-  };
+  }, [
+    localTask,
+    currentTask,
+    taskId,
+    setOptimisticMoves,
+    queryClient,
+    onClose,
+  ]);
 
   const task = localTask;
 

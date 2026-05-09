@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useRef, ReactNode } from "react";
-
+import { createPortal } from "react-dom";
 export interface ModalProps {
   /** Controls open/closed state */
   isOpen: boolean;
@@ -93,7 +93,7 @@ export default function Modal({
       aria-modal="true"
       role="dialog"
       aria-labelledby={title ? "modal-title" : undefined}
-      onClick={closeOnBackdrop ? onClose : undefined}
+      onClick={closeOnBackdrop && !disabled ? onClose : undefined}
     >
       {/* Panel */}
       <div
@@ -175,5 +175,6 @@ export default function Modal({
       `}</style>
     </div>
   );
-  return modal;
+
+  return createPortal(modal, document.body);
 }
