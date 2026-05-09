@@ -24,6 +24,7 @@ export interface ModalProps {
   /** Additional className for the modal panel */
   className?: string;
   showIcon?: boolean;
+  disabled?: boolean;
 }
 
 // ─── Size map ─────────────────────────────────────────────────────────────────
@@ -49,6 +50,7 @@ export default function Modal({
   closeOnEscape = true,
   className = "",
   showIcon = true,
+  disabled = false,
 }: ModalProps) {
   const panelRef = useRef<HTMLDivElement>(null);
 
@@ -133,6 +135,7 @@ export default function Modal({
                     onClick={onClose}
                     className="absolute top-4 right-4 p-1.5 rounded-lg text-slate-400 hover:text-slate-600 hover:bg-slate-100 transition-colors"
                     aria-label="Close modal"
+                    disabled={disabled}
                   >
                     X
                   </button>

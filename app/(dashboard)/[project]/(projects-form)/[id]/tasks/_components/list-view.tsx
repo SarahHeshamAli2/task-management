@@ -38,12 +38,12 @@ export default function ListView({ search }: { search: string }) {
     setLocalTasks(tasks);
   }, [tasks]);
   useEffect(() => {
-    if (search) {
+    if (search && searchParams.get("page") !== "1") {
       const params = new URLSearchParams(searchParams.toString());
       params.set("page", "1");
       router.replace(`?${params.toString()}`);
     }
-  }, [search]);
+  }, [search, searchParams, router]);
   return (
     <div className="bg-slate-50 rounded-2xl min-h-104 mb-10 md:mb-0">
       <div className="bg-white rounded-lg overflow-hidden shadow-sm ">
@@ -171,6 +171,7 @@ export default function ListView({ search }: { search: string }) {
             isOpen={!!selectedTaskId}
             taskId={selectedTaskId}
             projectId={projectId as string}
+            initialTask={localTasks.find((t) => t.id === selectedTaskId)}
             onClose={(savedTask) => {
               if (savedTask) {
                 setLocalTasks((prev) =>

@@ -56,47 +56,56 @@
   -ms-overflow-style: none;
   scrollbar-width: none;
 }
-.cal-day {
-  @apply text-center text-sm py-1.5 cursor-pointer rounded-lg;
-}
-/* .cal-day:not(.other-month):hover {
-  @apply bg-gray-100;
-} */
-.cal-day.other-month {
-  @apply text-gray-300 cursor-default;
-}
-.cal-day.today {
-  @apply font-semibold;
-}
-.cal-day.in-range {
-  @apply bg-blue-50 text-blue-700 rounded-none;
-}
-.cal-day.range-start {
-  @apply bg-blue-600 text-white rounded-l-lg rounded-r-none;
-}
-.cal-day.range-end {
-  @apply bg-blue-600 text-white rounded-r-lg rounded-l-none;
-}
-.cal-day.range-start.range-end {
-  @apply rounded-lg;
-}
+@layer components {
+  .cal-day {
+    @apply text-center text-sm py-1.5 cursor-pointer rounded-lg transition-colors;
+  }
 
-/* Add these to your existing cal-day styles */
-.cal-day.range-single {
-  @apply bg-blue-600 text-white rounded-lg;
-}
-.cal-day.hover-in-range {
-  @apply bg-blue-100 text-blue-600 rounded-none;
-}
-.cal-day.hover-start {
-  @apply bg-blue-200 text-blue-800 rounded-l-lg rounded-r-none;
-}
-.cal-day.hover-end {
-  @apply bg-blue-200 text-blue-800 rounded-r-lg rounded-l-none;
-}
-.cal-day.hover-single {
-  @apply bg-blue-200 text-blue-800 rounded-lg;
-}
-.cal-day:not(.other-month):not(.selected):hover {
-  @apply bg-gray-100;
+  .cal-day.other-month {
+    @apply text-gray-300 cursor-default;
+  }
+
+  .cal-day.today {
+    @apply font-semibold;
+  }
+
+  .cal-day.in-range {
+    @apply bg-blue-50 text-blue-700 rounded-none;
+  }
+
+  .cal-day.range-start {
+    @apply bg-blue-600 text-white rounded-l-lg rounded-r-none;
+  }
+
+  .cal-day.range-end {
+    @apply bg-blue-600 text-white rounded-r-lg rounded-l-none;
+  }
+
+  .cal-day.range-start.range-end {
+    @apply rounded-lg;
+  }
+
+  .cal-day.range-single {
+    @apply bg-blue-600 text-white rounded-lg;
+  }
+
+  .cal-day.hover-in-range {
+    @apply bg-blue-100 text-blue-600 rounded-none;
+  }
+
+  .cal-day.hover-start {
+    @apply bg-blue-200 text-blue-800 rounded-l-lg rounded-r-none;
+  }
+
+  .cal-day.hover-end {
+    @apply bg-blue-200 text-blue-800 rounded-r-lg rounded-l-none;
+  }
+
+  .cal-day.hover-single {
+    @apply bg-blue-200 text-blue-800 rounded-lg;
+  }
+
+  .cal-day:not(.other-month):not(.selected):hover {
+    @apply bg-gray-100;
+  }
 }

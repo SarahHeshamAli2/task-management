@@ -23,18 +23,23 @@ async function fetchTasksPage(
   return res.json();
 }
 
+const EMPTY_ARRAY: TasksList = [];
 export default function useGetTasks({
   limit = 20,
   offset = 0,
   params: filterParams = {},
   enabled = true,
   mode = "paginated",
+  refetchKey,
+  usePlaceholder = true,
 }: {
   limit?: number;
   offset?: number;
   params?: Record<string, string>;
   enabled?: boolean;
   mode?: "paginated" | "infinite";
+  refetchKey?: number;
+  usePlaceholder?: boolean;
 }) {
   const hasFilters = Object.keys(filterParams).length > 0;
 
@@ -49,7 +54,8 @@ export default function useGetTasks({
     queryFn: ({ signal }) =>
       fetchTasksPage(filterParams, limit, offset, signal),
     enabled: enabled && hasFilters && mode === "paginated",
-    placeholderData: (prev) => prev, // keep old page visible while loading next
+    placeholderData:
+      usePlaceholder && !filterParams.id ? (prev) => prev : undefined, // keep old page visible while loading next
   });
 
   const infinite = useInfiniteQuery<TasksPage, Error>({
@@ -62,41 +68,29 @@ export default function useGetTasks({
     },
     initialPageParam: 0,
     enabled: enabled && hasFilters && mode === "infinite",
-    placeholderData: (prev) => prev,
   });
 
-  if (mode === "infinite") {
-    const pages = infinite.data?.pages ?? [];
-
-    const seen = new Set<string>();
-    const tasks = pages
-      .flatMap((p) => p.data)
-      .filter((task) => {
-        if (seen.has(task.id)) return false;
-        seen.add(task.id);
-        return true;
-      }) as TasksList;
-
-    return {
-      tasks,
-      total: pages.at(-1)?.total ?? 0,
-      isLoading: infinite.isLoading,
-      isFetching: infinite.isFetching,
-      error: infinite.isError,
-      hasMore: !!infinite.hasNextPage,
-      fetchNextPage: infinite.fetchNextPage,
-      isFetchingNextPage: infinite.isFetchingNextPage,
-    };
-  }
+  const tasks = useMemo(() => {
+    if (mode === "paginated") {
+      return paginated.data?.data ?? EMPTY_ARRAY;
+    }
+    return infinite.data?.pages.flatMap((p) => p.data) ?? EMPTY_ARRAY;
+  }, [mode, paginated.data?.data, infinite.data?.pages]);
 
   return {
-    tasks: (paginated.data?.data ?? []) as TasksList,
-    total: paginated.data?.total ?? 0,
-    isLoading: paginated.isLoading,
-    isFetching: paginated.isFetching,
-    error: paginated.isError,
-    hasMore: false,
-    fetchNextPage: undefined,
-    isFetchingNextPage: false,
+    tasks,
+    total:
+      mode === "paginated"
+        ? (paginated.data?.total ?? 0)
+        : (infinite.data?.pages[0]?.total ?? 0),
+    isLoading: mode === "paginated" ? paginated.isLoading : infinite.isLoading,
+    isPending: mode === "paginated" ? paginated.isPending : infinite.isPending,
+    isFetching:
+      mode === "paginated" ? paginated.isFetching : infinite.isFetching,
+    error: mode === "paginated" ? paginated.error : infinite.error,
+    hasMore: mode === "paginated" ? false : !!infinite.hasNextPage,
+    isFetchingNextPage:
+      mode === "paginated" ? false : infinite.isFetchingNextPage,
+    fetchNextPage: infinite.fetchNextPage,
   };
 }

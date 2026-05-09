@@ -1,5 +1,5 @@
 "use client";
-import { PieChart, Pie, Cell, Tooltip } from "recharts";
+import { PieChart, Pie, Cell, Tooltip, PieLabelRenderProps } from "recharts";
 import { STATUS_CONFIG_STATS } from "@/lib/constants/tasks.constants";
 import Link from "next/link";
 import { ROUTES } from "@/lib/constants/routes.constants";
@@ -18,11 +18,11 @@ const STATUS_COLORS: Record<string, string> = {
 const renderCustomLabel = ({
   cx,
   cy,
-  midAngle,
-  innerRadius,
-  outerRadius,
-  percent,
-}: any) => {
+  midAngle = 0,
+  innerRadius = 0,
+  outerRadius = 0,
+  percent = 0,
+}: PieLabelRenderProps) => {
   if (percent < 0.05) return null;
   const RADIAN = Math.PI / 180;
   const radius = innerRadius + (outerRadius - innerRadius) * 0.5;
