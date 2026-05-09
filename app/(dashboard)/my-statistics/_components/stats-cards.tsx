@@ -62,7 +62,7 @@ export default function StatsCard({
   ];
 
   return (
-    <div className="grid grid-cols-3 gap-35 sm:gap-6 px-4 py-4 sm:px-6 overflow-auto">
+    <div className="grid grid-cols-3 gap-35 sm:gap-6 px-4 py-4 sm:px-6 overflow-auto md:p-0">
       {stats.map((stat) => (
         <StatCard key={stat.label} {...stat} />
       ))}

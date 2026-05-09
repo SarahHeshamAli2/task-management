@@ -104,13 +104,13 @@ export default function TasksByStatus({
   const total = chartData.reduce((s, d) => s + d.value, 0);
 
   return (
-    <div className="bg-white border-[1.5px] md:w-1/3 w-full border-blue-100 rounded-2xl md:p-6 shadow-sm inline-flex flex-col">
+    <div className="bg-white min-h-100 overflow-y-auto  px-4 border-[1.5px] md:w-1/3 w-full border-blue-100 rounded-2xl md:p-6 shadow-sm inline-flex flex-col">
       <h2 className="font-bold text-lg text-gray-900 mb-5">Tasks by Status</h2>
 
-      <div className="flex items-center">
+      <div className="md:flex items-center w h-55 shrink-0 mx-auto">
         <div className="relative">
           {total === 0 ? (
-            <div className="w-55 h-55 flex flex-col items-center justify-center gap-2">
+            <div className="w-55 h-55 flex flex-col items-center justify-center gap-2 mx-auto">
               <div className="w-30 h-30 rounded-full border-[3px] border-dashed border-gray-200 flex items-center justify-center">
                 <span className="text-3xl">📋</span>
               </div>
@@ -151,13 +151,14 @@ export default function TasksByStatus({
                 </Pie>
                 <Tooltip formatter={(v, name) => [v, name]} />
               </PieChart>
-
-              <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 text-center pointer-events-none">
-                <div className="text-[28px] font-extrabold text-gray-900 leading-none">
-                  {total}
-                </div>
-                <div className="text-[11px] text-gray-500 font-medium tracking-widest mt-0.5">
-                  TOTAL
+              <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+                <div className="text-center">
+                  <div className="text-[28px] font-extrabold text-gray-900 leading-none">
+                    {total}
+                  </div>
+                  <div className="text-[11px] text-gray-500 font-medium tracking-widest mt-0.5">
+                    TOTAL
+                  </div>
                 </div>
               </div>
             </>

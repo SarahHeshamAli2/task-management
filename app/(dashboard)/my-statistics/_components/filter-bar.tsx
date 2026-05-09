@@ -175,7 +175,7 @@ export default function FilterBar() {
         totalTasks={stats?.total_tasks}
       />
       <CalendarGrid daily={stats?.daily} />
-      <div className="flex items-center justify-between md:flex-row flex-col gap-4">
+      <div className="flex items-start justify-between md:flex-row flex-col gap-4">
         <TasksPieChart
           totals={stats?.totals}
           projectId={projectId}

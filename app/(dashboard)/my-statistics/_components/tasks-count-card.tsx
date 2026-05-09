@@ -10,7 +10,7 @@ export default function TasksCountCard(filters: TasksCountFilter) {
     return <EmptyTasksState />;
   }
   return (
-    <div className="bg-white md:w-1/2 w-full min-h-66 p-8">
+    <div className="bg-white md:w-1/3 w-full min-h-66 p-8 rounded-lg">
       <p className="text-slate-dark font-bold text-lg mb-10">All Projects</p>
       {tasksCount?.map((task: TasksStas) => (
         <div
