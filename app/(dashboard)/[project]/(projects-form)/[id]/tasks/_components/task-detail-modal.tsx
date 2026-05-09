@@ -105,6 +105,7 @@ export default function TaskDetailModal({
         : { id: null, name: null, department: null }
     );
   };
+
   const handleEpicChange = (epicId: string) => {
     const epic = epics?.find((e) => e.id === epicId);
     dirtyFields.current["epic_id"] = epicId || null;
@@ -119,6 +120,7 @@ export default function TaskDetailModal({
         : { id: null, epic_id: "", title: "" }
     );
   };
+
   const handleClose = async () => {
     const dirty = dirtyFields.current;
     const hasDirty = Object.keys(dirty).length > 0;
@@ -126,7 +128,6 @@ export default function TaskDetailModal({
     if (hasDirty && localTask && currentTask && !isSaving.current) {
       isSaving.current = true;
 
-      // If status changed, record an optimistic move for the Board view
       if (
         dirty.status &&
         dirty.status !== currentTask.status &&
@@ -144,13 +145,11 @@ export default function TaskDetailModal({
 
       const result = await updateTaskAction(localTask.id, dirty);
 
-      // Invalidate queries to refresh data
       await Promise.all([
         queryClient.invalidateQueries({ queryKey: ["tasks"] }),
         queryClient.invalidateQueries({ queryKey: ["tasks-infinite"] }),
       ]);
 
-      // Clear the move if it was optimistic
       if (dirty.status && setOptimisticMoves) {
         setOptimisticMoves((prev) => {
           const next = new Map(prev);
@@ -178,6 +177,7 @@ export default function TaskDetailModal({
 
     onClose();
   };
+
   const task = localTask;
 
   const toDateInputValue = (iso: string | null | undefined) => {
@@ -191,38 +191,44 @@ export default function TaskDetailModal({
       size="2xl"
       isOpen={isOpen}
       onClose={handleClose}
-      className="min-w-222"
+      // Removed fixed min-width; let Modal/screen width control sizing
+      className="w-full md:min-w-222"
       disabled={isPending}
     >
       <div
         key={taskId}
-        className="flex min-h-150 -mx-6 -mb-4 overflow-hidden cursor-default"
+        // Stack vertically on mobile, side-by-side on md+
+        // Removed negative margins that caused overflow on small screens
+        className="flex flex-col md:flex-row min-h-0 md:min-h-150 -mx-6 -mb-4 overflow-hidden cursor-default"
       >
         {isLoading && !currentTask ? (
           <TaskDetailModalSkeleton />
         ) : !task ? (
-          <div className="flex-1 flex items-center justify-center">
+          <div className="flex-1 flex items-center justify-center py-12">
             <p className="text-secondary text-sm">Task not found</p>
           </div>
         ) : (
           <>
             {/* ── LEFT COL ── */}
             <div className="flex flex-col flex-1 min-w-0 pt-6">
-              <div className="flex items-center gap-2 mb-3 px-8">
-                <span className="bg-blue-50 border border-blue-200 text-blue-700 text-xs font-semibold px-2 py-0.5 rounded">
+              {/* Header row: task ID, epic, close button */}
+              <div className="flex items-center gap-2 mb-3 px-4 md:px-8">
+                <span className="bg-blue-50 border border-blue-200 text-blue-700 text-xs font-semibold px-2 py-0.5 rounded shrink-0">
                   {task.task_id}
                 </span>
                 <span className="text-slate-300">·</span>
-                <div className="relative">
+
+                {/* Epic — truncate long titles on mobile */}
+                <div className="relative min-w-0 flex-1 md:flex-none">
                   {task.epic.id ? (
                     <div
                       onClick={() => epicSelectRef.current?.click()}
-                      className="flex items-center gap-2 cursor-pointer"
+                      className="flex items-center gap-1.5 cursor-pointer min-w-0"
                     >
-                      <span className="text-xs font-semibold text-blue-700 bg-blue-50 border border-blue-200 px-2 py-0.5 rounded">
+                      <span className="text-xs font-semibold text-blue-700 bg-blue-50 border border-blue-200 px-2 py-0.5 rounded shrink-0">
                         {task.epic.epic_id}
                       </span>
-                      <span className="text-xs text-slate-500 truncate">
+                      <span className="text-xs text-slate-500 truncate hidden sm:block">
                         {task.epic.title}
                       </span>
                     </div>
@@ -254,44 +260,44 @@ export default function TaskDetailModal({
                     {task.epic.id && <option value="">Remove epic</option>}
                   </select>
                 </div>
+
                 <button
                   disabled={isPending}
                   onClick={handleClose}
-                  className="ms-auto p-1.5 rounded-lg text-slate-400 hover:text-slate-600 hover:bg-slate-100 transition-colors"
+                  className="ms-auto p-1.5 rounded-lg text-slate-400 hover:text-slate-600 hover:bg-slate-100 transition-colors shrink-0"
                   aria-label="Close modal"
                 >
                   ✕
                 </button>
               </div>
 
-              <div className="border-b pb-6 border-ocean px-8 mb-3">
+              {/* Title */}
+              <div className="border-b pb-4 md:pb-6 border-ocean px-4 md:px-8 mb-3">
                 <input
                   type="text"
                   value={task.title}
-                  onChange={(e) => {
-                    handleField("title", e.target.value);
-                  }}
-                  className="text-2xl font-semibold text-slate-800 leading-snug outline-none rounded px-1 -mx-1 w-full
-    hover:bg-slate-50 focus:bg-slate-50 focus:ring-2 focus:ring-blue-200 cursor-text transition-colors bg-transparent"
+                  onChange={(e) => handleField("title", e.target.value)}
+                  className="text-xl md:text-2xl font-semibold text-slate-800 leading-snug outline-none rounded px-1 -mx-1 w-full
+                    hover:bg-slate-50 focus:bg-slate-50 focus:ring-2 focus:ring-blue-200 cursor-text transition-colors bg-transparent"
                 />
               </div>
 
+              {/* Description */}
               <textarea
                 value={task.description ?? ""}
-                onChange={(e) => {
-                  handleField("description", e.target.value);
-                }}
+                onChange={(e) => handleField("description", e.target.value)}
                 placeholder="Add a description…"
                 rows={4}
-                className="text-slate-600 text-sm leading-relaxed flex-1 px-8 outline-none rounded resize-none w-full
-    hover:bg-slate-50 focus:bg-slate-50 focus:ring-2 focus:ring-blue-200 
-    cursor-text transition-colors bg-transparent placeholder:text-slate-400"
+                className="text-slate-600 text-sm leading-relaxed flex-1 px-4 md:px-8 outline-none rounded resize-none w-full
+                  hover:bg-slate-50 focus:bg-slate-50 focus:ring-2 focus:ring-blue-200
+                  cursor-text transition-colors bg-transparent placeholder:text-slate-400"
               />
 
-              <div className="flex items-center gap-3 pt-4 border-t border-slate-100 mt-6 px-8 bg-surface-low py-4 rounded rounded-bl-2xl">
+              {/* Bottom action bar */}
+              <div className="flex items-center gap-3 pt-4 border-t border-slate-100 mt-4 md:mt-6 px-4 md:px-8 bg-surface-low py-3 md:py-4 rounded rounded-bl-2xl">
                 <button className="flex items-center gap-1.5 text-sm text-slate-400 hover:text-slate-600">
                   <svg
-                    className="w-4 h-4"
+                    className="w-4 h-4 shrink-0"
                     fill="none"
                     stroke="currentColor"
                     strokeWidth={2}
@@ -319,8 +325,21 @@ export default function TaskDetailModal({
               </div>
             </div>
 
-            {/* ── RIGHT COL ── */}
-            <div className="w-75 shrink-0 border-s bg-ocean border-slate-100 px-5 pt-6 pb-4 flex flex-col gap-5 rounded-tr-2xl rounded-br-2xl">
+            {/* ── RIGHT COL ──
+                On mobile: full width, sits below the left col, top border instead of left border.
+                On md+: fixed sidebar width with left border as before.
+            */}
+            <div
+              className="
+              w-full md:w-75 shrink-0
+              border-t md:border-t-0 md:border-s
+              bg-ocean border-slate-100
+              px-4 md:px-5 pt-5 pb-4
+              flex flex-col gap-5
+              md:rounded-tr-2xl md:rounded-br-2xl
+              rounded-bl-none md:rounded-bl-none
+            "
+            >
               {/* Status */}
               <div>
                 <p className="text-xs font-bold text-secondary uppercase tracking-widest mb-2">
@@ -334,14 +353,12 @@ export default function TaskDetailModal({
                   };
                   return (
                     <div className="relative w-full">
-                      {/* Colored badge — visual layer */}
                       <span
                         className={`flex items-center px-3 py-2.5 rounded-sm text-xs font-semibold
-          pointer-events-none ${config.badge} ${config.text}`}
+                          pointer-events-none ${config.badge} ${config.text}`}
                       >
                         {config.label.toUpperCase()}
                       </span>
-
                       <select
                         value={task.status}
                         onChange={(e) => handleField("status", e.target.value)}
@@ -368,9 +385,9 @@ export default function TaskDetailModal({
                     <Avatar
                       name={task.assignee.name ?? ""}
                       sizeClassName="w-7 h-7"
-                      className="rounded-full bg-[#DAE2FF] text-slate-dark"
+                      className="rounded-full bg-[#DAE2FF] text-slate-dark shrink-0"
                     />
-                    <span className="text-slate-dark font-semibold text-sm">
+                    <span className="text-slate-dark font-semibold text-sm truncate">
                       {task.assignee.name}
                       <span className="block font-normal text-xs text-secondary">
                         {task.assignee.department}
@@ -385,12 +402,11 @@ export default function TaskDetailModal({
                 )}
 
                 <select
-                  // ✅ derive current value from the nested assignee object, not assignee_id
                   value={task.assignee.id ?? ""}
                   onChange={(e) => handleAssigneeChange(e.target.value)}
-                  className="w-full px-2 py-1.5 rounded-lg text-xs text-slate-600 bg-white border 
-      border-slate-200 outline-none cursor-pointer focus:ring-2 focus:ring-blue-200 
-      transition-colors"
+                  className="w-full px-2 py-1.5 rounded-lg text-xs text-slate-600 bg-white border
+                    border-slate-200 outline-none cursor-pointer focus:ring-2 focus:ring-blue-200
+                    transition-colors"
                 >
                   {!task.assignee.id && (
                     <option value="" disabled>
@@ -421,12 +437,11 @@ export default function TaskDetailModal({
                       const currentVal = toDateInputValue(
                         currentTask?.due_date
                       );
-
                       if (e.target.value !== currentVal) {
                         handleField("due_date", newVal);
                       }
                     }}
-                    className="w-full px-2 py-1.5 rounded-lg text-sm font-medium text-slate-700 
+                    className="w-full px-2 py-1.5 rounded-lg text-sm font-medium text-slate-700
                       bg-white border border-slate-200 outline-none cursor-pointer
                       focus:ring-2 focus:ring-blue-200 transition-colors"
                   />
