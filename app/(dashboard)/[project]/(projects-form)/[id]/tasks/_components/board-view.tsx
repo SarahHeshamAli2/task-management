@@ -53,8 +53,6 @@ export default function BoardView({
     if (typeof ref === "function") ref(node);
   };
 
-  // Merged handler: record position AND forward to dnd-kit so drag still works.
-  // MUST be placed AFTER {...listeners} in JSX so it wins the prop override.
   const handlePointerDown = (e: React.PointerEvent<HTMLDivElement>) => {
     pointerDownPos.current = { x: e.clientX, y: e.clientY };
     // Forward to dnd-kit's listener so the sensor can activate drag
@@ -83,6 +81,7 @@ export default function BoardView({
         !isOverlay && "cursor-grab active:cursor-grabbing",
         !isOverlay && isDragging && "opacity-40" // only dim the source, not the overlay
       )}
+      style={{ touchAction: "none" }}
     >
       <div
         className={cn(

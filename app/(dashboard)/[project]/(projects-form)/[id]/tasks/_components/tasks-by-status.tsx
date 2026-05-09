@@ -10,6 +10,7 @@ import {
   PointerSensor,
   useSensor,
   useSensors,
+  TouchSensor,
 } from "@dnd-kit/core";
 import { useState, useCallback } from "react";
 import { Task } from "@/lib/types/tasks.type";
@@ -30,10 +31,7 @@ const STATUS_DOT_COLORS: Record<string, string> = {
 export default function TaskListBoardView({ search }: { search: string }) {
   const params = useParams();
   const projectId = params.id;
-  // const { accessToken } = useSession(); // adjust to however you get the token
 
-  // columnTasks: status -> Task[] (for optimistic UI)
-  // We keep a "patch" map to override what columns render
   const [draggedTask, setDraggedTask] = useState<Task | null>(null);
   const [optimisticMoves, setOptimisticMoves] = useState<
     Map<
@@ -44,62 +42,70 @@ export default function TaskListBoardView({ search }: { search: string }) {
 
   const queryClient = useQueryClient();
 
-  const handleDragEnd = useCallback(async (event: DragEndEvent) => {
-    const { active, over } = event;
-    setDraggedTask(null);
+  const handleDragEnd = useCallback(
+    async (event: DragEndEvent) => {
+      const { active, over } = event;
+      setDraggedTask(null);
 
-    if (!over) return;
+      if (!over) return;
 
-    const taskId = active.id as string;
-    const newStatus = over.id as string;
-    const task = active.data.current?.task as Task;
+      const taskId = active.id as string;
+      const newStatus = over.id as string;
+      const task = active.data.current?.task as Task;
 
-    if (!task || task.status === newStatus) return;
+      if (!task || task.status === newStatus) return;
 
-    const oldStatus = task.status;
+      const oldStatus = task.status;
 
-    // Optimistic update: tell columns to treat this task as moved
-    setOptimisticMoves((prev) =>
-      new Map(prev).set(taskId, {
-        taskId,
-        task,
-        fromStatus: oldStatus,
-        toStatus: newStatus,
-      })
-    );
+      // Optimistic update: tell columns to treat this task as moved
+      setOptimisticMoves((prev) =>
+        new Map(prev).set(taskId, {
+          taskId,
+          task,
+          fromStatus: oldStatus,
+          toStatus: newStatus,
+        })
+      );
 
-    try {
-      const result = await updateTaskAction(taskId, { status: newStatus });
-      if (!result.success) {
-        throw new Error(result.error);
+      try {
+        const result = await updateTaskAction(taskId, { status: newStatus });
+        if (!result.success) {
+          throw new Error(result.error);
+        }
+        await queryClient.invalidateQueries({ queryKey: ["tasks-infinite"] });
+        await queryClient.invalidateQueries({ queryKey: ["tasks"] });
+
+        // Clear the optimistic move once the query refetch has been triggered
+        // We do it after invalidation so the refetch uses the new data
+        setOptimisticMoves((prev) => {
+          const next = new Map(prev);
+          next.delete(taskId);
+          return next;
+        });
+      } catch (error) {
+        // Rollback
+        setOptimisticMoves((prev) => {
+          const next = new Map(prev);
+          next.delete(taskId);
+          return next;
+        });
+        toast.error("Failed to move task. Please try again.");
       }
-      await queryClient.invalidateQueries({ queryKey: ["tasks-infinite"] });
-      await queryClient.invalidateQueries({ queryKey: ["tasks"] });
-      
-      // Clear the optimistic move once the query refetch has been triggered
-      // We do it after invalidation so the refetch uses the new data
-      setOptimisticMoves((prev) => {
-        const next = new Map(prev);
-        next.delete(taskId);
-        return next;
-      });
-    } catch (error) {
-      // Rollback
-      setOptimisticMoves((prev) => {
-        const next = new Map(prev);
-        next.delete(taskId);
-        return next;
-      });
-      toast.error("Failed to move task. Please try again.");
-    }
-  }, [queryClient]);
+    },
+    [queryClient]
+  );
 
   const sensors = useSensors(
     useSensor(PointerSensor, {
       activationConstraint: { distance: 8 },
+    }),
+    useSensor(TouchSensor, {
+      activationConstraint: {
+        delay: 200,
+        tolerance: 8,
+      },
     })
   );
-
   return (
     <DndContext
       sensors={sensors}
