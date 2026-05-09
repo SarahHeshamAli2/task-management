@@ -7,12 +7,13 @@ import Avatar from "@/components/shared/avatar";
 import UnassignedIcon from "@/components/icons/unassigned-icon";
 import { formatDate } from "@/lib/utils/format-date";
 import { TaskDetailModalSkeleton } from "@/components/skeletons/task-detail-modal.skeleton";
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { updateTaskAction } from "@/lib/actions/tasks.actions";
 import { toast } from "sonner";
 import useGetProjectMembers from "../../members/hooks/use-get-project-members";
 import { Task, TasksList } from "@/lib/types/tasks.type";
 import useGetEpics from "../../epics/hooks/use-get-epics";
+import { useQueryClient } from "@tanstack/react-query";
 
 type TaskModalProps = {
   projectId: string;
@@ -52,9 +53,21 @@ export default function TaskDetailModal({
     Task["assignee"] | null
   >(null);
   const [epicOverride, setEpicOverRide] = useState<Task["epic"] | null>(null);
+  const queryClient = useQueryClient();
 
   const dirtyFields = useRef<EditableFields>({});
   const isSaving = useRef(false);
+
+  // Reset state when modal closes or taskId changes
+  useEffect(() => {
+    if (!isOpen) {
+      setOverrides({});
+      setAssigneeOverride(null);
+      setEpicOverRide(null);
+      dirtyFields.current = {};
+    }
+  }, [isOpen, taskId]);
+
   const localTask = currentTask
     ? {
         ...currentTask,
@@ -110,6 +123,8 @@ export default function TaskDetailModal({
     if (hasDirty && localTask && !isSaving.current) {
       isSaving.current = true;
       const result = await updateTaskAction(localTask.id, dirty);
+      await queryClient.invalidateQueries({ queryKey: ["tasks"] });
+      await queryClient.invalidateQueries({ queryKey: ["tasks-infinite"] });
       isSaving.current = false;
 
       if (!result.success) {
@@ -144,7 +159,10 @@ export default function TaskDetailModal({
       onClose={handleClose}
       className="min-w-222"
     >
-      <div className="flex min-h-150 -mx-6 -mb-4 overflow-hidden">
+      <div
+        key={taskId}
+        className="flex min-h-150 -mx-6 -mb-4 overflow-hidden cursor-default"
+      >
         {isLoading || !task ? (
           <TaskDetailModalSkeleton />
         ) : (
@@ -209,11 +227,9 @@ export default function TaskDetailModal({
               <div className="border-b pb-6 border-ocean px-8 mb-3">
                 <input
                   type="text"
-                  defaultValue={task.title}
-                  onBlur={(e) => {
-                    if (e.target.value !== (currentTask?.title ?? "")) {
-                      handleField("title", e.target.value);
-                    }
+                  value={task.title}
+                  onChange={(e) => {
+                    handleField("title", e.target.value);
                   }}
                   className="text-2xl font-semibold text-slate-800 leading-snug outline-none rounded px-1 -mx-1 w-full
     hover:bg-slate-50 focus:bg-slate-50 focus:ring-2 focus:ring-blue-200 cursor-text transition-colors bg-transparent"
@@ -221,11 +237,9 @@ export default function TaskDetailModal({
               </div>
 
               <textarea
-                defaultValue={task.description ?? ""}
-                onBlur={(e) => {
-                  if (e.target.value !== (currentTask?.description ?? "")) {
-                    handleField("description", e.target.value);
-                  }
+                value={task.description ?? ""}
+                onChange={(e) => {
+                  handleField("description", e.target.value);
                 }}
                 placeholder="Add a description…"
                 rows={4}

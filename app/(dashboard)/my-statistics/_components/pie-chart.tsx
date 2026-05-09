@@ -47,7 +47,6 @@ const CustomLegend = ({
   data: { key: string; label: string; value: number; color: string }[];
 }) => {
   const total = data.reduce((s, d) => s + d.value, 0);
-  console.log(data, "d");
 
   return (
     <div className="flex flex-col justify-center gap-4 px-4 ">

@@ -1,74 +1,102 @@
-import { useEffect, useState, useRef } from "react";
+import { useQuery, useInfiniteQuery } from "@tanstack/react-query";
+import { useMemo } from "react";
 import { TasksList } from "@/lib/types/tasks.type";
 
+interface TasksPage {
+  data: TasksList;
+  total: number;
+}
+
+async function fetchTasksPage(
+  filterParams: Record<string, string>,
+  limit: number,
+  offset: number,
+  signal: AbortSignal
+): Promise<TasksPage> {
+  const params = new URLSearchParams();
+  params.append("limit", String(limit));
+  params.append("offset", String(offset));
+  Object.entries(filterParams).forEach(([k, v]) => params.append(k, v));
+
+  const res = await fetch(`/api/tasks?${params.toString()}`, { signal });
+  if (!res.ok) throw new Error(`Tasks fetch failed: ${res.status}`);
+  return res.json();
+}
+
 export default function useGetTasks({
-  limit,
-  offset,
-  append = false,
+  limit = 20,
+  offset = 0,
   params: filterParams = {},
   enabled = true,
+  mode = "paginated",
 }: {
   limit?: number;
   offset?: number;
-  append?: boolean;
-  id?: string | null;
   params?: Record<string, string>;
-
   enabled?: boolean;
+  mode?: "paginated" | "infinite";
 }) {
-  const [tasks, setTasks] = useState<TasksList>([]);
-  const [total, setTotal] = useState<number>(0);
-  const [isLoading, setIsLoading] = useState<boolean>(true);
-  const [isInitialLoad, setIsInitialLoad] = useState<boolean>(true);
-  const [error, setError] = useState<boolean>(false);
-  const [hasMore, setHasMore] = useState<boolean>(false);
+  const hasFilters = Object.keys(filterParams).length > 0;
 
-  const isFirstFetch = useRef(true);
-  useEffect(() => {
-    const hasFilters = Object.keys(filterParams).length > 0;
-    if (!enabled || !hasFilters) return;
+  const stableKey = useMemo(
+    () => JSON.parse(JSON.stringify(filterParams)),
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [JSON.stringify(filterParams)]
+  );
 
-    const controller = new AbortController(); // 👈
+  const paginated = useQuery<TasksPage, Error>({
+    queryKey: ["tasks", stableKey, { limit, offset }],
+    queryFn: ({ signal }) =>
+      fetchTasksPage(filterParams, limit, offset, signal),
+    enabled: enabled && hasFilters && mode === "paginated",
+    placeholderData: (prev) => prev, // keep old page visible while loading next
+  });
 
-    const getTasks = async () => {
-      try {
-        setIsLoading(true);
-        setError(false);
-        if (offset === 0) setTasks([]);
+  const infinite = useInfiniteQuery<TasksPage, Error>({
+    queryKey: ["tasks-infinite", stableKey, { limit }],
+    queryFn: ({ pageParam = 0, signal }) =>
+      fetchTasksPage(filterParams, limit, pageParam as number, signal),
+    getNextPageParam: (lastPage, allPages) => {
+      const fetched = allPages.reduce((sum, p) => sum + p.data.length, 0);
+      return fetched < lastPage.total ? fetched : undefined;
+    },
+    initialPageParam: 0,
+    enabled: enabled && hasFilters && mode === "infinite",
+    placeholderData: (prev) => prev,
+  });
 
-        const params = new URLSearchParams();
-        if (limit !== undefined) params.append("limit", String(limit));
-        if (offset !== undefined) params.append("offset", String(offset));
-        Object.entries(filterParams).forEach(([key, value]) => {
-          params.append(key, value);
-        });
+  if (mode === "infinite") {
+    const pages = infinite.data?.pages ?? [];
 
-        const response = await fetch(`/api/tasks?${params.toString()}`, {
-          signal: controller.signal, // 👈
-        });
-        const data = await response.json();
+    const seen = new Set<string>();
+    const tasks = pages
+      .flatMap((p) => p.data)
+      .filter((task) => {
+        if (seen.has(task.id)) return false;
+        seen.add(task.id);
+        return true;
+      }) as TasksList;
 
-        setTasks((prev) =>
-          !append || offset === 0 ? data.data : [...prev, ...data.data]
-        );
-        setTotal(data.total);
-        setHasMore((offset ?? 0) + data.data.length < data.total);
-      } catch (err) {
-        if ((err as DOMException).name === "AbortError") return; // 👈 ignore cancelled fetches
-        setError(true);
-      } finally {
-        setIsLoading(false);
-        if (isFirstFetch.current) {
-          setIsInitialLoad(false);
-          isFirstFetch.current = false;
-        }
-      }
+    return {
+      tasks,
+      total: pages.at(-1)?.total ?? 0,
+      isLoading: infinite.isLoading,
+      isFetching: infinite.isFetching,
+      error: infinite.isError,
+      hasMore: !!infinite.hasNextPage,
+      fetchNextPage: infinite.fetchNextPage,
+      isFetchingNextPage: infinite.isFetchingNextPage,
     };
+  }
 
-    getTasks();
-
-    return () => controller.abort(); // 👈 cancel on re-fetch
-  }, [limit, offset, append, enabled, JSON.stringify(filterParams)]);
-
-  return { tasks, total, isLoading, isInitialLoad, error, hasMore };
+  return {
+    tasks: (paginated.data?.data ?? []) as TasksList,
+    total: paginated.data?.total ?? 0,
+    isLoading: paginated.isLoading,
+    isFetching: paginated.isFetching,
+    error: paginated.isError,
+    hasMore: false,
+    fetchNextPage: undefined,
+    isFetchingNextPage: false,
+  };
 }

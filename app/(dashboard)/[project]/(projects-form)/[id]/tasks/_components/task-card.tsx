@@ -22,7 +22,7 @@ export default function TaskCard({ task: initialTask }: TaskCardProps) {
         e.stopPropagation();
         setOpen(true);
       }}
-      className="flex justify-between border-b py-4 border-slate-light/15"
+      className="flex justify-between border-b py-4 border-slate-light/15 cursor-pointer"
     >
       <div className="flex items-center gap-4">
         <TaskCheckIcon />
@@ -56,15 +56,17 @@ export default function TaskCard({ task: initialTask }: TaskCardProps) {
       )}
 
       {open && (
-        <TaskDetailModal
-          isOpen={open}
-          taskId={task.id}
-          projectId={task.project_id}
-          onClose={(savedTask) => {
-            if (savedTask) setTask(savedTask);
-            setOpen(false);
-          }}
-        />
+        <div onClick={(e) => e.stopPropagation()} className="cursor-default">
+          <TaskDetailModal
+            isOpen={open}
+            taskId={task.id}
+            projectId={task.project_id}
+            onClose={(savedTask) => {
+              if (savedTask) setTask(savedTask);
+              setOpen(false);
+            }}
+          />
+        </div>
       )}
     </div>
   );

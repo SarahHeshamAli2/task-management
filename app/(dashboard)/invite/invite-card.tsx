@@ -7,7 +7,6 @@ import { useAcceptInvite } from "./hooks/use-accept-invite";
 
 export default function InviteCard({ token }: { token: string }) {
   const { acceptInvite, isPending } = useAcceptInvite();
-  console.log(token, "tt");
 
   const handleAccept = () => {
     acceptInvite({ p_token: token });

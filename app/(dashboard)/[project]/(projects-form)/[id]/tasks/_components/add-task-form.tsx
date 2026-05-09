@@ -18,6 +18,7 @@ import useGetProjectMembers from "../../members/hooks/use-get-project-members";
 import useGetEpics from "../../epics/hooks/use-get-epics";
 import { addTaskSchema, TaskFormValues } from "@/lib/schemes/tasks.schema";
 import { addTasksAction } from "@/lib/actions/tasks.actions";
+import { useQueryClient } from "@tanstack/react-query";
 
 export default function AddTaskForm() {
   const params = useParams();
@@ -43,19 +44,23 @@ export default function AddTaskForm() {
     });
 
   const [error, setError] = useState<string | undefined>();
-  console.log(formState.errors, "ee");
+
+  const queryClient = useQueryClient();
 
   const onSubmit = async (data: TaskFormValues) => {
-    console.log(data, "loggedtask data");
-
     const response = await addTasksAction(data);
 
     if (!response.success) {
       setError(response.error);
       return;
     }
+
+    queryClient.invalidateQueries({ queryKey: ["tasks"] });
+    queryClient.invalidateQueries({ queryKey: ["tasks-infinite"] });
+
     toast.success("task created successfully");
-    setTimeout(() => router.push(ROUTES.tasks.list(projectId)), 1000);
+    router.push(ROUTES.tasks.list(projectId));
+    router.refresh();
   };
 
   return (
@@ -97,7 +102,11 @@ export default function AddTaskForm() {
                 placeholder="select a team member"
                 options={[
                   { value: "", label: "No assignee" },
-                  ...(members?.map((member) => ({
+                  ...(Array.from(
+                    new Map(
+                      members?.map((member) => [member.user_id, member])
+                    ).values()
+                  ).map((member) => ({
                     value: member.user_id,
                     label: member.metadata.name,
                   })) ?? []),
