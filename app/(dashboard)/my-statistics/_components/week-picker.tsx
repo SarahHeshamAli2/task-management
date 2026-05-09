@@ -104,16 +104,17 @@ export default function WeekRangePicker({
     if (!tempStart || tempEnd) {
       setTempStart(d);
       setTempEnd(null);
+      setHoverDay(d);
     } else {
       const [s, e] = d < tempStart ? [d, tempStart] : [tempStart, d];
       const clamped = addDays(s, 6);
       setTempStart(s);
       setTempEnd(e > clamped ? clamped : e);
+      setHoverDay(null);
     }
   };
   const applyRange = () => {
     if (!tempStart || !tempEnd) return;
-    onChange?.(tempStart, tempEnd);
     onChange?.(tempStart, tempEnd);
     setOpen(false);
     setTempStart(null);
@@ -128,24 +129,31 @@ export default function WeekRangePicker({
     if (sameDay(d, today)) cls.push("today");
 
     const range = activeRange();
+    const dt = d.getTime();
+
     if (!range) {
-      // anchor-only state: just highlight the anchor
-      if (d.getTime() === tempStart?.getTime()) cls.push("range-single");
+      if (tempStart && dt === tempStart.getTime()) {
+        cls.push("range-single", "selected");
+      }
       return cls.join(" ");
     }
 
-    const dt = d.getTime();
     const { s, e } = range;
     const isHover = !!(tempStart && !tempEnd && hoverDay);
 
-    if (dt === s && dt === e)
-      cls.push(isHover ? "hover-single" : "range-single", "selected");
-    else if (dt === s)
-      cls.push(isHover ? "hover-start" : "range-start", "selected");
-    else if (dt === e)
+    if (dt === s && dt === e) {
+      // Single day or anchor point
+      cls.push(isHover ? "range-single" : "range-single", "selected");
+    } else if (dt === s) {
+      // Start of a range
+      cls.push("range-start", "selected");
+    } else if (dt === e) {
+      // End of a range (hover or permanent)
       cls.push(isHover ? "hover-end" : "range-end", "selected");
-    else if (dt > s && dt < e)
+    } else if (dt > s && dt < e) {
+      // Inside a range
       cls.push(isHover ? "hover-in-range" : "in-range", "selected");
+    }
 
     return cls.join(" ");
   };

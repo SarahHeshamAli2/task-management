@@ -7,7 +7,7 @@ import Avatar from "@/components/shared/avatar";
 import UnassignedIcon from "@/components/icons/unassigned-icon";
 import { formatDate } from "@/lib/utils/format-date";
 import { TaskDetailModalSkeleton } from "@/components/skeletons/task-detail-modal.skeleton";
-import { useEffect, useRef, useState } from "react";
+import { useRef, useState } from "react";
 import { updateTaskAction } from "@/lib/actions/tasks.actions";
 import { toast } from "sonner";
 import useGetProjectMembers from "../../members/hooks/use-get-project-members";
@@ -20,6 +20,15 @@ type TaskModalProps = {
   taskId: string;
   isOpen: boolean;
   onClose: (savedTask?: TasksList[number]) => void;
+  initialTask?: Task;
+  setOptimisticMoves?: React.Dispatch<
+    React.SetStateAction<
+      Map<
+        string,
+        { taskId: string; task: Task; fromStatus: string; toStatus: string }
+      >
+    >
+  >;
 };
 
 type EditableFields = {
@@ -36,16 +45,20 @@ export default function TaskDetailModal({
   taskId,
   isOpen,
   onClose,
+  initialTask,
+  setOptimisticMoves,
 }: TaskModalProps) {
-  const { tasks, isLoading } = useGetTasks({
+  const { tasks, isLoading, isPending } = useGetTasks({
     params: { project_id: `eq.${projectId}`, id: `eq.${taskId}` },
     enabled: isOpen && !!taskId && !!projectId,
+    usePlaceholder: false,
   });
 
   const { members } = useGetProjectMembers({ id: projectId });
   const epicSelectRef = useRef<HTMLSelectElement>(null);
 
-  const currentTask = tasks[0];
+  const currentTaskFromQuery = tasks[0];
+  const currentTask = currentTaskFromQuery || initialTask;
   const { epics } = useGetEpics({ id: projectId });
 
   const [overrides, setOverrides] = useState<EditableFields>({});
@@ -57,16 +70,6 @@ export default function TaskDetailModal({
 
   const dirtyFields = useRef<EditableFields>({});
   const isSaving = useRef(false);
-
-  // Reset state when modal closes or taskId changes
-  useEffect(() => {
-    if (!isOpen) {
-      setOverrides({});
-      setAssigneeOverride(null);
-      setEpicOverRide(null);
-      dirtyFields.current = {};
-    }
-  }, [isOpen, taskId]);
 
   const localTask = currentTask
     ? {
@@ -120,11 +123,42 @@ export default function TaskDetailModal({
     const dirty = dirtyFields.current;
     const hasDirty = Object.keys(dirty).length > 0;
 
-    if (hasDirty && localTask && !isSaving.current) {
+    if (hasDirty && localTask && currentTask && !isSaving.current) {
       isSaving.current = true;
+
+      // If status changed, record an optimistic move for the Board view
+      if (
+        dirty.status &&
+        dirty.status !== currentTask.status &&
+        setOptimisticMoves
+      ) {
+        setOptimisticMoves((prev) =>
+          new Map(prev).set(taskId, {
+            taskId,
+            task: currentTask,
+            fromStatus: currentTask.status,
+            toStatus: dirty.status!,
+          })
+        );
+      }
+
       const result = await updateTaskAction(localTask.id, dirty);
-      await queryClient.invalidateQueries({ queryKey: ["tasks"] });
-      await queryClient.invalidateQueries({ queryKey: ["tasks-infinite"] });
+
+      // Invalidate queries to refresh data
+      await Promise.all([
+        queryClient.invalidateQueries({ queryKey: ["tasks"] }),
+        queryClient.invalidateQueries({ queryKey: ["tasks-infinite"] }),
+      ]);
+
+      // Clear the move if it was optimistic
+      if (dirty.status && setOptimisticMoves) {
+        setOptimisticMoves((prev) => {
+          const next = new Map(prev);
+          next.delete(taskId);
+          return next;
+        });
+      }
+
       isSaving.current = false;
 
       if (!result.success) {
@@ -158,13 +192,18 @@ export default function TaskDetailModal({
       isOpen={isOpen}
       onClose={handleClose}
       className="min-w-222"
+      disabled={isPending}
     >
       <div
         key={taskId}
         className="flex min-h-150 -mx-6 -mb-4 overflow-hidden cursor-default"
       >
-        {isLoading || !task ? (
+        {isLoading && !currentTask ? (
           <TaskDetailModalSkeleton />
+        ) : !task ? (
+          <div className="flex-1 flex items-center justify-center">
+            <p className="text-secondary text-sm">Task not found</p>
+          </div>
         ) : (
           <>
             {/* ── LEFT COL ── */}
@@ -216,6 +255,7 @@ export default function TaskDetailModal({
                   </select>
                 </div>
                 <button
+                  disabled={isPending}
                   onClick={handleClose}
                   className="ms-auto p-1.5 rounded-lg text-slate-400 hover:text-slate-600 hover:bg-slate-100 transition-colors"
                   aria-label="Close modal"
