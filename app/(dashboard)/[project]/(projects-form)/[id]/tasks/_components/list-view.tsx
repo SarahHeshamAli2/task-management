@@ -6,7 +6,7 @@ import { formatDate } from "@/lib/utils/format-date";
 import { cn } from "@/lib/utils/tailwind-merge";
 import useGetTasks from "../hooks/use-get-tasks";
 import { useParams, useRouter, useSearchParams } from "next/navigation";
-import { STATUS_CONFIG } from "@/lib/constants/tasks.constants";
+import { STATUS_CONFIG_STATS } from "@/lib/constants/tasks.constants";
 import { TaskTableSkeleton } from "@/components/skeletons/tasks-list-table.skeleton";
 import { useEffect, useState } from "react";
 import TaskDetailModal from "./task-detail-modal";
@@ -33,7 +33,10 @@ export default function ListView({ search }: { search: string }) {
 
   const [selectedTaskId, setSelectedTaskId] = useState<string | null>(null);
   const router = useRouter();
-
+  const [localTasks, setLocalTasks] = useState(tasks);
+  useEffect(() => {
+    setLocalTasks(tasks);
+  }, [tasks]);
   useEffect(() => {
     if (search) {
       const params = new URLSearchParams(searchParams.toString());
@@ -87,10 +90,10 @@ export default function ListView({ search }: { search: string }) {
 
             {!isLoading &&
               !error &&
-              tasks.map((task) => {
+              localTasks.map((task) => {
                 const status =
-                  STATUS_CONFIG[task.status?.toUpperCase()] ??
-                  STATUS_CONFIG["TO_DO"];
+                  STATUS_CONFIG_STATS[task.status?.toUpperCase()] ??
+                  STATUS_CONFIG_STATS["TO_DO"];
 
                 return (
                   <tr
@@ -163,13 +166,19 @@ export default function ListView({ search }: { search: string }) {
               })}
           </tbody>
         </table>
-
         {selectedTaskId && (
           <TaskDetailModal
             isOpen={!!selectedTaskId}
-            onClose={() => setSelectedTaskId(null)}
             taskId={selectedTaskId}
             projectId={projectId as string}
+            onClose={(savedTask) => {
+              if (savedTask) {
+                setLocalTasks((prev) =>
+                  prev.map((t) => (t.id === savedTask.id ? savedTask : t))
+                );
+              }
+              setSelectedTaskId(null);
+            }}
           />
         )}
 

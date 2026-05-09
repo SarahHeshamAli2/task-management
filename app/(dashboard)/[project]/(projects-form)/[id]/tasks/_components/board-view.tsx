@@ -15,7 +15,9 @@ type TaskProps = {
   task: Task;
 };
 
-export default function BoardView({ ref, task }: TaskProps) {
+export default function BoardView({ ref, task: initialTask }: TaskProps) {
+  const [task, setTask] = useState(initialTask);
+
   const { title, due_date, assignee } = task;
   const [open, setOpen] = useState(false);
 
@@ -56,9 +58,12 @@ export default function BoardView({ ref, task }: TaskProps) {
         <div onClick={(e) => e.stopPropagation()}>
           <TaskDetailModal
             isOpen={open}
-            onClose={() => setOpen(false)}
             taskId={task.id}
             projectId={task.project_id}
+            onClose={(savedTask) => {
+              if (savedTask) setTask(savedTask);
+              setOpen(false);
+            }}
           />
         </div>
       )}

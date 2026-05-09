@@ -12,8 +12,9 @@ type TaskCardProps = {
   task: TasksList[number];
 };
 
-export default function TaskCard({ task }: TaskCardProps) {
+export default function TaskCard({ task: initialTask }: TaskCardProps) {
   const [open, setOpen] = useState(false);
+  const [task, setTask] = useState(initialTask);
 
   return (
     <div
@@ -29,7 +30,6 @@ export default function TaskCard({ task }: TaskCardProps) {
           <p className="text-slate-dark font-medium mb-1">{task.title}</p>
           {task.assignee.name ? (
             <>
-              {" "}
               <Avatar
                 name={task.assignee.name}
                 sizeClassName="w-6 h-6 rounded-full"
@@ -45,20 +45,25 @@ export default function TaskCard({ task }: TaskCardProps) {
           )}
         </div>
       </div>
+
       {task.due_date ? (
         <p>
           Due Date
           <span className="block">{formatDate(task.due_date)}</span>
         </p>
       ) : (
-        <span>No Due Date </span>
+        <span>No Due Date</span>
       )}
+
       {open && (
         <TaskDetailModal
           isOpen={open}
-          onClose={() => setOpen(false)}
           taskId={task.id}
           projectId={task.project_id}
+          onClose={(savedTask) => {
+            if (savedTask) setTask(savedTask);
+            setOpen(false);
+          }}
         />
       )}
     </div>

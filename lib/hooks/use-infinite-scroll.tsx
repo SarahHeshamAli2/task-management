@@ -1,10 +1,10 @@
-import { useRef, useCallback } from "react";
+import { useRef, useCallback, useEffect } from "react";
 
 type UseInfiniteScrollOptions = {
   isLoading: boolean;
   hasMore: boolean;
   onLoadMore: () => void;
-  enabled?: boolean; // e.g. pass `isMobile` to disable on desktop
+  enabled?: boolean;
 };
 
 export function useInfiniteScroll({
@@ -15,23 +15,33 @@ export function useInfiniteScroll({
 }: UseInfiniteScrollOptions) {
   const observer = useRef<IntersectionObserver | null>(null);
 
+  // Stable ref so the observer callback never captures a stale onLoadMore
+  // without needing it in the dependency array
+  const onLoadMoreRef = useRef(onLoadMore);
+  useEffect(() => {
+    onLoadMoreRef.current = onLoadMore;
+  }, [onLoadMore]);
+
+  // Disconnect on unmount
+  useEffect(() => {
+    return () => observer.current?.disconnect();
+  }, []);
+
   const lastElementRef = useCallback(
     (node: HTMLElement | null) => {
       if (!enabled) return;
-      if (isLoading) return;
 
-      // Disconnect previous observer before attaching a new one
-      if (observer.current) observer.current.disconnect();
+      observer.current?.disconnect();
 
-      observer.current = new IntersectionObserver((entries) => {
-        if (entries[0].isIntersecting && hasMore && !isLoading) {
-          onLoadMore();
-        }
+      if (!node || isLoading || !hasMore) return;
+
+      observer.current = new IntersectionObserver(([entry]) => {
+        if (entry.isIntersecting) onLoadMoreRef.current();
       });
 
-      if (node) observer.current.observe(node);
+      observer.current.observe(node);
     },
-    [enabled, isLoading, hasMore, onLoadMore]
+    [enabled, isLoading, hasMore] // onLoadMore intentionally excluded
   );
 
   return { lastElementRef };

@@ -41,3 +41,15 @@ export const addTaskSchema = z.object({
 
 export type TaskFormValues = z.input<typeof addTaskSchema>;
 export type TaskFormOutput = z.output<typeof addTaskSchema>;
+export const udpateTaskSchema = addTaskSchema
+  .pick({
+    title: true,
+    description: true,
+    assignee_id: true,
+    epic_id: true,
+    status: true,
+    due_date: true,
+  })
+  .partial();
+
+export type UpdateTaskFormValues = z.infer<typeof udpateTaskSchema>;
