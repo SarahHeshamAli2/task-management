@@ -11,7 +11,7 @@ import { loginAction } from "@/lib/actions/auth.actions";
 import { useState } from "react";
 import SubmissionError from "@/components/shared/submission-error";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import MailIcon from "@/components/icons/mail-icon";
 import LockIcon from "@/components/icons/lock-icon";
 import RightArrow from "@/components/icons/right-arrow";
@@ -25,7 +25,7 @@ export default function LoginForm() {
   });
   const router = useRouter();
   const dispatch = useAppDispatch();
-
+  const searchParams = useSearchParams();
   const [errorMsg, setErrorMsg] = useState<string>("");
 
   const onSubmit = async (fields: LoginFormValues) => {
@@ -45,9 +45,10 @@ export default function LoginForm() {
           email: response.user.email,
           department: response.user.user_metadata.department,
           role: response.user.role,
-        }),
+        })
       );
-      router.push("/project");
+      const callbackUrl = searchParams.get("callbackUrl") || "/project";
+      router.replace(callbackUrl);
     }
   };
 
