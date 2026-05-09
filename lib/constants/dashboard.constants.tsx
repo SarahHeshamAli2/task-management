@@ -44,4 +44,10 @@ export const projectTabsList: Tabs[] = [
     href: "edit",
     id: 5,
   },
+  {
+    icon: <StatsIcon />,
+    title: "My Statistics",
+    href: "/my-statistics",
+    id: 6,
+  },
 ];
