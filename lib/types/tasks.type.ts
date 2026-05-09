@@ -2,20 +2,23 @@ export type Task = {
   id: string;
   task_id: string;
   project_id: string;
-  epic_id: string;
+  epic_id: string | null;
   title: string;
   description?: string;
   created_by: string;
   created_at: string;
   status: string;
-  due_date?: string;
+  due_date?: string | null;
   assignee: {
-    name: string;
-    department: string;
+    id: string | null;
+
+    name: string | null;
+    department: string | null;
   };
   epic: {
-    epic_id: string;
-    title: string;
+    id: string | null;
+    epic_id: string | null;
+    title: string | null;
   };
 };
 

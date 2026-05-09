@@ -32,6 +32,8 @@ type HeaderProps = {
   viewOptions?: ViewOption[];
   selectedView?: string;
   onViewChange?: (value: string) => void;
+
+  onClick?: () => void;
 };
 
 export default function Header({
@@ -51,6 +53,7 @@ export default function Header({
   selectedView,
   onViewChange,
   subTitleClassName,
+  onClick,
 }: HeaderProps) {
   const currentView =
     viewOptions?.find((v) => v.value === selectedView) ?? viewOptions?.[0];
@@ -114,6 +117,7 @@ export default function Header({
 
         {buttonText && (
           <Button
+            onClick={onClick}
             iconClassName="me-2"
             leftIcon={leftIcon}
             className={cn("rounded-xs", buttonClassName)}

@@ -17,6 +17,7 @@ import BoardView from "./board-view";
 import { toast } from "sonner";
 import { updateTaskAction } from "@/lib/actions/tasks.actions";
 import { DragStartEvent } from "@dnd-kit/core";
+import { useQueryClient } from "@tanstack/react-query";
 
 const STATUS_DOT_COLORS: Record<string, string> = {
   blocked: "bg-error",
@@ -41,13 +42,7 @@ export default function TaskListBoardView({ search }: { search: string }) {
     >
   >(new Map());
 
-  const [refetchKey, setRefetchKey] = useState(0);
-
-  const sensors = useSensors(
-    useSensor(PointerSensor, {
-      activationConstraint: { distance: 8 }, // prevents accidental drags on click
-    })
-  );
+  const queryClient = useQueryClient();
 
   const handleDragEnd = useCallback(async (event: DragEndEvent) => {
     const { active, over } = event;
@@ -74,9 +69,21 @@ export default function TaskListBoardView({ search }: { search: string }) {
     );
 
     try {
-      await updateTaskAction(newStatus, taskId);
-      setRefetchKey((k) => k + 1);
-    } catch {
+      const result = await updateTaskAction(taskId, { status: newStatus });
+      if (!result.success) {
+        throw new Error(result.error);
+      }
+      await queryClient.invalidateQueries({ queryKey: ["tasks-infinite"] });
+      await queryClient.invalidateQueries({ queryKey: ["tasks"] });
+      
+      // Clear the optimistic move once the query refetch has been triggered
+      // We do it after invalidation so the refetch uses the new data
+      setOptimisticMoves((prev) => {
+        const next = new Map(prev);
+        next.delete(taskId);
+        return next;
+      });
+    } catch (error) {
       // Rollback
       setOptimisticMoves((prev) => {
         const next = new Map(prev);
@@ -85,7 +92,13 @@ export default function TaskListBoardView({ search }: { search: string }) {
       });
       toast.error("Failed to move task. Please try again.");
     }
-  }, []);
+  }, [queryClient]);
+
+  const sensors = useSensors(
+    useSensor(PointerSensor, {
+      activationConstraint: { distance: 8 },
+    })
+  );
 
   return (
     <DndContext
@@ -95,7 +108,7 @@ export default function TaskListBoardView({ search }: { search: string }) {
       }
       onDragEnd={handleDragEnd}
     >
-      <div className="flex gap-8 overflow-x-auto items-stretch mt-6 h-full">
+      <div className="flex gap-8 overflow-x-auto overflow-y-hidden items-stretch mt-6 h-full">
         {STATUS_VALUES.map((status) => {
           const dotColor =
             STATUS_DOT_COLORS[status.value.toLocaleLowerCase()] ??
@@ -109,7 +122,7 @@ export default function TaskListBoardView({ search }: { search: string }) {
               projectId={projectId}
               dotColor={dotColor}
               optimisticMoves={optimisticMoves}
-              refetchKey={refetchKey}
+              setOptimisticMoves={setOptimisticMoves}
             />
           );
         })}

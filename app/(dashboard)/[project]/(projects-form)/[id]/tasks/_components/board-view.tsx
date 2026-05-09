@@ -14,9 +14,24 @@ type TaskProps = {
   ref?: (node: HTMLDivElement | null) => void;
   task: Task;
   isOverlay?: boolean;
+  setOptimisticMoves?: React.Dispatch<
+    React.SetStateAction<
+      Map<
+        string,
+        { taskId: string; task: Task; fromStatus: string; toStatus: string }
+      >
+    >
+  >;
 };
 
-export default function BoardView({ ref, task, isOverlay }: TaskProps) {
+export default function BoardView({
+  ref,
+  task: initialTask,
+  isOverlay,
+  setOptimisticMoves,
+}: TaskProps) {
+  const [savedOverride, setSavedOverride] = useState<Task | null>(null);
+  const task = savedOverride ?? initialTask;
   const { title, due_date, assignee } = task;
   const [open, setOpen] = useState(false);
 
@@ -29,7 +44,7 @@ export default function BoardView({ ref, task, isOverlay }: TaskProps) {
   const { attributes, listeners, setNodeRef, isDragging } = useDraggable({
     id: task.id,
     data: { task },
-    disabled: isOverlay,
+    disabled: isOverlay || open,
   });
 
   // Merge the infinite-scroll ref with dnd-kit's setNodeRef
@@ -99,12 +114,22 @@ export default function BoardView({ ref, task, isOverlay }: TaskProps) {
         </div>
       </div>
       {open && (
-        <div onClick={(e) => e.stopPropagation()}>
+        <div
+          onClick={(e) => e.stopPropagation()}
+          onPointerDown={(e) => e.stopPropagation()}
+          className="cursor-default"
+        >
           <TaskDetailModal
+            key={task.id}
             isOpen={open}
-            onClose={() => setOpen(false)}
             taskId={task.id}
             projectId={task.project_id}
+            initialTask={task}
+            onClose={(savedTask) => {
+              if (savedTask) setSavedOverride(savedTask);
+              setOpen(false);
+            }}
+            setOptimisticMoves={setOptimisticMoves}
           />
         </div>
       )}

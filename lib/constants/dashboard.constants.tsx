@@ -3,6 +3,7 @@ import ProjectEpicIcon from "@/components/icons/project-epic-icon";
 import ProjectMemeberIcon from "@/components/icons/project-member-icon";
 import ProjectTaskIcon from "@/components/icons/project-task-icon";
 import ProjectIcon from "@/components/icons/projects-icon";
+import StatsIcon from "@/components/icons/stats-icon";
 
 type Tabs = {
   icon: React.ReactElement;
@@ -13,6 +14,12 @@ type Tabs = {
 
 export const mainTabsList: Tabs[] = [
   { icon: <ProjectIcon />, title: "Projects", href: "/project", id: 1 },
+  {
+    icon: <StatsIcon />,
+    title: "My Statistics",
+    href: "/my-statistics",
+    id: 2,
+  },
 ];
 
 export const projectTabsList: Tabs[] = [

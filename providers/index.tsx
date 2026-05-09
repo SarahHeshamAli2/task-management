@@ -1,5 +1,6 @@
 import { Toaster } from "sonner";
 import StoreProvider from "./_components/store-provider";
+import ReactQueryProvider from "./_components/react-query-provider";
 
 type ProvidersProps = {
   children: React.ReactNode;
@@ -7,8 +8,10 @@ type ProvidersProps = {
 export default function Providers({ children }: ProvidersProps) {
   return (
     <>
-      <Toaster />
-      <StoreProvider>{children}</StoreProvider>
+      <ReactQueryProvider>
+        <Toaster />
+        <StoreProvider>{children}</StoreProvider>
+      </ReactQueryProvider>
     </>
   );
 }

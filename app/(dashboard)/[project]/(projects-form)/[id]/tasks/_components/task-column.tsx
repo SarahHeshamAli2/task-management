@@ -1,6 +1,6 @@
 import Link from "next/link";
 import useGetTasks from "../hooks/use-get-tasks";
-import { useState, useCallback, useEffect, useMemo } from "react";
+import { useMemo } from "react";
 import PlusIcon from "@/components/icons/plus-icon";
 import BoardView from "./board-view";
 import { ParamValue } from "next/dist/server/request/params";
@@ -11,7 +11,6 @@ import { Task } from "@/lib/types/tasks.type";
 import TaskCardBoardViewSkeleton from "@/components/skeletons/task-board-view.skeleton";
 
 const LIMIT = 10;
-
 type Props = {
   status: { label: string; value: string };
   projectId: string | ParamValue;
@@ -21,7 +20,14 @@ type Props = {
     string,
     { taskId: string; task: Task; fromStatus: string; toStatus: string }
   >;
-  refetchKey: number;
+  setOptimisticMoves?: React.Dispatch<
+    React.SetStateAction<
+      Map<
+        string,
+        { taskId: string; task: Task; fromStatus: string; toStatus: string }
+      >
+    >
+  >;
 };
 
 export default function TaskColumn({
@@ -30,45 +36,36 @@ export default function TaskColumn({
   dotColor,
   search,
   optimisticMoves,
-  refetchKey,
+  setOptimisticMoves,
 }: Props) {
-  const [offset, setOffset] = useState(0);
-  useEffect(() => {
-    setOffset(0);
-  }, [search]);
-
   const {
     tasks: rawTasks,
     total,
     isLoading,
+    isPending,
     error,
     hasMore,
+    isFetchingNextPage,
+    fetchNextPage,
   } = useGetTasks({
     limit: LIMIT,
-    offset,
-    append: true,
+    mode: "infinite",
     params: {
       project_id: `eq.${projectId}`,
       status: `eq.${status.value}`,
       ...(search && { title: `ilike.%${search}%` }),
     },
-    refetchKey: refetchKey,
   });
-
-  const loadMore = useCallback(() => {
-    if (isLoading) return;
-    setOffset((prev) => prev + LIMIT);
-  }, [isLoading]);
 
   const { lastElementRef } = useInfiniteScroll({
-    isLoading,
+    isLoading: isFetchingNextPage ?? false,
     hasMore,
-    onLoadMore: loadMore,
+    onLoadMore: () => fetchNextPage?.(),
   });
 
-  const { setNodeRef, isOver } = useDroppable({ id: status.value });
-
   const tasks = useMemo(() => {
+    const searchLower = search.toLowerCase();
+
     const movedAwayIds = new Set(
       [...optimisticMoves.values()]
         .filter((m) => m.fromStatus === status.value)
@@ -77,13 +74,20 @@ export default function TaskColumn({
 
     const incomingTasks = [...optimisticMoves.values()]
       .filter((m) => m.toStatus === status.value)
+      .filter(
+        (m) => !search || m.task.title.toLowerCase().includes(searchLower)
+      )
       .map((m) => ({ ...m.task, status: m.toStatus }));
 
     return [
       ...rawTasks.filter((t) => !movedAwayIds.has(t.id)),
       ...incomingTasks.filter((t) => !rawTasks.find((r) => r.id === t.id)),
     ];
-  }, [rawTasks, optimisticMoves, status.value]);
+  }, [rawTasks, optimisticMoves, status.value, search]);
+
+  const isInitialLoad = isPending && tasks.length === 0;
+
+  const { setNodeRef, isOver } = useDroppable({ id: status.value });
 
   return (
     <div className="flex-1 min-w-[288px] flex flex-col">
@@ -93,9 +97,10 @@ export default function TaskColumn({
           {status.label}
         </p>
         <span className="text-placeholder text-xs font-medium">
-          {isLoading && offset === 0 ? "…" : total}
+          {isInitialLoad ? "…" : total}
         </span>
       </div>
+
       <Link
         href={`/project/${projectId}/tasks/new?status=${status.value}`}
         className="text-xs font-bold text-secondary/60 uppercase flex items-center gap-2 border-dashed border-slate-light/30 p-4 rounded-lg border-2 mb-3"
@@ -120,8 +125,7 @@ export default function TaskColumn({
           <p className="text-error text-xs text-center py-6">Failed to load</p>
         )}
 
-        {isLoading &&
-          offset === 0 &&
+        {isInitialLoad &&
           Array.from({ length: 3 }).map((_, i) => (
             <TaskCardBoardViewSkeleton key={i} />
           ))}
@@ -133,11 +137,12 @@ export default function TaskColumn({
               key={task.id}
               task={task}
               ref={isLast ? lastElementRef : undefined}
+              setOptimisticMoves={setOptimisticMoves}
             />
           );
         })}
 
-        {isLoading && offset > 0 && (
+        {isFetchingNextPage && (
           <p className="text-placeholder text-xs text-center py-2">
             Loading more…
           </p>

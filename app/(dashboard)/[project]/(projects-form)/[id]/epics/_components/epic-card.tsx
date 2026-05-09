@@ -3,7 +3,7 @@
 import CalendarIcon from "@/components/icons/calendar-icon";
 import Modal from "@/components/shared/modal";
 import { formatDate } from "@/lib/utils/format-date";
-import { Ref, useState } from "react";
+import { Ref, useMemo, useState } from "react";
 import EmptyTask from "./empty-task";
 import CreatedByIcon from "@/components/icons/created-by-icon";
 import { updateEpicAction } from "@/lib/actions/epics.actions";
@@ -70,13 +70,10 @@ export default function EpicCard({
   const [draftTitle, setDraftTitle] = useState(title);
   const [draftDescription, setDraftDescription] = useState(description ?? "");
   const [draftDeadline, setDraftDeadline] = useState<string | null>(deadline);
-  const { tasks, isLoading } = useGetTasks({
-    params: { epic_id: `eq.${epicId}` },
-    enabled: isOpen,
-  });
+  const taskParams = useMemo(() => ({ epic_id: `eq.${epicId}` }), [epicId]);
 
-  const { members } = useGetProjectMembers({
-    id: projectId,
+  const { tasks, isLoading } = useGetTasks({
+    params: taskParams,
     enabled: isOpen,
   });
 
@@ -143,6 +140,7 @@ export default function EpicCard({
     else setDraftDeadline(deadline);
     setIsSavingDeadline(false);
   };
+  const { members } = useGetProjectMembers({ id: projectId });
 
   const handleAssigneeChange = async (selectedId: string) => {
     const nextAssigneeId = selectedId === "unassigned" ? null : selectedId;
@@ -214,7 +212,7 @@ export default function EpicCard({
                   />
                 ) : (
                   <h2
-                    className="text-slate-dark font-medium text-lg cursor-pointer"
+                    className="text-slate-dark font-medium text-lg"
                     onClick={() => {
                       setDraftTitle(title);
                       setIsEditingTitle(true);
