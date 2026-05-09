@@ -78,8 +78,9 @@ export default function BoardView({
       onClick={handleClick}
       {...attributes}
       className={cn(
+        "select-none",
         !isOverlay && "cursor-grab active:cursor-grabbing",
-        !isOverlay && isDragging && "opacity-40" // only dim the source, not the overlay
+        !isOverlay && isDragging && "opacity-40"
       )}
       style={{ touchAction: "none" }}
     >
