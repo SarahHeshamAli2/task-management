@@ -12,7 +12,7 @@ export async function getTasksService(
   Object.entries(params).forEach(([key, value]) => {
     url.searchParams.append(key, String(value));
   });
-
+  console.log("serviceAuth:", options.serviceAuth, "token defined:", !!token);
   url.searchParams.append("order", "created_at.asc");
   console.log("Tasks URL:", url.toString());
 
