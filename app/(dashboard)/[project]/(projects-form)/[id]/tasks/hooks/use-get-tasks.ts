@@ -59,7 +59,7 @@ export default function useGetTasks({
   });
 
   const infinite = useInfiniteQuery<TasksPage, Error>({
-    queryKey: ["tasks-infinite", stableKey, { limit }],
+    queryKey: ["tasks", stableKey, { limit }],
     queryFn: ({ pageParam = 0, signal }) =>
       fetchTasksPage(filterParams, limit, pageParam as number, signal),
     getNextPageParam: (lastPage, allPages) => {

@@ -1,9 +1,12 @@
 import { getToken } from "../utils/manage-token";
 
 export async function getTasksService(
-  params: Record<string, string | number> = {}
+  params: Record<string, string | number> = {},
+  options: { serviceAuth?: boolean } = {}
 ) {
-  const token = await getToken();
+  const token = options.serviceAuth
+    ? process.env.API_SERVICE_ROLE_KEY // bypasses RLS, no user session needed
+    : await getToken();
   const url = new URL(`${process.env.API_URL}/rest/v1/project_tasks`);
 
   Object.entries(params).forEach(([key, value]) => {

@@ -16,10 +16,7 @@ type Props = {
   projectId: string | ParamValue;
   dotColor: string;
   search: string;
-  optimisticMoves: Map<
-    string,
-    { taskId: string; task: Task; fromStatus: string; toStatus: string }
-  >;
+
   setOptimisticMoves?: React.Dispatch<
     React.SetStateAction<
       Map<
@@ -35,11 +32,9 @@ export default function TaskColumn({
   projectId,
   dotColor,
   search,
-  optimisticMoves,
-  setOptimisticMoves,
 }: Props) {
   const {
-    tasks: rawTasks,
+    tasks,
     total,
     isLoading,
     isPending,
@@ -62,28 +57,6 @@ export default function TaskColumn({
     hasMore,
     onLoadMore: () => fetchNextPage?.(),
   });
-
-  const tasks = useMemo(() => {
-    const searchLower = search.toLowerCase();
-
-    const movedAwayIds = new Set(
-      [...optimisticMoves.values()]
-        .filter((m) => m.fromStatus === status.value)
-        .map((m) => m.taskId)
-    );
-
-    const incomingTasks = [...optimisticMoves.values()]
-      .filter((m) => m.toStatus === status.value)
-      .filter(
-        (m) => !search || m.task.title.toLowerCase().includes(searchLower)
-      )
-      .map((m) => ({ ...m.task, status: m.toStatus }));
-
-    return [
-      ...rawTasks.filter((t) => !movedAwayIds.has(t.id)),
-      ...incomingTasks.filter((t) => !rawTasks.find((r) => r.id === t.id)),
-    ];
-  }, [rawTasks, optimisticMoves, status.value, search]);
 
   const isInitialLoad = isPending && tasks.length === 0;
 
@@ -137,7 +110,6 @@ export default function TaskColumn({
               key={task.id}
               task={task}
               ref={isLast ? lastElementRef : undefined}
-              setOptimisticMoves={setOptimisticMoves}
             />
           );
         })}

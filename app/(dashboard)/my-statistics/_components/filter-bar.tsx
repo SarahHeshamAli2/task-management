@@ -13,6 +13,7 @@ import TasksPieChart from "./pie-chart";
 import { addDays, getSunday, toDateString } from "@/lib/utils/format-date";
 import { useRouter, useSearchParams } from "next/navigation";
 import StatisticsSkeleton from "./stats-skeleton";
+import { customToast } from "@/app/customToas";
 
 export default function FilterBar() {
   const router = useRouter();
@@ -68,6 +69,17 @@ export default function FilterBar() {
   return (
     <>
       <div className="md:bg-surface-low py-6 md:px-4">
+        <button
+          onClick={() =>
+            customToast(
+              "success",
+              "Booking Confirmed",
+              "Your appointment has been saved."
+            )
+          }
+        >
+          Book
+        </button>
         <div className="flex flex-col gap-3 sm:hidden">
           <select
             className="w-full p-2 outline-0 md:bg-white bg-surface-low rounded-lg"

@@ -14,21 +14,12 @@ type TaskProps = {
   ref?: (node: HTMLDivElement | null) => void;
   task: Task;
   isOverlay?: boolean;
-  setOptimisticMoves?: React.Dispatch<
-    React.SetStateAction<
-      Map<
-        string,
-        { taskId: string; task: Task; fromStatus: string; toStatus: string }
-      >
-    >
-  >;
 };
 
 export default function BoardView({
   ref,
   task: initialTask,
   isOverlay,
-  setOptimisticMoves,
 }: TaskProps) {
   const [savedOverride, setSavedOverride] = useState<Task | null>(null);
   const task = savedOverride ?? initialTask;
@@ -129,7 +120,6 @@ export default function BoardView({
               if (savedTask) setSavedOverride(savedTask);
               setOpen(false);
             }}
-            setOptimisticMoves={setOptimisticMoves}
           />
         </div>
       )}

@@ -33,12 +33,6 @@ export default function TaskListBoardView({ search }: { search: string }) {
   const projectId = params.id;
 
   const [draggedTask, setDraggedTask] = useState<Task | null>(null);
-  const [optimisticMoves, setOptimisticMoves] = useState<
-    Map<
-      string,
-      { taskId: string; task: Task; fromStatus: string; toStatus: string }
-    >
-  >(new Map());
 
   const queryClient = useQueryClient();
 
@@ -46,7 +40,6 @@ export default function TaskListBoardView({ search }: { search: string }) {
     async (event: DragEndEvent) => {
       const { active, over } = event;
       setDraggedTask(null);
-
       if (!over) return;
 
       const taskId = active.id as string;
@@ -55,39 +48,28 @@ export default function TaskListBoardView({ search }: { search: string }) {
 
       if (!task || task.status === newStatus) return;
 
-      const oldStatus = task.status;
+      const previousData = queryClient.getQueriesData({ queryKey: ["tasks"] });
 
-      // Optimistic update: tell columns to treat this task as moved
-      setOptimisticMoves((prev) =>
-        new Map(prev).set(taskId, {
-          taskId,
-          task,
-          fromStatus: oldStatus,
-          toStatus: newStatus,
-        })
-      );
+      queryClient.setQueriesData({ queryKey: ["tasks"] }, (old: any) => {
+        if (!old?.pages) return old;
+        return {
+          ...old,
+          pages: old.pages.map((page: any) => ({
+            ...page,
+            data: page.data.map((t: Task) =>
+              t.id === taskId ? { ...t, status: newStatus } : t
+            ),
+          })),
+        };
+      });
 
       try {
         const result = await updateTaskAction(taskId, { status: newStatus });
-        if (!result.success) {
-          throw new Error(result.error);
-        }
-        await queryClient.invalidateQueries({ queryKey: ["tasks-infinite"] });
-        await queryClient.invalidateQueries({ queryKey: ["tasks"] });
-
-        // Clear the optimistic move once the query refetch has been triggered
-        // We do it after invalidation so the refetch uses the new data
-        setOptimisticMoves((prev) => {
-          const next = new Map(prev);
-          next.delete(taskId);
-          return next;
-        });
-      } catch (error) {
-        // Rollback
-        setOptimisticMoves((prev) => {
-          const next = new Map(prev);
-          next.delete(taskId);
-          return next;
+        if (!result.success) throw new Error(result.error);
+        queryClient.invalidateQueries({ queryKey: ["tasks"] });
+      } catch {
+        previousData.forEach(([queryKey, data]) => {
+          queryClient.setQueryData(queryKey, data);
         });
         toast.error("Failed to move task. Please try again.");
       }
@@ -127,8 +109,6 @@ export default function TaskListBoardView({ search }: { search: string }) {
               status={status}
               projectId={projectId}
               dotColor={dotColor}
-              optimisticMoves={optimisticMoves}
-              setOptimisticMoves={setOptimisticMoves}
             />
           );
         })}
